@@ -48,8 +48,10 @@
                     
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors duration-300">Masuk</button>
                     
-                    <div class="mt-6 text-center text-white">
-                        <p>Belum memiliki akun? <a href="#" class="text-blue-200 hover:underline">Daftar Sekarang!</a></p>
+                    <div class="border-t border-white/30 my-8 pt-4">
+                        <div class="text-center text-white mb-6">
+                            <p>Belum memiliki akun? <a href="{{ route('registrasi') }}" class="text-blue-200 hover:underline">Daftar sekarang!</a></p>
+                        </div>
                     </div>
                 </form>
             </div>

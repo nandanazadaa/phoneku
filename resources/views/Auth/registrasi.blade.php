@@ -12,7 +12,7 @@
         <div class="hidden md:flex md:w-1/2 bg-white flex-col p-10 pt-6 pb-0 relative">
             <div class="mb-10">
                 <div class="flex items-center">
-                    <img src="img/logo.png" alt="PhoneKu Logo" class="h-16" />
+                    <img src="img/logo.png" alt="PhoneKu Logo" class="w-100" />
                 </div>
             </div>
             
@@ -42,19 +42,17 @@
                         </div>
                     </div>
                     
-                    <div class="mb-6">
+                    <div class="mb-12">
                         <label for="otp" class="block text-white mb-2">Kode OTP</label>
                         <input type="text" id="otp" class="w-full px-4 py-3 rounded-lg" placeholder="Masukkan kode OTP anda">
                     </div>
-                    
-                    <div class="border-t border-white/30 my-8 pt-4">
-                        <div class="text-center text-white mb-6">
-                            <p>Sudah memiliki akun? <a href="#" class="text-blue-200 hover:underline">Kembali login!</a></p>
-                        </div>
-                    </div>
-                    
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors duration-300">Daftar</button>
                 </form>
+                <div class="border-t border-white/30 my-8 pt-4">
+                    <div class="text-center text-white mb-6">
+                        <p>Sudah memiliki akun? <a href="{{ route('login') }}" class="text-blue-200 hover:underline">Kembali login!</a></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
