@@ -9,49 +9,55 @@
 <body class="font-sans">
     <div class="flex min-h-screen">
         <!-- Left Side with Logo and Image -->
-        <div class="hidden md:flex md:w-1/2 bg-white flex-col p-10 pt-6 pb-0 relative">
-            <div class="mb-10">
-                <div class="flex items-center">
-                    <img src="img/logo.png" alt="PhoneKu Logo" class="w-100" />
-                </div>
+        <div class="hidden md:flex md:w-1/2 bg-white flex-col p-8 relative overflow-hidden">
+            <div class="mb-8">
+                <img src="img/logo.png" alt="PhoneKu Logo" class="w-40">
             </div>
             
-            <div class="flex-1 flex items-end justify-center">
-                <div class="w-full">
-                    <img src="img/model.png" alt="Person with phone" class="w-full h-auto object-contain max-h-[90vh]" />
-                </div>
+            <div class="flex-1 flex items-center justify-center">
+                <img src="img/model.png" alt="Person with phone" 
+                     class="w-full h-auto object-contain absolute inset-25 mx-auto my-8"
+                     style="max-height: 80vh">
             </div>
         </div>
-        
+
         <!-- Right Side with Login Form -->
-        <div class="w-full md:w-1/2 bg-gradient-to-b from-blue-500 to-cyan-400 p-8 flex items-center justify-center rounded-l-3xl">
-            <div class="w-full max-w-md">
+        <div class="w-full md:w-[45%] ml-auto bg-gradient-to-b from-blue-500 to-cyan-400 flex items-center justify-center p-8">
+            <div class="w-full max-w-md transform transition-all">
                 <div class="text-center text-white mb-8">
-                    <h2 class="text-4xl font-bold mb-2">Masuk</h2>
-                    <p class="text-sm">Silahkan masuk jika sudah memiliki akun!</p>
+                    <h2 class="text-3xl font-bold mb-2">Masuk</h2>
+                    <p class="text-sm opacity-90">Silahkan masuk jika sudah memiliki akun!</p>
                 </div>
-                
-                <form>
-                    <div class="mb-6">
-                        <label for="email" class="block text-white mb-2">Email</label>
-                        <input type="email" id="email" class="w-full px-4 py-3 rounded-lg" placeholder="Masukkan email anda">
+
+                <form class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-white mb-2 text-sm">Email</label>
+                        <input type="email" id="email" 
+                               class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                               placeholder="Masukkan email anda">
                     </div>
-                    
-                    <div class="mb-2">
-                        <label for="password" class="block text-white mb-2">Password</label>
-                        <input type="password" id="password" class="w-full px-4 py-3 rounded-lg" placeholder="Masukkan password anda">
+
+                    <div>
+                        <label for="password" class="block text-white mb-2 text-sm">Password</label>
+                        <input type="password" id="password" 
+                               class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                               placeholder="Masukkan password anda">
                     </div>
-                    
-                    <div class="text-right mb-8">
-                        <a href="#" class="text-white hover:underline text-sm">Lupa Password?</a>
+
+                    <div class="text-right">
+                        <a href="#" class="text-white hover:underline text-xs">Lupa Password?</a>
                     </div>
-                    
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors duration-300">Masuk</button>
-                    
-                    <div class="border-t border-white/30 my-8 pt-4">
-                        <div class="text-center text-white mb-6">
-                            <p>Belum memiliki akun? <a href="{{ route('registrasi') }}" class="text-blue-200 hover:underline">Daftar sekarang!</a></p>
-                        </div>
+
+                    <button type="submit" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors duration-300">
+                        Masuk
+                    </button>
+
+                    <div class="border-t border-white/20 pt-4 mt-6">
+                        <p class="text-center text-white text-sm">
+                            Belum memiliki akun? 
+                            <a href="{{ route('registrasi') }}" class="text-blue-200 hover:underline">Daftar sekarang!</a>
+                        </p>
                     </div>
                 </form>
             </div>
