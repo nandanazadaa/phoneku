@@ -10,14 +10,14 @@
     <div class="flex min-h-screen">
         <!-- Left Side with Logo and Image -->
         <div class="hidden md:flex md:w-1/2 bg-white flex-col p-8 relative overflow-hidden">
-            <div class="mb-8">
-                <img src="img/logo.png" alt="PhoneKu Logo" class="w-40">
+            <div class="mb-4">
+                <img src="img/logo2.png" alt="PhoneKu Logo" class="w-60">
             </div>
             
             <div class="flex-1 flex items-center justify-center">
                 <img src="img/model.png" alt="Person with phone" 
                      class="w-full h-auto object-contain absolute inset-25 mx-auto my-8"
-                     style="max-height: 80vh">
+                     style="max-height: 90vh">
             </div>
         </div>
 
