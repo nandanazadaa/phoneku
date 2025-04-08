@@ -14,3 +14,6 @@ Route::get('/registrasi', function () {
     return view('Auth/registrasi');
 })->name('registrasi');
 
+Route::get('/aboutus', function () {
+    return view('home.aboutus');
+});
