@@ -19,3 +19,17 @@ Route::get('/registrasi', function () {
     return view('Auth/registrasi');
 })->name('registrasi');
 
+Route::get('/aboutus', function () {
+    return view('home.aboutus');
+});
+
+Route::get('/product', function () {
+    return view('Home/product');
+})->name('product');
+
+Route::get('/kontak', function () {
+    return view('home.kontak');
+});
+
+
+
