@@ -3,21 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhoneKu - tentang</title>
+    <title>PhoneKu - kontak</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .section {
-            padding: 60px 0;
-        }
-        .section img {
-            max-width: 100%;
-            border-radius: 10px;
-        }
-    </style>
 </head>
 <body class="font-sans bg-white">
-    <!-- Header -->
+    <!-- Header Section with Wave -->
     <div class="relative">
         <!-- Blue Background with Wave -->
         <div class="bg-blue-500 pb-52 bg-gradient-to-br from-blue-500 to-cyan-400"> <!-- Increased padding from pb-48 to pb-72 -->
@@ -41,10 +32,10 @@
                     <!-- Navigation Links -->
                     <div class="hidden md:flex space-x-8">
                         <a href="#" class="text-gray-600 hover:text-blue-500">Beranda</a>
-                        <a href="#" class="text-blue-500 font-medium border-b-2 border-blue-500 pb-1">Tentang</a>
+                        <a href="#" class="text-gray-600 hover:text-blue-500">Tentang</a>
                         <a href="#" class="text-gray-600 hover:text-blue-500">Tim</a>
                         <a href="#" class="text-gray-600 hover:text-blue-500">Belanja</a>
-                        <a href="#" class="text-gray-600 hover:text-blue-500">Kontak</a>
+                        <a href="#" class="text-blue-500 font-medium border-b-2 border-blue-500 pb-1">Kontak</a>
                     </div>
                     
                     <!-- Icons -->
@@ -56,63 +47,109 @@
                             <i class="fas fa-user-circle text-xl"></i>
                         </a>
                     </div>
-                </div> 
-
-            <!-- tentang kami -->
-            <div class="mt-40 flex justify-center"> 
-                <ul class="flex space-x-4 space-y-3 " >
-                    <li><h1 class="text-[48px] text-white font-bold text-center">Tentang Kami</h1></li>
-                    <li><img src="/img/aboutusicon.png" alt="icon tentang kami" ></li>
-                </ul>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- About us Content -->
+            <!-- kontak -->
+            <div class="mt-40 flex justify-center"> 
+                    <h1 class="text-[48px] text-white font-bold text-center">Kontak</h1>
+            </div>
+    </div>
+    
+    <!-- kontak Content -->
     <div class="bg-white">
-        <div class="container mx-auto px-32  py-16 ">
-            <div>
-                <!-- about -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-1/2">
-                    <div class="px-24 text-justify">
-                        <h6 class="text-[20px]">Pusat Belanja</h6>
-                        <h2 class="font-bold text-[28px]">Handphone & Aksesoris</h2>
-                        <p>Selamat datang di Phoneku! Kami adalah sebuah toko yang berfokus pada penjualan handphone (HP) dan berbagai aksesoris berkualitas tinggi.</p>
-                        <p class="mt-4">Berdiri sejak 2025, kami telah melayani ribuan pelanggan yang mencari produk berkualitas dan pelayanan terbaik.</p>
+        <div class="container mx-auto px-32 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">  
+                <div class="flex flex-row">
+                    <!-- isi kanan -->
+                    <div>
+                        <!-- sambutan -->
+                        <div>
+                            <h6 class="text-[20px]">Hubungi Kami</h6>
+                            <h2 class="font-bold text-[48px] leading-tight">Kami selalu senang membantu Anda dan menjawab pertanyaan Anda</h2>
+                            <p class="mt-8 ">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>          
+                        </div>
+
+                        <!-- detail kontak -->
+                        <div class="flex flex-row gap-20 mt-16">
+                            <div>
+                                <h6 class="font-bold text-[18px] mb-3 ">Pusat Panggilan</h6>
+                                <a href="#" class="text-gray-600 hover:text-blue-500">
+                                    <p >08-311-328-913-799</p>
+                                </a>
+
+                                <h6 class="font-bold text-[18px] mb-3 mt-16">Email</h6>
+                                <a href="#" class="text-gray-600 hover:text-blue-500">
+                                    <p >phonku@mail.com</p>
+                                </a>
+                            </div>
+                            <div>
+                                <h6 class="font-bold text-[18px] mb-3">Lokasi Kami</h6>
+                                <a href="https://maps.app.goo.gl/TDxKt3buY2CinubM7" class="text-gray-600 hover:text-blue-500">
+                                    <p>Indonesia</p>
+                                </a>
+
+
+                                <h6 class="font-bold text-[18px] mb-3 mt-16">Media Sosial</h6>
+                                <div class="flex flex-row space-x-4">
+                                    <a href="#" class="text-gray-600 hover:text-blue-500">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <a href="#" class="text-gray-600 hover:text-blue-500">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <a href="#" class="text-gray-600 hover:text-blue-500">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                    <a href="#" class="text-gray-600 hover:text-blue-500">
+                                        <i class="fab fa-tiktok"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- isi kiri -->
+                <div class=" bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl px-24 py-16 flex flex-col text-white">
+                    <div>
+                        <h4 class="font-semibold text-[24px]">Hubungi Kami</h4>
+                        <p class="mt-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do  sit amet, consectetur </p>
                     </div>
                     <div>
-                    <img src="/img/aboutus.png" alt="Team Working" class="w-[70%]">
+                        <input type="text" placeholder="Nama Lengkap" class="w-full mt-12 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
                     </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-1/2 mt-4" >
-                    <!-- visi -->
-                    <div class="px-24 text-justify">
-                        <h5 class="mt-5 font-bold text-[20px]">Visi Kami</h5>
-                        <p class="text-justify text-[16px]">Menjadi penyedia gadget dan aksesoris terbaik yang dapat memenuhi kebutuhan digital Anda dengan memberikan produk berkualitas, harga kompetitif, dan layanan pelanggan yang memuaskan.</p>
+                    <div>
+                        <input type="email" placeholder="Email" class="w-full mt-2 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
                     </div>
-                    
-                    <!-- misi -->
-                    <div class="pr-48">
-                        <h5 class="mt-5 font-bold text-[20px]">Misi Kami</h5>
-                        <ul class="text-justify list-disc list-outside text-[16px] pl-5">
-                                <li>Menyediakan berbagai pilihan HP terbaru dari berbagai merek terkenal dengan kualitas terjamin.</li>
-                                <li>Menawarkan berbagai aksesoris pendukung yang akan meningkatkan pengalaman penggunaan handphone Anda.</li>
-                                <li>Memberikan layanan purna jual yang responsif dan membantu pelanggan dalam setiap kebutuhan mereka.</li>
-                                <li>Memberikan harga yang terjangkau dengan kualitas terbaik.</li>
-                        </ul>
+                    <div>
+                        <input type="text" placeholder="Subjek" class="w-full mt-2 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Pesan" class="w-full mt-2 pb-20 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
+                    </div>
+
+                    <div>
+                        <button class="bg-white text-gray-800 font-medium mt-8 px-6 py-3 rounded-full hover:bg-gray-100">
+                            > Kirim Pesan
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <!-- google map -->
+            <div class="mt-16 w-full h-96 rounded-xl overflow-hidden shadow-lg">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3953.2818402780804!2d110.4090461!3d-7.7599048999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a599bd3bdc4ef%3A0x6f1714b0c4544586!2sUniversitas%20Amikom%20Yogyakarta!5e0!3m2!1sid!2sid!4v1744115106486!5m2!1sid!2sid" 
+                    class="w-full h-full border-0"
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+
         </div>
-        <!-- Sejarah -->
-        <div class="bg-gray-100 pt-2 pb-9 w-full mt-10">
-            <div class="px-64 pr-96">
-                <h4 class="mt-4 font-bold text-[28px]">Sejarah</h4>
-                <p class="text-[16px]">2025 - Sekarang</p>
-                <p class="text-[20px] mt-5 leading-tight">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-            </div>
-        </div> 
+    </div>
     </div>
 
         <!-- Newsletter Section -->
