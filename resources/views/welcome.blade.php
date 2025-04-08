@@ -7,11 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Banner slider styles */
         .slide-container {
             overflow: hidden;
             width: 100%;
             border-radius: 0.75rem;
-            max-height: 500px; 
+            max-height: 500px; /* Increased from original */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -51,6 +52,7 @@
             z-index: 1;
         }
         
+        /* Fix for maintaining image aspect ratio while avoiding cropping */
         .banner-image {
             width: 100%;
             height: auto;
@@ -58,10 +60,12 @@
             object-fit: contain; /* Changed from cover to contain */
         }
         
+        /* Increase the height of the container to accommodate the banner */
         .banner-container {
             padding-bottom: 2rem; /* Added padding at bottom */
         }
         
+        /* Fix for the wave position */
         .wave-svg {
             display: block;
             width: 100%;
@@ -185,7 +189,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -199,7 +203,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -213,7 +217,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -227,7 +231,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -242,7 +246,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -256,7 +260,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -270,7 +274,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -284,7 +288,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -316,7 +320,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -330,7 +334,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -344,7 +348,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -358,7 +362,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -373,7 +377,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -387,7 +391,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -401,7 +405,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -415,7 +419,7 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
                     </div>
                 </div>
             </div>
@@ -588,3 +592,4 @@
     </script>
 </body>
 </html>
+
