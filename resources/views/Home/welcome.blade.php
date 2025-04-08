@@ -98,16 +98,26 @@
                     
                     <!-- Navigation Links -->
                     <div class="hidden md:flex space-x-8">
+<<<<<<< HEAD
+                        <a href="/" class="text-blue-500 font-medium border-b-2 border-blue-500 pb-1">Beranda</a>
+                        <a href="#" class="text-gray-600 hover:text-blue-500">Tentang</a>
+                        <a href="/tim" class="text-gray-600 hover:text-blue-500">Tim</a>
+=======
                         <a href="#" class="text-blue-500 font-medium border-b-2 border-blue-500 pb-1">Beranda</a>
                         <a href="#" class="text-gray-600 hover:text-blue-500">Tentang</a>
                         <a href="#" class="text-gray-600 hover:text-blue-500">Tim</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                         <a href="#" class="text-gray-600 hover:text-blue-500">Belanja</a>
                         <a href="#" class="text-gray-600 hover:text-blue-500">Kontak</a>
                     </div>
                     
                     <!-- Icons -->
                     <div class="flex items-center space-x-4">
+<<<<<<< HEAD
+                        <a href="/cart" class="text-blue-500">
+=======
                         <a href="#" class="text-blue-500">
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                             <i class="fas fa-shopping-cart text-xl"></i>
                         </a>
                         <a href="#" class="text-blue-500">
@@ -189,7 +199,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -203,7 +217,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -217,7 +235,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -231,7 +253,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -246,7 +272,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -260,7 +290,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -274,7 +308,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -288,7 +326,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -320,7 +362,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -334,7 +380,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -348,7 +398,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -362,7 +416,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -377,7 +435,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -391,7 +453,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -405,7 +471,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -419,7 +489,11 @@
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
                         <button class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center">+Keranjang</button>
+<<<<<<< HEAD
+                        <button class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center">Beli</button>
+=======
                         <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d
                     </div>
                 </div>
             </div>
@@ -591,4 +665,9 @@
         });
     </script>
 </body>
+<<<<<<< HEAD
 </html>
+
+=======
+</html>
+>>>>>>> c36e32cc7bfc5f8356de4a194ae65c94e0b62d0d

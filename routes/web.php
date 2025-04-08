@@ -5,7 +5,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('Home/welcome');
 });
-
+Route::get('/tim', function () {
+    return view('Home/tim');
+});
+Route::get('/cart', function () {
+    return view('Home/cart');
+});
 Route::get('/login', function () {
     return view('Auth/login');
 })->name('login');
