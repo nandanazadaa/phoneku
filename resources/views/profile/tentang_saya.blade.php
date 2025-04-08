@@ -209,7 +209,7 @@
                                 <!-- Submit Button -->
                                 <div class="text-right pt-4">
                                     <button type="submit" class="bg-blue-500 text-white px-8 py-3 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1">
-                                        Simpan Perubahan
+                                        Simpan
                                     </button>
                                 </div>
                             </div>
