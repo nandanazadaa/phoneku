@@ -14,3 +14,7 @@ Route::get('/registrasi', function () {
     return view('Auth/registrasi');
 })->name('registrasi');
 
+Route::get('/product', function () {
+    return view('Home/product');
+})->name('product');
+
