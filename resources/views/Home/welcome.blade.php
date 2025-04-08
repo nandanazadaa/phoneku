@@ -7,12 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Banner slider styles */
         .slide-container {
             overflow: hidden;
             width: 100%;
             border-radius: 0.75rem;
-            max-height: 500px; /* Increased from original */
+            max-height: 500px; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -52,7 +51,6 @@
             z-index: 1;
         }
         
-        /* Fix for maintaining image aspect ratio while avoiding cropping */
         .banner-image {
             width: 100%;
             height: auto;
@@ -60,12 +58,10 @@
             object-fit: contain; /* Changed from cover to contain */
         }
         
-        /* Increase the height of the container to accommodate the banner */
         .banner-container {
             padding-bottom: 2rem; /* Added padding at bottom */
         }
         
-        /* Fix for the wave position */
         .wave-svg {
             display: block;
             width: 100%;
