@@ -1,136 +1,41 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhoneKu - iPhone 11 258GB</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .color-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: inline-block;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .color-circle.selected {
-            border: 2px solid #0ea5e9;
-            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
-        }
-        
-        .quantity-input {
-            width: 60px;
-            text-align: center;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-        }
-        
-        .quantity-btn {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #e5e7eb;
-            background-color: white;
-            border-radius: 9999px;
-            cursor: pointer;
-        }
-        
-        .star-rating .star {
-            color: #0ea5e9;
-            font-size: 24px;
-        }
-        
-        .star-rating .star.empty {
-            color: #94a3b8;
-        }
-        
-        .tab-button {
-            position: relative;
-        }
-        
-        .tab-button::after {
-            content: "";
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: #0ea5e9;
-        }
-        
-        .check-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        
-        .check-icon {
-            background-color: #22c55e;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 8px;
-            flex-shrink: 0;
-            margin-top: 3px;
-        }
-    </style>
-</head>
-<body class="font-sans bg-white">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-500 to-blue-400">
-        <div class="container mx-auto px-4 py-4">
-            <div class="bg-white rounded-xl p-4 flex items-center justify-between">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <img src="img/logo2.png" alt="PhoneKu Logo" class="h-10">
-                </div>
-                
-                <!-- Navigation Links -->
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-gray-600 hover:text-blue-500">Beranda</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-500">Tentang</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-500">Tim</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-500 border-b-2 border-blue-500 pb-1">Belanja</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-500">Kontak</a>
-                </div>
-                
-                <!-- Icons -->
-                <div class="flex items-center space-x-4">
-                    <a href="#" class="text-blue-500">
-                        <i class="fas fa-shopping-cart text-xl"></i>
-                    </a>
-                    <a href="#" class="text-blue-500">
-                        <i class="fas fa-user-circle text-xl"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+@extends('layouts.app')
+
+@section('title', 'Product - PhoneKu')
+
+@section('content')    
 
     <!-- Product Detail Section -->
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <!-- Product Image Section -->
             <div class="flex flex-col">
-                <!-- Main Image -->
-                <div class="bg-gray-50 rounded-xl p-8 flex items-center justify-center mb-4">
-                    <img src="img/iphone11.png" alt="iPhone 11 Red" class="w-full max-w-md h-auto object-contain" style="min-height: 350px;">
+                <!-- Main Image Container with Arrows -->
+                <div class="bg-gray-50 rounded-xl p-8 flex items-center justify-center mb-4 relative">
+                    <!-- Red iPhone (default) -->
+                    <img src="img/iphone-merah.png" alt="iPhone 11 Red" data-color="red" class="product-image active w-full max-w-md h-auto object-contain" style="min-height: 350px;">
+                    
+                    <!-- Pink iPhone -->
+                    <img src="img/iphone-hitam.png" alt="iPhone 11 Pink" data-color="pink" class="product-image w-full max-w-md h-auto object-contain" style="min-height: 350px;">
+                    
+                    <!-- White iPhone -->
+                    <img src="img/iphone-ungu.png" alt="iPhone 11 White" data-color="white" class="product-image w-full max-w-md h-auto object-contain" style="min-height: 350px;">
+                    
+                    <!-- Left Arrow -->
+                    <div class="slider-arrow left">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    
+                    <!-- Right Arrow -->
+                    <div class="slider-arrow right">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 </div>
                 
                 <!-- Image Navigation Dots -->
                 <div class="flex justify-center space-x-2">
-                    <button class="w-8 h-3 rounded-full bg-blue-500"></button>
-                    <button class="w-3 h-3 rounded-full bg-gray-300"></button>
-                    <button class="w-3 h-3 rounded-full bg-gray-300"></button>
+                    <button class="w-8 h-3 rounded-full bg-blue-500 dot active" data-index="0"></button>
+                    <button class="w-3 h-3 rounded-full bg-gray-300 dot" data-index="1"></button>
+                    <button class="w-3 h-3 rounded-full bg-gray-300 dot" data-index="2"></button>
                 </div>
             </div>
             
@@ -152,9 +57,9 @@
                 <div class="mb-8">
                     <h3 class="text-gray-800 font-semibold mb-3">WARNA</h3>
                     <div class="flex space-x-4">
-                        <div class="color-circle selected" style="background-color: #FF3B30;"></div>
-                        <div class="color-circle" style="background-color: #FFA698;"></div>
-                        <div class="color-circle" style="background-color: #FFFFFF; border: 1px solid #E5E7EB;"></div>
+                        <div class="color-circle selected" style="background-color: #FF3B30;" data-color="red"></div>
+                        <div class="color-circle" style="background-color: #000000;" data-color="pink"></div>
+                        <div class="color-circle" style="background-color: #efa1ff; border: 1px solid #E5E7EB;" data-color="white"></div>
                     </div>
                 </div>
                 
@@ -234,105 +139,206 @@
         </div>
     </div>
 
-<!-- Newsletter Section -->
-<div class="bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl mx-4 my-12">
-    <div class="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between">
-        <div class="text-white mb-6 md:mb-0">
-            <h2 class="text-2xl font-bold uppercase">Tetap Update</h2>
-            <h2 class="text-2xl font-bold uppercase">Dengan Penawaran Kami</h2>
-        </div>
-        
-        <div class="w-full md:w-auto">
-            <div class="flex flex-col md:flex-row gap-4">
-                <input type="email" placeholder="Masukkan Email Anda" class="px-4 py-3 rounded-full focus:outline-none">
-                <button class="bg-white text-gray-800 font-medium px-6 py-3 rounded-full hover:bg-gray-100">
-                    Mulai Berlangganan Buletin
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Footer -->
-<footer class="bg-white pt-10 pb-6">
-    <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Company Info -->
-            <div>
-                <div class="flex items-center mb-4">
-                    <img src="img/logo2.png" alt="PhoneKu Logo" class="h-10">
-                </div>
-                <p class="text-gray-600 mb-4">
-                    We have clothes that suits your style and which you're proud to wear. From women to men.
-                </p>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-blue-500">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-blue-500">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-blue-500">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-blue-500">
-                        <i class="fab fa-tiktok"></i>
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Company Links -->
-            <div>
-                <h3 class="text-lg font-bold mb-4 uppercase">Perusahaan</h3>
-                <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Tentang</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Fitur</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Tim Kami</a></li>
-                </ul>
-            </div>
-            
-            <!-- Product Links -->
-            <div>
-                <h3 class="text-lg font-bold mb-4 uppercase">Produk & Layanan</h3>
-                <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Customer Support</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Delivery Details</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Terms & Conditions</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Privacy Policy</a></li>
-                </ul>
-            </div>
-            
-            <!-- Payment Methods -->
-            <div>
-                <h3 class="text-lg font-bold mb-4 uppercase">Pembayaran</h3>
-                <div class="flex flex-wrap gap-2">
-                    <img src="/api/placeholder/60/40" alt="Dana" class="h-8">
-                    <img src="/api/placeholder/60/40" alt="OVO" class="h-8">
-                    <img src="/api/placeholder/60/40" alt="GoPay" class="h-8">
-                    <img src="/api/placeholder/60/40" alt="BRI" class="h-8">
-                </div>
-            </div>
-        </div>
-        
-        <div class="border-t border-gray-200 mt-10 pt-6">
-            <p class="text-gray-500 text-sm text-center">
-                Phone.Ku © 2025-Present All Rights Reserved
-            </p>
-        </div>
-    </div>
-</footer>
+@endsection
  
     
+@section('styles')
+<style>
+    .color-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-block;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .color-circle.selected {
+        border: 2px solid #0ea5e9;
+        box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+    }
+    
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+    }
+    
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e5e7eb;
+        background-color: white;
+        border-radius: 9999px;
+        cursor: pointer;
+    }
+    
+    .star-rating .star {
+        color: #0ea5e9;
+        font-size: 24px;
+    }
+    
+    .star-rating .star.empty {
+        color: #94a3b8;
+    }
+    
+    .tab-button {
+        position: relative;
+    }
+    
+    .tab-button::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #0ea5e9;
+    }
+    
+    .check-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+    
+    .check-icon {
+        background-color: #22c55e;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+        flex-shrink: 0;
+        margin-top: 3px;
+    }
+
+    /* New styles for image slider arrows */
+    .slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.7);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #0ea5e9;
+        font-size: 18px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .slider-arrow:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #0369a1;
+    }
+
+    .slider-arrow.left {
+        left: 10px;
+    }
+
+    .slider-arrow.right {
+        right: 10px;
+    }
+
+    .product-image {
+        display: none;
+    }
+
+    .product-image.active {
+        display: block;
+    }
+</style>
+@endsection
+
+@section('scripts')
     <script>
         // Color selection
         const colorCircles = document.querySelectorAll('.color-circle');
+        const productImages = document.querySelectorAll('.product-image');
+        const dots = document.querySelectorAll('.dot');
+        let currentImageIndex = 0;
+        
+        // Function to update image slider based on index
+        function updateImageSlider(index) {
+            // Hide all images
+            productImages.forEach(img => {
+                img.classList.remove('active');
+            });
+            
+            // Show selected image
+            productImages[index].classList.add('active');
+            
+            // Update dots
+            dots.forEach(dot => {
+                dot.classList.remove('active', 'bg-blue-500', 'w-8');
+                dot.classList.add('bg-gray-300', 'w-3');
+            });
+            
+            dots[index].classList.add('active', 'bg-blue-500', 'w-8');
+            dots[index].classList.remove('bg-gray-300', 'w-3');
+            
+            // Update current index
+            currentImageIndex = index;
+        }
+        
+        // Color circle click event
         colorCircles.forEach(circle => {
             circle.addEventListener('click', () => {
                 // Remove selected class from all circles
                 colorCircles.forEach(c => c.classList.remove('selected'));
+                
                 // Add selected class to clicked circle
                 circle.classList.add('selected');
+                
+                // Get color
+                const selectedColor = circle.getAttribute('data-color');
+                
+                // Find image with matching color
+                productImages.forEach((img, index) => {
+                    if (img.getAttribute('data-color') === selectedColor) {
+                        updateImageSlider(index);
+                    }
+                });
             });
+        });
+        
+        // Dot click event
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                updateImageSlider(index);
+            });
+        });
+        
+        // Arrow click events
+        const leftArrow = document.querySelector('.slider-arrow.left');
+        const rightArrow = document.querySelector('.slider-arrow.right');
+        
+        leftArrow.addEventListener('click', () => {
+            let newIndex = currentImageIndex - 1;
+            if (newIndex < 0) {
+                newIndex = productImages.length - 1;
+            }
+            updateImageSlider(newIndex);
+        });
+        
+        rightArrow.addEventListener('click', () => {
+            let newIndex = currentImageIndex + 1;
+            if (newIndex >= productImages.length) {
+                newIndex = 0;
+            }
+            updateImageSlider(newIndex);
         });
         
         // Quantity buttons
@@ -352,5 +358,4 @@
             quantityInput.value = value + 1;
         });
     </script>
-</body>
-</html>
+@endsection
