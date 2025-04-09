@@ -358,7 +358,6 @@
                 slide.style.display = 'none';
                 slide.classList.remove('active');
             });
-            
             // Remove active class from all dots
             dots.forEach(dot => {
                 dot.classList.remove('active');
@@ -407,3 +406,4 @@
     });
 </script>
 @endsection
+

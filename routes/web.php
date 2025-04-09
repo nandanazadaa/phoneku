@@ -32,6 +32,9 @@ Route::get('/product', function () {
 Route::get('/kontak', function () {
     return view('home.kontak');
 });
+Route::get('/profile', function () {
+    return view('profile/tentang_saya');
+})->name('profile');
 
 
 
