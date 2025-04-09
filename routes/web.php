@@ -30,14 +30,15 @@ Route::get('/product', function () {
 })->name('product');
 
 
-Route::get('/profilepage', function () {
-    return view('Home/profilepage');
-});
+Route::get('/profilebayar', function () {
+    return view('profile/atur_pembayaran');
+})->name('profilebayar');
 
 
 Route::get('/kontak', function () {
     return view('home.kontak');
 });
+
 Route::get('/profile', function () {
     return view('profile/tentang_saya');
 })->name('profile');
