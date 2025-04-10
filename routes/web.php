@@ -29,10 +29,14 @@ Route::get('/product', function () {
     return view('Home/product');
 })->name('product');
 
+Route::get('/checkout', function () {
+    return view('Home/checkout');
+})->name('checkout');
 
 Route::get('/profilebayar', function () {
     return view('profile/atur_pembayaran');
 })->name('profilebayar');
+
 
 
 Route::get('/kontak', function () {

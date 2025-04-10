@@ -7,27 +7,6 @@
 <div class="relative">
     <!-- Blue Background -->
     <div class="bg-gradient-to-r from-blue-500 to-blue-400 pb-80 md:pb-96">
-        <!-- Top Navigation -->
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <!-- Logo -->
-            <div class="flex items-center">
-                <img src="img/logo.png" alt="PhoneKu Logo" class="h-8">
-                <span class="ml-2 text-white font-bold text-lg">PhoneKu</span>
-            </div>
-            <!-- Navigation Links -->
-            <div class="flex space-x-6 text-white font-medium">
-                <a href="#" class="hover:text-blue-200 transition-colors">Beranda</a>
-                <a href="#" class="hover:text-blue-200 transition-colors">Tentang</a>
-                <a href="#" class="hover:text-blue-200 transition-colors">Tim</a>
-                <a href="#" class="hover:text-blue-200 transition-colors">Belanja</a>
-                <a href="#" class="hover:text-blue-200 transition-colors">Kontak</a>
-            </div>
-            <!-- Icons -->
-            <div class="flex space-x-4">
-                <a href="#" class="text-white"><i class="fas fa-shopping-cart"></i></a>
-                <a href="#" class="text-white"><i class="fas fa-user-circle"></i></a>
-            </div>
-        </div>
     </div>
 
     <!-- Wave SVG -->
@@ -43,44 +22,77 @@
     </div>
 </div>
 
-<!-- Main Content - Logout Confirmation -->
-<div class="container mx-auto px-4 py-12 relative z-10">
-    <div class="bg-white rounded-2xl shadow-lg p-8 flex flex-col md:flex-row items-center justify-between">
-        <!-- Left Side: Profile Icon and "Belum Masuk" -->
-        <div class="flex flex-col items-center md:items-start mb-6 md:mb-0">
-            <div class="w-24 h-24 rounded-full bg-blue-200 flex items-center justify-center mb-4">
-                <i class="fas fa-user text-4xl text-blue-500"></i>
+<!-- Main Content - User Profile -->
+<div class="container mx-auto px-4 py-16 relative z-10">
+    <div class="flex flex-wrap">
+        <!-- Left Sidebar -->
+        <div class="w-full md:w-1/4 mb-6 md:mb-0 md:pr-4">
+            <!-- User Profile Card -->
+            <div class="bg-white rounded-xl p-4 shadow-md mb-6">
+                <div class="flex flex-col items-center mb-4">
+                    <div class="w-32 h-32 rounded-full bg-blue-200 flex items-center justify-center mb-4 border-2 border-gray-200 shadow-sm">
+                        <i class="fas fa-user text-5xl text-blue-500"></i>
+                    </div>
+                    <h2 class="text-xl font-bold mb-1 text-gray-800">Belum Masuk</h2>
+                </div>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700">Belum Masuk</h3>
+
+            <!-- Navigation Menu -->
+            <div class="bg-white rounded-xl p-4 shadow-md space-y-2">
+                <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-sm transition-all duration-200">
+                    <i class="fas fa-user w-5 mr-3 text-center"></i>
+                    <span>Tentang Saya</span>
+                </a>
+                <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-sm transition-all duration-200">
+                    <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
+                    <span>Pengaturan Pembayaran</span>
+                </a>
+                <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-sm transition-all duration-200">
+                    <i class="fas fa-history w-5 mr-3 text-center"></i>
+                    <span>Riwayat Pembelian</span>
+                </a>
+                <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-sm transition-all duration-200">
+                    <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
+                    <span>Keamanan & Privasi</span>
+                </a>
+                <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-sm transition-all duration-200">
+                    <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>
+                    <span>Keluar Akun</span>
+                </a>
+            </div>
         </div>
 
-        <!-- Right Side: Text and Buttons -->
-        <div class="text-center md:text-left">
-            <h2 class="text-2xl font-bold text-gray-700 mb-2">Anda Belum Masuk</h2>
-            <p class="text-gray-500 mb-6">Silahkan Masuk ke Akun Terlebih Dahulu atau Daftar!</p>
-            <div class="flex justify-center md:justify-start space-x-4">
-                <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-8 rounded-full text-sm font-medium transition-all duration-200">Masuk</a>
-                <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-8 rounded-full text-sm font-medium transition-all duration-200">Daftar</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Newsletter Section -->
-<div class="container mx-auto px-4 py-12">
-    <div class="bg-gradient-to-r from-blue-500 to-blue-400 rounded-xl p-8 text-white shadow-lg">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-            <div class="mb-6 md:mb-0">
-                <h3 class="text-2xl font-bold mb-2">TETAP UPDATE DENGAN PENAWARAN KAMI</h3>
-            </div>
-            <div class="w-full md:w-1/2">
-                <div class="flex flex-col space-y-3">
-                    <input type="email" placeholder="Masukkan Email Anda" class="px-4 py-3 rounded-full text-gray-700 w-full focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-200">
-                    <button class="bg-white text-blue-500 hover:bg-gray-100 font-medium py-3 rounded-full transition-all duration-200">Mulai Berlangganan Buletin</button>
+        <!-- Right Content -->
+        <div class="w-full md:w-3/4 md:pl-4">
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center md:text-left">
+                <h2 class="text-2xl font-bold text-gray-700 mb-2">Anda Belum Masuk</h2>
+                <p class="text-gray-500 mb-6">Silahkan Masuk ke Akun Terlebih Dahulu atau Daftar!</p>
+                <div class="flex justify-center md:justify-start space-x-4">
+                    <a href="#" class="bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white py-2 px-8 rounded-full text-sm font-medium transition-all duration-200">Masuk</a>
+                    <a href="#" class="bg-blue-500 hover:bg-blue-600 hover:shadow-md text-white py-2 px-8 rounded-full text-sm font-medium transition-all duration-200">Daftar</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
+@endsection
+
+@section('styles')
+<style>
+    /* Fade-in Animation for Banner */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    /* Smooth Scroll Behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
 @endsection
