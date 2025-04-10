@@ -43,6 +43,10 @@ Route::get('/profile', function () {
     return view('profile/tentang_saya');
 })->name('profile');
 
+Route::get('/allproduct', function () {
+    return view('home.allproduct');
+});
+
 
 
 
