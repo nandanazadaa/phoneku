@@ -63,9 +63,9 @@ Route::get('/logout', function () {
     return view('profile/logout');
 })->name('logout');
 
-Route::get('/profilekeluar', function () {
+Route::get('/profileout', function () {
     return view('profile/setelah_keluar');
-})->name('profilekeluar');
+})->name('profileout');
 
 Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');

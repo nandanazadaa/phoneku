@@ -77,7 +77,7 @@
 
         <!-- Right Content -->
         <section class="w-full md:w-3/4">
-            <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="bg-white rounded-2xl shadow-lg p-11 text-center">
                 <h3 class="text-2xl font-semibold text-gray-700 mb-2">Keluar Akun</h3>
                 <p class="text-gray-500 mb-6">Anda Yakin Ingin Keluar Dari Akun Anda?</p>
                 <div class="flex justify-start space-x-4">
@@ -93,3 +93,16 @@
 
 
 @endsection
+
+<div class="bg-white rounded-2xl shadow-lg p-11 text-center">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-2">Anda Belum Masuk</h3>
+                    <p class="text-gray-500 mb-6">Silahkan Masuk ke Akun Terlebih Dahulu atau Daftar!</p>
+
+                    <div class="flex justify-center gap-6">
+                        <a href="/login" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">
+                            Masuk
+                        </a>
+                        <a href="/register" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">
+                            Daftar
+                        </a>
+                    </div>

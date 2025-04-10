@@ -66,18 +66,15 @@
                         <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
                         <span>Pengaturan Pembayaran</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="#" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
                         <span>Keamanan & Privasi</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                        <i class="fas fa-bell w-5 mr-3 text-center"></i>
-                        <span>Notifikasi</span>
-                    </a>
+                    
                     <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>
                         <span>Keluar Akun</span>
