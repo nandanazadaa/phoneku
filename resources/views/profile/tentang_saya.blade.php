@@ -18,15 +18,14 @@
                 </path>
             </svg>
         </div>
-
-        <!-- Banner handphone - dengan containment yang lebih ketat -->
-        <div class="absolute top-[20%] left-1/2 transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
-            <div class="relative w-full h-full" style="overflow: hidden;">
-                <img src="img/banner4.png" alt="Smartphones"
-                    class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
-            </div>
-        </div>
+        <!--banner hp-->
+        <div class="absolute top-[15%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
+    <div class="relative w-full h-full" style="overflow: hidden;">
+        <img src="img/banner4.png" alt="Smartphones"
+            class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
     </div>
+</div>
+
 
     <!-- Main Content - User Profile -->
     <!-- Menggunakan margin-top yang lebih kecil -->
@@ -64,11 +63,7 @@
                         <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
                         <span>Keamanan & Privasi</span>
                     </a>
-                    <a href="#"
-                        class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                        <i class="fas fa-bell w-5 mr-3 text-center"></i>
-                        <span>Notifikasi</span>
-                    </a>
+            
                     <a href="#"
                         class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>

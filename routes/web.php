@@ -49,6 +49,15 @@ Route::get('/allproduct', function () {
     return view('home.allproduct');
 });
 
+Route::get('/riwayatpembelian', function () {
+    return view('profile/riwayat_pembelian');
+})->name('riwayatpembelian');
 
+Route::get('/logout', function () {
+    return view('profile/logout');
+})->name('logout');
 
+Route::get('/setelah_logout', function () {
+    return view('profile/setelah_logout');
+})->name('setelah_logout');
 
