@@ -1,3 +1,8 @@
+@extends('layouts.app')
+
+@section('title', 'Tim - PhoneKu')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -172,17 +177,35 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             cursor: pointer;
         }
+        .payment-methods-expanded {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .payment-methods-expanded.show {
+            max-height: 1000px;
+        }
+
+        /* Voucher styling */
+        .voucher-item {
+            border: 1px dashed #d1d5db;
+            transition: all 0.2s ease;
+        }
+
+        .voucher-item:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .voucher-radio:checked + .voucher-item {
+            border: 1px dashed #3b82f6;
+            background-color: #f0f9ff;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Header/Logo -->
-    <header class="container mx-auto py-4 px-4 mt-5">
-        <div class="flex items-center">
-            <a href="#" class="flex items-center">
-                <img src="img/logo2.png" alt="PhoneKu Logo">
-            </a>
-        </div>
-    </header>
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 pb-12">
@@ -308,19 +331,93 @@
                                 </div>
                             </label>
                         </div>
+
+                        <div class="payment-methods-expanded" id="expandedPaymentMethods">
+                            <!-- BCA Option -->
+                            <div class="mb-4">
+                                <label class="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50" for="payment-bca">
+                                    <div class="flex items-center">
+                                        <div class="radio-circle mr-3">
+                                            <input type="radio" name="payment" id="payment-bca" class="sr-only payment-radio">
+                                            <span class="radio-custom"></span>
+                                        </div>
+                                        <img src="img/bca.png" alt="BCA" class="h-6 mr-3">
+                                        <div>
+                                            <div>Bank BCA</div>
+                                            <div class="text-xs text-gray-500">Bayar melalui transfer BCA</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- BNI Option -->
+                            <div class="mb-4">
+                                <label class="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50" for="payment-bni">
+                                    <div class="flex items-center">
+                                        <div class="radio-circle mr-3">
+                                            <input type="radio" name="payment" id="payment-bni" class="sr-only payment-radio">
+                                            <span class="radio-custom"></span>
+                                        </div>
+                                        <img src="img/bni.png" alt="BNI" class="h-6 mr-3">
+                                        <div>
+                                            <div>Bank BNI</div>
+                                            <div class="text-xs text-gray-500">Bayar melalui transfer BNI</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- OVO Option -->
+                            <div class="mb-4">
+                                <label class="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50" for="payment-ovo">
+                                    <div class="flex items-center">
+                                        <div class="radio-circle mr-3">
+                                            <input type="radio" name="payment" id="payment-ovo" class="sr-only payment-radio">
+                                            <span class="radio-custom"></span>
+                                        </div>
+                                        <img src="img/ovo.png" alt="OVO" class="h-6 mr-3">
+                                        <div>
+                                            <div>OVO</div>
+                                            <div class="text-xs text-gray-500">Bayar dengan saldo OVO</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- Dana Option -->
+                            <div class="mb-4">
+                                <label class="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50" for="payment-dana">
+                                    <div class="flex items-center">
+                                        <div class="radio-circle mr-3">
+                                            <input type="radio" name="payment" id="payment-dana" class="sr-only payment-radio">
+                                            <span class="radio-custom"></span>
+                                        </div>
+                                        <img src="img/dana.png" alt="DANA" class="h-6 mr-3">
+                                        <div>
+                                            <div>DANA</div>
+                                            <div class="text-xs text-gray-500">Bayar dengan saldo DANA</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                         
                         <div class="text-center">
-                            <a href="#" class="text-blue-500 text-sm">Lihat Semua</a>
+                            <button id="togglePaymentMethods" class="text-blue-500 text-sm flex items-center justify-center w-full">
+                                <span id="togglePaymentText">Lihat Semua</span>
+                                <i class="fas fa-chevron-down ml-1" id="togglePaymentIcon"></i>
+                            </button>
                         </div>
-                    </div>
                     
                     <!-- Voucher Section -->
                     <div class="p-4 border-b border-gray-200">
-                        <button class="flex items-center justify-between w-full bg-gray-100 p-3 rounded-lg">
-                            <span class="font-medium">Pilih Voucher Anda</span>
+                        <button id="openVoucherModal" class="flex items-center justify-between w-full bg-gray-100 p-3 rounded-lg">
+                            <span class="font-medium" id="selectedVoucherText">Pilih Voucher Anda</span>
                             <i class="fas fa-chevron-right text-gray-400"></i>
                         </button>
                     </div>
+
+
 
                     <!-- Order Summary -->
                     <div class="p-4">
@@ -339,6 +436,12 @@
                                 <span>Rp 1.000</span>
                             </div>
                         </div>
+
+                        <div class="flex justify-between text-blue-500" id="voucher-discount-row" style="display: none;">
+                            <span>Diskon Voucher</span>
+                            <span id="voucher-discount-amount">- Rp 0</span>
+                        </div>
+
                         <div class="flex justify-between font-medium text-lg pt-4 border-t border-gray-200">
                             <span>Total Tagihan</span>
                             <span id="total-amount">Rp 6.020.999</span>
@@ -356,6 +459,115 @@
             </div>
         </div>
     </main>
+
+<!-- Voucher Modal -->
+<div id="voucherModal" class="modal">
+    <div class="modal-content modal-fade" style="max-width: 500px">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h2 class="text-xl font-medium">Pilih Voucher</h2>
+            <button id="closeVoucherModal" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="p-4">
+            <div class="mb-4">
+                <div class="relative">
+                    <input type="text" placeholder="Masukkan kode voucher" class="w-full pl-10 pr-4 py-3 border rounded-lg">
+                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2 px-2 py-1 bg-blue-500 text-white rounded">
+                        Pakai
+                    </button>
+                </div>
+            </div>
+            
+            <div class="my-4">
+                <h3 class="font-medium">Voucher PhoneKu</h3>
+                
+                <!-- Voucher List -->
+                <div class="space-y-3 mt-3">
+                    <!-- Voucher 1 -->
+                    <div>
+                        <input type="radio" name="voucher" id="voucher-1" class="sr-only voucher-radio">
+                        <label for="voucher-1" class="block">
+                            <div class="voucher-item rounded-lg p-3">
+                                <div class="flex items-start">
+                                    <div class="text-blue-500 text-xl mr-3 mt-1">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="font-medium">Diskon Rp 100.000</div>
+                                        <div class="text-sm text-gray-600">Min. belanja Rp 1.000.000</div>
+                                        <div class="mt-1 text-xs text-gray-500">Berlaku hingga 30 April 2025</div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center voucher-radio-circle">
+                                            <div class="h-3 w-3 bg-blue-500 rounded-full hidden voucher-radio-dot"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Voucher 2 -->
+                    <div>
+                        <input type="radio" name="voucher" id="voucher-2" class="sr-only voucher-radio">
+                        <label for="voucher-2" class="block">
+                            <div class="voucher-item rounded-lg p-3">
+                                <div class="flex items-start">
+                                    <div class="text-blue-500 text-xl mr-3 mt-1">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="font-medium">Gratis Ongkir</div>
+                                        <div class="text-sm text-gray-600">Min. belanja Rp 500.000</div>
+                                        <div class="mt-1 text-xs text-gray-500">Berlaku hingga 20 April 2025</div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center voucher-radio-circle">
+                                            <div class="h-3 w-3 bg-blue-500 rounded-full hidden voucher-radio-dot"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Voucher 3 -->
+                    <div>
+                        <input type="radio" name="voucher" id="voucher-3" class="sr-only voucher-radio">
+                        <label for="voucher-3" class="block">
+                            <div class="voucher-item rounded-lg p-3">
+                                <div class="flex items-start">
+                                    <div class="text-blue-500 text-xl mr-3 mt-1">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="font-medium">Diskon 10%</div>
+                                        <div class="text-sm text-gray-600">Maks. diskon Rp 200.000</div>
+                                        <div class="mt-1 text-xs text-gray-500">Berlaku hingga 15 April 2025</div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center voucher-radio-circle">
+                                            <div class="h-3 w-3 bg-blue-500 rounded-full hidden voucher-radio-dot"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="applyVoucherBtn" class="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition mt-4">
+                Pakai Voucher
+            </button>
+        </div>
+    </div>
+</div>
 
     <!-- Address Modal -->
     <div id="addressModal" class="modal">
@@ -1311,5 +1523,143 @@ document.addEventListener('DOMContentLoaded', function() {
     setupCharacterCounters();
 });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle payment methods
+        const togglePaymentMethods = document.getElementById('togglePaymentMethods');
+        const expandedPaymentMethods = document.getElementById('expandedPaymentMethods');
+        const togglePaymentText = document.getElementById('togglePaymentText');
+        const togglePaymentIcon = document.getElementById('togglePaymentIcon');
+        
+        togglePaymentMethods.addEventListener('click', function() {
+            // Toggle expanded methods visibility
+            expandedPaymentMethods.classList.toggle('show');
+            
+            // Update text and icon
+            if (expandedPaymentMethods.classList.contains('show')) {
+                togglePaymentText.textContent = 'Lihat Lebih Sedikit';
+                togglePaymentIcon.classList.remove('fa-chevron-down');
+                togglePaymentIcon.classList.add('fa-chevron-up');
+            } else {
+                togglePaymentText.textContent = 'Lihat Semua';
+                togglePaymentIcon.classList.remove('fa-chevron-up');
+                togglePaymentIcon.classList.add('fa-chevron-down');
+            }
+        });
+        
+        // Voucher modal functionality
+        const voucherModal = document.getElementById('voucherModal');
+        const openVoucherModal = document.getElementById('openVoucherModal');
+        const closeVoucherModal = document.getElementById('closeVoucherModal');
+        const applyVoucherBtn = document.getElementById('applyVoucherBtn');
+        const voucherRadios = document.querySelectorAll('.voucher-radio');
+        const selectedVoucherText = document.getElementById('selectedVoucherText');
+        const voucherDiscountRow = document.getElementById('voucher-discount-row');
+        const voucherDiscountAmount = document.getElementById('voucher-discount-amount');
+        
+        // Open voucher modal
+        openVoucherModal.addEventListener('click', function() {
+            voucherModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Close voucher modal
+        closeVoucherModal.addEventListener('click', function() {
+            voucherModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+        
+        // Apply selected voucher
+        applyVoucherBtn.addEventListener('click', function() {
+            const selectedVoucher = document.querySelector('.voucher-radio:checked');
+            
+            if (selectedVoucher) {
+                // Get the selected voucher info
+                const voucherLabel = selectedVoucher.closest('label');
+                const voucherTitle = voucherLabel.querySelector('.font-medium').textContent;
+                
+                // Update the voucher button text
+                selectedVoucherText.textContent = voucherTitle;
+                
+                // Show discount in the summary
+                voucherDiscountRow.style.display = 'flex';
+                
+                // Calculate discount based on the selected voucher
+                let discount = 0;
+                
+                if (voucherTitle === 'Diskon Rp 100.000') {
+                    discount = 100000;
+                    voucherDiscountAmount.textContent = '- Rp 100.000';
+                } else if (voucherTitle === 'Gratis Ongkir') {
+                    discount = 20000; // Shipping cost
+                    voucherDiscountAmount.textContent = '- Rp 20.000';
+                } else if (voucherTitle === 'Diskon 10%') {
+                    // 10% of product price with max 200,000
+                    const productPrice = 5999999;
+                    discount = Math.min(productPrice * 0.1, 200000);
+                    voucherDiscountAmount.textContent = '- Rp ' + formatPrice(discount);
+                }
+                
+                // Update total amount
+                updateTotalWithDiscount(discount);
+                
+                // Close modal
+                voucherModal.style.display = 'none';
+                document.body.style.overflow = '';
+            } else {
+                alert('Silakan pilih voucher terlebih dahulu');
+            }
+        });
+        
+        // Style for selected voucher
+        voucherRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Update all radio indicators
+                document.querySelectorAll('.voucher-radio-dot').forEach(dot => {
+                    dot.classList.add('hidden');
+                });
+                document.querySelectorAll('.voucher-radio-circle').forEach(circle => {
+                    circle.classList.remove('border-blue-500');
+                    circle.classList.add('border-gray-300');
+                });
+                
+                // Show the selected indicator
+                if (this.checked) {
+                    const radioCircle = this.closest('label').querySelector('.voucher-radio-circle');
+                    const radioDot = this.closest('label').querySelector('.voucher-radio-dot');
+                    
+                    radioCircle.classList.remove('border-gray-300');
+                    radioCircle.classList.add('border-blue-500');
+                    radioDot.classList.remove('hidden');
+                }
+            });
+        });
+        
+        // Update total amount with discount
+        function updateTotalWithDiscount(discount) {
+            const quantity = parseInt(document.querySelector('.quantity-input').value);
+            const unitPrice = 5999999;
+            const shippingCost = 20000;
+            const serviceFee = 1000;
+            
+            const totalProductPrice = unitPrice * quantity;
+            let totalAmount = totalProductPrice + shippingCost + serviceFee;
+            
+            // Apply discount
+            totalAmount -= discount;
+            
+            // Update the displayed total
+            document.getElementById('total-amount').textContent = 'Rp ' + formatPrice(totalAmount);
+        }
+        
+        // Format price with dots as thousand separators
+        function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+    });
+    </script>
+
+@endsection
 </body>
 </html>
