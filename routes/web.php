@@ -29,10 +29,14 @@ Route::get('/product', function () {
     return view('Home/product');
 })->name('product');
 
+Route::get('/checkout', function () {
+    return view('Home/checkout');
+})->name('checkout');
 
 Route::get('/profilebayar', function () {
     return view('profile/atur_pembayaran');
 })->name('profilebayar');
+
 
 
 Route::get('/kontak', function () {
@@ -47,12 +51,23 @@ Route::get('/allproduct', function () {
     return view('home.allproduct');
 });
 
+Route::get('/riwayatpembelian', function () {
+    return view('profile/riwayat_pembelian');
+})->name('riwayatpembelian');
+
 Route::get('/profilekeamanan', function () {
     return view('profile/keamanan_privasi');
 })->name('profilekeamanan');
+
+Route::get('/logout', function () {
+    return view('profile/logout');
+})->name('logout');
 
 Route::get('/profilekeluar', function () {
     return view('profile/setelah_keluar');
 })->name('profilekeluar');
 
+Route::get('/setelah_logout', function () {
+    return view('profile/setelah_logout');
+})->name('setelah_logout');
 
