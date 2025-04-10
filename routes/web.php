@@ -37,8 +37,6 @@ Route::get('/profilebayar', function () {
     return view('profile/atur_pembayaran');
 })->name('profilebayar');
 
-
-
 Route::get('/kontak', function () {
     return view('home.kontak');
 });

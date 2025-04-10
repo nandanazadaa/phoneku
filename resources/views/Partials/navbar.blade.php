@@ -1,11 +1,7 @@
 <!-- Top Navigation -->
 <div class="bg-blue-500 relative">
     <div class="container mx-auto px-4 py-2 flex justify-end">
-        <div class="text-white flex space-x-4">
-            <a href="{{ route('login') }}" class="hover:underline">Masuk</a>
-            <span class="text-white">|</span>
-            <a href="{{ route('registrasi') }}" class="hover:underline">Daftar</a>
-        </div>
+        
     </div>
     
     <!-- Main Navigation -->
