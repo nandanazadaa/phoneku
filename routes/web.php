@@ -47,6 +47,12 @@ Route::get('/allproduct', function () {
     return view('home.allproduct');
 });
 
+Route::get('/profilekeamanan', function () {
+    return view('profile/keamanan_privasi');
+})->name('profilekeamanan');
 
+Route::get('/profilekeluar', function () {
+    return view('profile/setelah_keluar');
+})->name('profilekeluar');
 
 
