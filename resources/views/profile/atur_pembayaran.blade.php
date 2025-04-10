@@ -1,7 +1,7 @@
 
 @extends('layouts.app')
 
-@section('title', 'Beranda - PhoneKu Handphone & Aksesoris')
+@section('title', 'Pengaturan Pembayaran - PhoneKu')
 
 @section('content')
 <!-- Header Section with Wave -->

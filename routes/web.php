@@ -43,6 +43,14 @@ Route::get('/profile', function () {
     return view('profile/tentang_saya');
 })->name('profile');
 
+Route::get('/riwayatpembelian', function () {
+    return view('profile/riwayat_pembelian');
+})->name('riwayatpembelian');
+
+Route::get('/logout', function () {
+    return view('profile/logout');
+})->name('logout');
+
 
 
 
