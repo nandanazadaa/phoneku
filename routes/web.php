@@ -33,12 +33,24 @@ Route::get('/checkout', function () {
     return view('Home/checkout');
 })->name('checkout');
 
+Route::get('/profilebayar', function () {
+    return view('profile/atur_pembayaran');
+})->name('profilebayar');
+
+
+
 Route::get('/kontak', function () {
     return view('home.kontak');
 });
+
 Route::get('/profile', function () {
     return view('profile/tentang_saya');
 })->name('profile');
+
+Route::get('/allproduct', function () {
+    return view('home.allproduct');
+});
+
 
 
 
