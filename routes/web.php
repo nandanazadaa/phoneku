@@ -49,7 +49,7 @@ Route::get('/profile', function () {
 })->name('profile');
 
 Route::get('/allproduct', function () {
-    return view('home.allproduct');
+    return view('Home/allproduct');
 })->name('allproduct');
 
 Route::get('/riwayatpembelian', function () {

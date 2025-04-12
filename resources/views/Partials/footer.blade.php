@@ -49,9 +49,9 @@
             <div>
                 <h3 class="text-lg font-bold mb-4 uppercase">Perusahaan</h3>
                 <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Tentang</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Fitur</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Tim Kami</a></li>
+                    <li><a href="{{ route('aboutus') }}" class="text-gray-600 hover:text-blue-500">Tentang</a></li>
+                    <li><a href="{{ route('kontak') }}" class="text-gray-600 hover:text-blue-500">Kontak</a></li>
+                    <li><a href="{{ route('tim') }}" class="text-gray-600 hover:text-blue-500">Tim Kami</a></li>
                 </ul>
             </div>
             
@@ -69,11 +69,22 @@
             <!-- Payment Methods -->
             <div>
                 <h3 class="text-lg font-bold mb-4 uppercase">Pembayaran</h3>
-                <div class="flex flex-wrap gap-2">
-                    <img src="/api/placeholder/60/40" alt="Dana" class="h-8">
-                    <img src="/api/placeholder/60/40" alt="OVO" class="h-8">
-                    <img src="/api/placeholder/60/40" alt="GoPay" class="h-8">
-                    <img src="/api/placeholder/60/40" alt="BRI" class="h-8">
+                <div class="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-xl shadow p-4 flex items-center justify-center">
+                        <img src="/img/dana.png" alt="Dana" class="h-8 object-contain">
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow p-4 flex items-center justify-center">
+                        <img src="/img/shopeepay.png" alt="ShopeePay" class="h-8 object-contain">
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow p-4 flex items-center justify-center">
+                        <img src="/img/paypal.png" alt="Paypal" class="h-8 object-contain">
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow p-4 flex items-center justify-center">
+                        <img src="/img/bri.png" alt="BRI" class="h-8 object-contain">
+                    </div>
                 </div>
             </div>
         </div>
