@@ -58,24 +58,24 @@
 
                 <!-- Navigation Menu -->
                 <div class="bg-white rounded-xl p-4 shadow-md space-y-2">
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl shadow-sm">
+                    <a href="{{ route('profileout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl shadow-sm">
                         <i class="fas fa-user w-5 mr-3 text-center"></i>
                         <span>Tentang Saya</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profileout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
                         <span>Pengaturan Pembayaran</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profileout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profileout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
                         <span>Keamanan & Privasi</span>
                     </a>
             
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profileout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>
                         <span>Keluar Akun</span>
                     </a>
@@ -93,7 +93,7 @@
                         <a href="/login" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">
                             Masuk
                         </a>
-                        <a href="/register" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">
+                        <a href="/registrasi" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">
                             Daftar
                         </a>
                     </div>

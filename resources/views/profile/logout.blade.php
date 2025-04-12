@@ -52,23 +52,23 @@
 
                 <!-- Navigation Menu -->
                 <div class="bg-white rounded-xl p-4 shadow-md space-y-2">
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profile') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-user w-5 mr-3 text-center"></i>
                         <span>Tentang Saya</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profilebayar') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
                         <span>Pengaturan Pembayaran</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('riwayatpembelian') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profilekeamanan') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
                         <span>Keamanan & Privasi</span>
                     </a>
-                    <a href="#" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl shadow-sm">
+                    <a href="{{ route('logout') }}" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl shadow-sm">
                         <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>
                         <span>Keluar Akun</span>
                     </a>
@@ -81,8 +81,9 @@
                     <h3 class="text-2xl font-semibold text-gray-700 mb-2">Keluar Akun</h3>
                     <p class="text-gray-500 mb-6">Anda Yakin Ingin Keluar Dari Akun Anda?</p>
                     <div class="flex justify-center">
-                        <form class="inline">
-                            <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-12 rounded-full text-sm font-medium transition-all duration-200">
+                        <form class="inline" action="{{ route('profileout') }}" method="GET">
+                            <button 
+                                class="bg-red-500 hover:bg-red-600 text-white py-2 px-12 rounded-full text-sm font-medium transition-all duration-200">
                                 Keluar
                             </button>
                         </form>

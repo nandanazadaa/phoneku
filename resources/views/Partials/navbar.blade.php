@@ -36,15 +36,15 @@
                 </a>
             </div>
             
-
-            
             <!-- Icons -->
             <div class="flex items-center space-x-4">
-                <a href="{{ route('checkout') }}" class="text-blue-500">
-                    <i class="fas fa-shopping-cart text-xl"></i>
+                <a href="{{ route('cart') }}" 
+                    class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    <i class="fas fa-shopping-cart text-xl text-blue-500"></i>
                 </a>
-                <a href="{{ route('profile') }}" class="text-blue-500">
-                    <i class="fas fa-user-circle text-xl"></i>
+                <a href="{{ route('profile') }}" 
+                    class="{{ Route::currentRouteName() == 'profile' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    <i class="fas fa-user-circle text-xl text-blue-500"></i>
                 </a>
             </div>
         </div>
