@@ -56,9 +56,17 @@ Route::get('/riwayatpembelian', function () {
     return view('profile/riwayat_pembelian');
 })->name('riwayatpembelian');
 
+Route::get('/profilekeamanan', function () {
+    return view('profile/keamanan_privasi');
+})->name('profilekeamanan');
+
 Route::get('/logout', function () {
     return view('profile/logout');
 })->name('logout');
+
+Route::get('/profileout', function () {
+    return view('profile/setelah_keluar');
+})->name('profileout');
 
 Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
