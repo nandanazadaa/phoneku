@@ -23,7 +23,7 @@
             
             <!-- Icons -->
             <div class="flex items-center space-x-4">
-                <a href="{{ route('checkuot') }}" class="text-blue-500">
+                <a href="{{ route('checkout') }}" class="text-blue-500">
                     <i class="fas fa-shopping-cart text-xl"></i>
                 </a>
                 <a href="#" class="text-blue-500">
