@@ -6,13 +6,16 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {
     return view('Home/welcome');
-});
+})->name('welcome');
+
 Route::get('/tim', function () {
     return view('Home/tim');
-});
+})->name('tim');
+
 Route::get('/cart', function () {
     return view('Home/cart');
-});
+})->name('cart');
+
 Route::get('/login', function () {
     return view('Auth/login');
 })->name('login');
@@ -23,7 +26,7 @@ Route::get('/registrasi', function () {
 
 Route::get('/aboutus', function () {
     return view('home.aboutus');
-});
+})->name('aboutus');
 
 Route::get('/product', function () {
     return view('Home/product');
@@ -39,7 +42,7 @@ Route::get('/profilebayar', function () {
 
 Route::get('/kontak', function () {
     return view('home.kontak');
-});
+})->name('kontak');
 
 Route::get('/profile', function () {
     return view('profile/tentang_saya');
@@ -47,7 +50,7 @@ Route::get('/profile', function () {
 
 Route::get('/allproduct', function () {
     return view('home.allproduct');
-});
+})->name('allproduct');
 
 Route::get('/riwayatpembelian', function () {
     return view('profile/riwayat_pembelian');

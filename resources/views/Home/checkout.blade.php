@@ -46,7 +46,7 @@
         }
         
         .payment-radio:checked + .radio-custom {
-            border: 2px solid #3b82f6;
+            border: 2px solid #0FA6EB;
         }
         
         .payment-radio:checked + .radio-custom::after {
@@ -58,12 +58,12 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background-color: #3b82f6;
+            background-color: #0FA6EB;
         }
         
         .payment-radio:checked ~ label {
             background-color: #f0f9ff;
-            border-color: #3b82f6;
+            border-color: #0FA6EB;
         }
         
         /* Quantity counter styling */
@@ -102,8 +102,8 @@
         }
 
         .active-tab {
-            color: #3b82f6;
-            border-bottom: 2px solid #3b82f6;
+            color: #0FA6EB;
+            border-bottom: 2px solid #0FA6EB;
         }
 
         /* Animation for modal */
@@ -136,7 +136,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -100%);
-            color: #3b82f6;
+            color: #0FA6EB;
             font-size: 2rem;
             z-index: 10;
             pointer-events: none;
@@ -194,13 +194,13 @@
         }
 
         .voucher-item:hover {
-            border-color: #3b82f6;
+            border-color: #0FA6EB;
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .voucher-radio:checked + .voucher-item {
-            border: 1px dashed #3b82f6;
+            border: 1px dashed #0FA6EB;
             background-color: #f0f9ff;
         }
     </style>
@@ -221,7 +221,7 @@
                     </div>
                     <div class="p-4">
                         <div class="flex items-center mb-4">
-                            <div class="text-blue-500 mr-3">
+                            <div class="text-blue-400 mr-3">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
                             <span class="font-medium">Rumah | Nama Penerima</span>
@@ -231,7 +231,7 @@
                             Kabupaten Bantul, Daerah Istimewa Yogyakarta
                         </p>
                         <div class="mt-4 ml-9">
-                            <button id="changeAddressBtn" class="px-4 py-1 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition">Ganti</button>
+                            <button id="changeAddressBtn" class="px-4 py-1 border border-blue-400 text-blue-400 rounded-md hover:bg-blue-50 transition">Ganti</button>
                         </div>
                     </div>
                 </div>
@@ -256,7 +256,7 @@
                                 </div>
                                 
                                 <div class="flex border-t border-gray-200 pt-4">
-                                    <button class="flex items-center text-blue-500">
+                                    <button class="flex items-center text-blue-400">
                                         <i class="far fa-sticky-note mr-2"></i>
                                         <span>Beri Catatan</span>
                                     </button>
@@ -403,7 +403,7 @@
                         </div>
                         
                         <div class="text-center">
-                            <button id="togglePaymentMethods" class="text-blue-500 text-sm flex items-center justify-center w-full">
+                            <button id="togglePaymentMethods" class="text-blue-400 text-sm flex items-center justify-center w-full">
                                 <span id="togglePaymentText">Lihat Semua</span>
                                 <i class="fas fa-chevron-down ml-1" id="togglePaymentIcon"></i>
                             </button>
@@ -437,7 +437,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-between text-blue-500" id="voucher-discount-row" style="display: none;">
+                        <div class="flex justify-between text-blue-400" id="voucher-discount-row" style="display: none;">
                             <span>Diskon Voucher</span>
                             <span id="voucher-discount-amount">- Rp 0</span>
                         </div>
@@ -448,7 +448,7 @@
                         </div>
                         
                         <!-- Pay Button -->
-                        <button class="w-full bg-blue-500 text-white rounded-lg py-3 mt-6 font-medium hover:bg-blue-600 transition">
+                        <button class="w-full bg-blue-400 text-white rounded-lg py-3 mt-6 font-medium hover:bg-blue-600 transition">
                             Bayar Sekarang
                         </button>
                         <p class="text-gray-500 text-xs text-center mt-3">
@@ -477,7 +477,7 @@
                     <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                         <i class="fas fa-search"></i>
                     </div>
-                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2 px-2 py-1 bg-blue-500 text-white rounded">
+                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2 px-2 py-1 bg-blue-400 text-white rounded">
                         Pakai
                     </button>
                 </div>
@@ -494,7 +494,7 @@
                         <label for="voucher-1" class="block">
                             <div class="voucher-item rounded-lg p-3">
                                 <div class="flex items-start">
-                                    <div class="text-blue-500 text-xl mr-3 mt-1">
+                                    <div class="text-blue-400 text-xl mr-3 mt-1">
                                         <i class="fas fa-ticket-alt"></i>
                                     </div>
                                     <div class="flex-grow">
@@ -504,7 +504,7 @@
                                     </div>
                                     <div class="ml-3">
                                         <div class="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center voucher-radio-circle">
-                                            <div class="h-3 w-3 bg-blue-500 rounded-full hidden voucher-radio-dot"></div>
+                                            <div class="h-3 w-3 bg-blue-400 rounded-full hidden voucher-radio-dot"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -518,7 +518,7 @@
                         <label for="voucher-2" class="block">
                             <div class="voucher-item rounded-lg p-3">
                                 <div class="flex items-start">
-                                    <div class="text-blue-500 text-xl mr-3 mt-1">
+                                    <div class="text-blue-400 text-xl mr-3 mt-1">
                                         <i class="fas fa-ticket-alt"></i>
                                     </div>
                                     <div class="flex-grow">
@@ -528,7 +528,7 @@
                                     </div>
                                     <div class="ml-3">
                                         <div class="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center voucher-radio-circle">
-                                            <div class="h-3 w-3 bg-blue-500 rounded-full hidden voucher-radio-dot"></div>
+                                            <div class="h-3 w-3 bg-blue-400 rounded-full hidden voucher-radio-dot"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -542,7 +542,7 @@
                         <label for="voucher-3" class="block">
                             <div class="voucher-item rounded-lg p-3">
                                 <div class="flex items-start">
-                                    <div class="text-blue-500 text-xl mr-3 mt-1">
+                                    <div class="text-blue-400 text-xl mr-3 mt-1">
                                         <i class="fas fa-ticket-alt"></i>
                                     </div>
                                     <div class="flex-grow">
@@ -552,7 +552,7 @@
                                     </div>
                                     <div class="ml-3">
                                         <div class="h-5 w-5 border-2 border-gray-300 rounded-full flex items-center justify-center voucher-radio-circle">
-                                            <div class="h-3 w-3 bg-blue-500 rounded-full hidden voucher-radio-dot"></div>
+                                            <div class="h-3 w-3 bg-blue-400 rounded-full hidden voucher-radio-dot"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -562,7 +562,7 @@
                 </div>
             </div>
             
-            <button id="applyVoucherBtn" class="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition mt-4">
+            <button id="applyVoucherBtn" class="w-full py-3 bg-blue-400 text-white rounded-lg font-medium hover:bg-blue-600 transition mt-4">
                 Pakai Voucher
             </button>
         </div>
@@ -583,7 +583,6 @@
                 <div class="p-4">
                     <div class="flex border-b">
                         <button id="allAddressTab" class="flex-1 py-3 text-center active-tab">Semua Alamat</button>
-                        <button id="friendAddressTab" class="flex-1 py-3 text-center text-gray-500"></button>
                     </div>
                     
                     <div class="my-4">
@@ -596,7 +595,7 @@
                     </div>
                     
                     <div class="my-4">
-                        <button id="addNewAddressBtn" class="w-full py-3 border-2 border-blue-500 text-blue-500 rounded-lg font-medium hover:bg-blue-50 transition">
+                        <button id="addNewAddressBtn" class="w-full py-3 border-2 border-blue-400 text-blue-400 rounded-lg font-medium hover:bg-blue-50 transition">
                             Tambah Alamat Baru
                         </button>
                     </div>
@@ -619,7 +618,7 @@
                         </div>
                         
                         <!-- Selected checkmark -->
-                        <div class="absolute top-4 right-4 text-blue-500">
+                        <div class="absolute top-4 right-4 text-blue-400">
                             <i class="fas fa-check"></i>
                         </div>
                     </div>
@@ -639,12 +638,12 @@
                     <!-- Progress steps -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mb-1">1</div>
-                            <div class="text-xs text-blue-500">Cari lokasi pengirimanmu</div>
+                            <div class="w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center mb-1">1</div>
+                            <div class="text-xs text-blue-400">Cari lokasi pengirimanmu</div>
                         </div>
                         <div class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
                         <div class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full bg-white text-blue-500 border-2 border-blue-500 flex items-center justify-center mb-1">2</div>
+                            <div class="w-8 h-8 rounded-full bg-white text-blue-400 border-2 border-blue-400 flex items-center justify-center mb-1">2</div>
                             <div class="text-xs text-gray-500">Tentukan pinpoint lokasi</div>
                         </div>
                         <div class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
@@ -669,11 +668,11 @@
                     </button>
                     
                     <div class="text-gray-500 mb-4">
-                        Tidak ketemu? <a href="#" class="text-blue-500">Isi alamat secara manual</a>
+                        Tidak ketemu? <a href="#" class="text-blue-400">Isi alamat secara manual</a>
                     </div>
                     
                     <div class="text-gray-500">
-                        Mau cara lain? <a href="#" class="text-blue-500">Isi alamat secara manual</a>
+                        Mau cara lain? <a href="#" class="text-blue-400">Isi alamat secara manual</a>
                     </div>
                 </div>
             </div>
@@ -694,15 +693,15 @@
                     <!-- Progress steps -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mb-1">
+                            <div class="w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center mb-1">
                                 <i class="fas fa-check"></i>
                             </div>
-                            <div class="text-xs text-blue-500">Cari lokasi pengirimanmu</div>
+                            <div class="text-xs text-blue-400">Cari lokasi pengirimanmu</div>
                         </div>
-                        <div class="flex-1 h-0.5 bg-blue-500 mx-2"></div>
+                        <div class="flex-1 h-0.5 bg-blue-400 mx-2"></div>
                         <div class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mb-1">2</div>
-                            <div class="text-xs text-blue-500">Tentukan pinpoint lokasi</div>
+                            <div class="w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center mb-1">2</div>
+                            <div class="text-xs text-blue-400">Tentukan pinpoint lokasi</div>
                         </div>
                         <div class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
                         <div class="flex flex-col items-center">
@@ -750,12 +749,12 @@
                     </div>
                     
                     <div class="mb-4">
-                        <button id="manualAddressLink" class="text-blue-500">
+                        <button id="manualAddressLink" class="text-blue-400">
                             Mau cara lain? Isi alamat secara manual
                         </button>
                     </div>
                     
-                    <button id="continueToDetailsBtn" class="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition">
+                    <button id="continueToDetailsBtn" class="w-full py-3 bg-blue-400 text-white rounded-lg font-medium hover:bg-blue-600 transition">
                         Pilih Lokasi & Lanjut Isi Alamat
                     </button>
                 </div>
@@ -777,22 +776,22 @@
                     <!-- Progress steps -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mb-1">
+                            <div class="w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center mb-1">
                                 <i class="fas fa-check"></i>
                             </div>
-                            <div class="text-xs text-blue-500">Cari lokasi pengirimanmu</div>
+                            <div class="text-xs text-blue-400">Cari lokasi pengirimanmu</div>
                         </div>
-                        <div class="flex-1 h-0.5 bg-blue-500 mx-2"></div>
+                        <div class="flex-1 h-0.5 bg-blue-400 mx-2"></div>
                         <div class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mb-1">
+                            <div class="w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center mb-1">
                                 <i class="fas fa-check"></i>
                             </div>
-                            <div class="text-xs text-blue-500">Tentukan pinpoint lokasi</div>
+                            <div class="text-xs text-blue-400">Tentukan pinpoint lokasi</div>
                         </div>
-                        <div class="flex-1 h-0.5 bg-blue-500 mx-2"></div>
+                        <div class="flex-1 h-0.5 bg-blue-400 mx-2"></div>
                         <div class="flex flex-col items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mb-1">3</div>
-                            <div class="text-xs text-blue-500">Lengkapi detail alamat</div>
+                            <div class="w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center mb-1">3</div>
+                            <div class="text-xs text-blue-400">Lengkapi detail alamat</div>
                         </div>
                     </div>
                     
@@ -801,7 +800,7 @@
                     <div class="mb-4">
                         <div class="mb-2 font-medium">Long-Lat</div>
                         <div class="flex items-center border rounded-lg p-3 bg-gray-50">
-                            <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+                            <i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>
                             <span class="text-gray-700"></span>
                         </div>
                     </div>
@@ -843,15 +842,15 @@
                     
                     <div class="mb-6">
                         <label class="flex items-center">
-                            <input type="checkbox" id="primaryAddress" class="mr-2 h-4 w-4 text-blue-500">
+                            <input type="checkbox" id="primaryAddress" class="mr-2 h-4 w-4 text-blue-400">
                             <span>Jadikan alamat utama</span>
                         </label>
                     </div>
                     
                     <div class="mb-6">
                         <label class="flex items-center">
-                            <input type="checkbox" id="termsAgreement" class="mr-2 h-4 w-4 text-blue-500">
-                            <span>Saya menyetujui <a href="#" class="text-blue-500">Syarat & Ketentuan</a> serta <a href="#" class="text-blue-500">Kebijakan Privasi</a> pengaturan alamat di PhoneKu.</span>
+                            <input type="checkbox" id="termsAgreement" class="mr-2 h-4 w-4 text-blue-400">
+                            <span>Saya menyetujui <a href="#" class="text-blue-400">Syarat & Ketentuan</a> serta <a href="#" class="text-blue-400">Kebijakan Privasi</a> pengaturan alamat di PhoneKu.</span>
                         </label>
                     </div>
                     
@@ -872,20 +871,20 @@
         paymentOptions.forEach(radio => {
             radio.addEventListener('change', function() {
                 document.querySelectorAll('.payment-radio').forEach(r => {
-                    r.closest('label').classList.remove('bg-blue-50', 'border-blue-500');
+                    r.closest('label').classList.remove('bg-blue-50', 'border-blue-400');
                     r.closest('label').classList.add('hover:bg-gray-50');
                 });
                 
                 // Add active class to selected label
                 if (this.checked) {
-                    this.closest('label').classList.add('bg-blue-50', 'border-blue-500');
+                    this.closest('label').classList.add('bg-blue-50', 'border-blue-400');
                     this.closest('label').classList.remove('hover:bg-gray-50');
                 }
             });
         });
 
         document.querySelectorAll('.payment-radio:checked').forEach(radio => {
-            radio.closest('label').classList.add('bg-blue-50', 'border-blue-500');
+            radio.closest('label').classList.add('bg-blue-50', 'border-blue-400');
             radio.closest('label').classList.remove('hover:bg-gray-50');
         });
         
@@ -974,20 +973,10 @@
         
         // Tab switching
         const allAddressTab = document.getElementById('allAddressTab');
-        const friendAddressTab = document.getElementById('friendAddressTab');
         
         allAddressTab.addEventListener('click', function() {
             allAddressTab.classList.add('active-tab');
             allAddressTab.classList.remove('text-gray-500');
-            friendAddressTab.classList.remove('active-tab');
-            friendAddressTab.classList.add('text-gray-500');
-        });
-        
-        friendAddressTab.addEventListener('click', function() {
-            friendAddressTab.classList.add('active-tab');
-            friendAddressTab.classList.remove('text-gray-500');
-            allAddressTab.classList.remove('active-tab');
-            allAddressTab.classList.add('text-gray-500');
         });
         
         // Show add new address modal
@@ -1037,11 +1026,11 @@
                 termsAgreement.checked
             ) {
                 saveAddressBtn.classList.remove('bg-gray-200', 'text-gray-400');
-                saveAddressBtn.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                saveAddressBtn.classList.add('bg-blue-400', 'text-white', 'hover:bg-blue-600');
                 saveAddressBtn.disabled = false;
             } else {
                 saveAddressBtn.classList.add('bg-gray-200', 'text-gray-400');
-                saveAddressBtn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                saveAddressBtn.classList.remove('bg-blue-400', 'text-white', 'hover:bg-blue-600');
                 saveAddressBtn.disabled = true;
             }
         }
@@ -1409,11 +1398,11 @@ document.addEventListener('DOMContentLoaded', function() {
             termsAgreement.checked
         ) {
             saveAddressBtn.classList.remove('bg-gray-200', 'text-gray-400');
-            saveAddressBtn.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+            saveAddressBtn.classList.add('bg-blue-400', 'text-white', 'hover:bg-blue-600');
             saveAddressBtn.disabled = false;
         } else {
             saveAddressBtn.classList.add('bg-gray-200', 'text-gray-400');
-            saveAddressBtn.classList.remove('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+            saveAddressBtn.classList.remove('bg-blue-400', 'text-white', 'hover:bg-blue-600');
             saveAddressBtn.disabled = true;
         }
     };
@@ -1620,7 +1609,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     dot.classList.add('hidden');
                 });
                 document.querySelectorAll('.voucher-radio-circle').forEach(circle => {
-                    circle.classList.remove('border-blue-500');
+                    circle.classList.remove('border-blue-400');
                     circle.classList.add('border-gray-300');
                 });
                 
@@ -1630,7 +1619,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const radioDot = this.closest('label').querySelector('.voucher-radio-dot');
                     
                     radioCircle.classList.remove('border-gray-300');
-                    radioCircle.classList.add('border-blue-500');
+                    radioCircle.classList.add('border-blue-400');
                     radioDot.classList.remove('hidden');
                 }
             });
