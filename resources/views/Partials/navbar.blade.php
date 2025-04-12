@@ -14,19 +14,36 @@
             
             <!-- Navigation Links -->
             <div class="hidden md:flex space-x-8">
-                <a href="{{ route('welcome') }}" class="text-blue-500 font-medium border-b-2 border-blue-500 pb-1">Beranda</a>
-                <a href="{{ route('aboutus') }}" class="text-gray-600 hover:text-blue-500">Tentang</a>
-                <a href="{{ route('tim') }}" class="text-gray-600 hover:text-blue-500">Tim</a>
-                <a href="{{ route('allproduct') }}" class="text-gray-600 hover:text-blue-500">Belanja</a>
-                <a href="{{ route('kontak') }}" class="text-gray-600 hover:text-blue-500">Kontak</a>
+                <a href="{{ route('welcome') }}"
+                class="{{ Route::currentRouteName() == 'welcome' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    Beranda
+                </a>
+                <a href="{{ route('aboutus') }}"
+                class="{{ Route::currentRouteName() == 'aboutus' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    Tentang
+                </a>
+                <a href="{{ route('tim') }}"
+                class="{{ Route::currentRouteName() == 'tim' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    Tim
+                </a>
+                <a href="{{ route('allproduct') }}"
+                class="{{ Route::currentRouteName() == 'allproduct' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    Belanja
+                </a>
+                <a href="{{ route('kontak') }}"
+                class="{{ Route::currentRouteName() == 'kontak' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    Kontak
+                </a>
             </div>
+            
+
             
             <!-- Icons -->
             <div class="flex items-center space-x-4">
-                <a href="{{ route('checkuot') }}" class="text-blue-500">
+                <a href="{{ route('checkout') }}" class="text-blue-500">
                     <i class="fas fa-shopping-cart text-xl"></i>
                 </a>
-                <a href="#" class="text-blue-500">
+                <a href="{{ route('profile') }}" class="text-blue-500">
                     <i class="fas fa-user-circle text-xl"></i>
                 </a>
             </div>
