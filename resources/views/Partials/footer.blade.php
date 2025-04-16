@@ -1,22 +1,3 @@
- <!-- Newsletter Section -->
- <div class="bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl mx-4 my-12">
-    <div class="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between">
-        <div class="text-white mb-6 md:mb-0">
-            <h2 class="text-2xl font-bold uppercase">Tetap Update</h2>
-            <h2 class="text-2xl font-bold uppercase">Dengan Penawaran Kami</h2>
-        </div>
-        
-        <div class="w-full md:w-auto">
-            <div class="flex flex-col md:flex-row gap-4">
-                <input type="email" placeholder="Masukkan Email Anda" class="px-4 py-3 rounded-full focus:outline-none">
-                <button class="bg-white text-gray-800 font-medium px-6 py-3 rounded-full hover:bg-gray-100">
-                    Mulai Berlangganan Buletin
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Footer -->
 <footer class="bg-white pt-10 pb-6">
     <div class="container mx-auto px-4">
@@ -27,7 +8,7 @@
                     <img src="img/logo2.png" alt="PhoneKu Logo" class="h-15">
                 </div>
                 <p class="text-gray-600 mb-4">
-                    We have clothes that suits your style and which you're proud to wear. From women to men.
+                Kami memiliki ponsel yang sesuai dengan gaya Anda, dan Anda akan bangga memamerkannya. Dari desain yang ramping hingga performa yang tangguh.
                 </p>
                 <div class="flex space-x-4">
                     <a href="#" class="text-gray-400 hover:text-blue-500">
@@ -60,9 +41,6 @@
                 <h3 class="text-lg font-bold mb-4 uppercase">Produk & Layanan</h3>
                 <ul class="space-y-2">
                     <li><a href="#" class="text-gray-600 hover:text-blue-500">Customer Support</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Delivery Details</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Terms & Conditions</a></li>
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Privacy Policy</a></li>
                 </ul>
             </div>
             
