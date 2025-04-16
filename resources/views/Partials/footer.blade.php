@@ -1,4 +1,4 @@
- <!-- Newsletter Section -->
+ {{-- <!-- Newsletter Section -->
  <div class="bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl mx-4 my-12">
     <div class="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between">
         <div class="text-white mb-6 md:mb-0">
@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 <!-- Footer -->
 <footer class="bg-white pt-10 pb-6">

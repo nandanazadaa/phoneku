@@ -56,10 +56,6 @@
                         <i class="fas fa-user w-5 mr-3 text-center"></i>
                         <span>Tentang Saya</span>
                     </a>
-                    <a href="{{ route('profilebayar') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                        <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
-                        <span>Pengaturan Pembayaran</span>
-                    </a>
                     <a href="{{ route('riwayatpembelian') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
