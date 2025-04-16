@@ -31,23 +31,25 @@
 
                 <form class="space-y-5">
                     <div>
-                        <label for="phone" class="block text-white mb-2 text-sm">Nomor Telepon</label>
+                        <label for="email" class="block text-white mb-2 text-sm">Email</label>
                         <div class="relative">
-                            <input type="tel" id="phone" 
+                            <input type="tel" id="email" 
                                    class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 pr-28"
-                                   placeholder="Masukkan nomor telepon">
-                            <button type="button" 
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 text-sm bg-white px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                                Kirim kode
-                            </button>
+                                   placeholder="Masukkan email anda">
                         </div>
                     </div>
 
                     <div>
-                        <label for="otp" class="block text-white mb-2 text-sm">Kode OTP</label>
-                        <input type="text" id="otp" 
+                        <label for="password1" class="block text-white mb-2 text-sm">Password</label>
+                        <input type="text" id="password1" 
                                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                               placeholder="Masukkan kode OTP">
+                               placeholder="Masukkan password">
+                    </div>
+                    <div>
+                        <label for="password2" class="block text-white mb-2 text-sm">Password</label>
+                        <input type="text" id="password2" 
+                               class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                               placeholder="Masukkan ulang password">
                     </div>
 
                     <button type="submit" 

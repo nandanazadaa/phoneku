@@ -28,7 +28,7 @@
                         <div>
                             <h6 class="text-[20px]">Hubungi Kami</h6>
                             <h2 class="font-bold text-[48px] leading-tight">Kami selalu senang membantu Anda dan menjawab pertanyaan Anda</h2>
-                            <p class="mt-8 ">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>          
+                            <p class="mt-8 ">Silakan hubungi kami melalui pusat panggilan, email, atau kunjungi lokasi kami untuk mendapatkan bantuan lebih lanjut.</p>          
                         </div>
 
                         <!-- detail kontak -->
@@ -72,10 +72,10 @@
                 </div>
 
                 <!-- isi kiri -->
-                <div class=" bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl px-24 py-16 flex flex-col text-white">
+                <div class=" bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl px-24 py-16 flex flex-col text-white overflow-hidden shadow-lg">
                     <div>
-                        <h4 class="font-semibold text-[24px]">Hubungi Kami</h4>
-                        <p class="mt-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do  sit amet, consectetur </p>
+                        <h4 class="font-bold text-[24px]">Hubungi Kami</h4>
+                        <p class="mt-6"> Tim kami akan dengan senang hati merespons setiap pertanyaan atau kebutuhan Anda secepat mungkin.</p>
                     </div>
                     <div>
                         <input type="text" placeholder="Nama Lengkap" class="w-full mt-12 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
@@ -99,7 +99,7 @@
             </div>
 
             <!-- google map -->
-            <div class="mt-16 w-full h-96 rounded-xl overflow-hidden shadow-lg">
+            <div class="mt-16 w-full h-[500px] rounded-xl overflow-hidden shadow-lg">
                 <iframe 
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3953.2818402780804!2d110.4090461!3d-7.7599048999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a599bd3bdc4ef%3A0x6f1714b0c4544586!2sUniversitas%20Amikom%20Yogyakarta!5e0!3m2!1sid!2sid!4v1744115106486!5m2!1sid!2sid" 
                     class="w-full h-full border-0"
