@@ -62,10 +62,6 @@
                         <i class="fas fa-user w-5 mr-3 text-center"></i>
                         <span>Tentang Saya</span>
                     </a>
-                    <a href="{{ route('profilebayar') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                        <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
-                        <span>Pengaturan Pembayaran</span>
-                    </a>
                     <a href="{{ route('riwayatpembelian') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
@@ -113,66 +109,6 @@
                         </button>
                     </div>
 
-                    <!-- Autentikasi 2 Faktor -->
-                    <div class="col-span-1 md:col-span-2 flex items-center justify-between">
-                        <label for="auth" class="text-sm font-medium text-gray-700">Autentikasi Dua Faktor</label>
-
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="auth" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 relative transition-colors">
-                                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-all peer-checked:translate-x-5"></div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Metode -->
-                    <div class="col-span-1 md:col-span-2 flex items-center justify-between">
-                        <label for="method" class="text-sm font-medium text-gray-700">Metode</label>
-
-                        <select class="w-full md:w-1/4 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700">
-                            <option>SMS</option>
-                            <option>Aplikasi</option>
-                            <option>Fingerprint</option>
-                            <option>Face Id</option>
-                        </select>
-                    </div>
-
-                    <!-- Preverensi Privasi -->
-                    <div class="col-span-1 md:col-span-2 flex items-center justify-between">
-                        <label for="pref" class="text-sm font-medium text-gray-700">Preferensi Privasi</label>
-
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="auth" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 relative transition-colors">
-                                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-all peer-checked:translate-x-5"></div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Personalisasi Iklan -->
-                    <div class="col-span-1 md:col-span-2 flex items-center justify-between">
-                        <label for="ads" class="text-sm font-medium text-gray-700">Personalisasi Iklan</label>
-
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="auth" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 relative transition-colors">
-                                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-all peer-checked:translate-x-5"></div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Email Promosi -->
-                    <div class="col-span-1 md:col-span-2 flex items-center justify-between">
-                        <label for="email" class="text-sm font-medium text-gray-700">Email Promosi</label>
-
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="auth" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-500 relative transition-colors">
-                                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-all peer-checked:translate-x-5"></div>
-                            </div>
-                        </label>
-                    </div>
-
                     <!-- Hapus Akun -->
                     <div class="col-span-1 md:col-span-2">
                         <label for="pwubah" class="block text-sm font-medium text-gray-700 mb-1">Hapus Akun</label>
@@ -182,7 +118,6 @@
                             Ajukan Penghapusan Akun
                         </button>
                     </div>
-
                 </form>
             </div>
         </section>

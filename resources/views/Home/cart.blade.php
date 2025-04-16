@@ -27,7 +27,6 @@
                   <img src="https://cdnpro.eraspace.com/media/catalog/product/a/p/apple_iphone_11_white_new_1_1_1.jpg" alt="Iphone 11" class="w-44 h-44 rounded-lg object-cover">
                   <div>
                     <h3 class="text-xl font-semibold">Iphone 11</h3>
-                    <p class="text-base text-gray-600">SKU: 8100019113</p>
                     <p class="text-base text-gray-600">Red</p>
                     <p class="text-base text-green-600 font-medium">Tersedia</p>
                   </div>
@@ -54,7 +53,6 @@
                   <div>
                     <h3 class="text-xl font-semibold">Iphone 12</h3>
                     <p class="text-base text-gray-600">Blue</p>
-                    <p class="text-base text-gray-600">SKU: 8100019222</p>
                     <p class="text-base text-green-600 font-medium">Tersedia</p>
                   </div>
                 </div>
@@ -72,7 +70,6 @@
                 </div>
               </div>
             </div>
-        
             <!-- Ringkasan -->
             <div class="w-full">
               <div class="bg-white shadow rounded-xl p-6 border">
@@ -86,17 +83,15 @@
                   <span>Total</span>
                   <span>Rp12.999.998</span>
                 </div>
-                <button class="w-full bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600 transition duration-200">
+                <a href="{{ route('checkout') }}"><button class="w-full bg-blue-400 text-white py-2 rounded-lg font-semibold hover:bg-blue-600 transition duration-200">
                   Lanjutkan Pembayaran
-                </button>
+                </button></a>
               </div>
             </div>
           </div>
         </section>
-        
-        
     </div>
-    
    @endsection
+
 </body>
 </html>

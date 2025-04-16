@@ -44,10 +44,6 @@
                     <span>Tentang Saya</span>
                 </a>
                 <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-sm transition-all duration-200">
-                    <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
-                    <span>Pengaturan Pembayaran</span>
-                </a>
-                <a href="#" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-sm transition-all duration-200">
                     <i class="fas fa-history w-5 mr-3 text-center"></i>
                     <span>Riwayat Pembelian</span>
                 </a>

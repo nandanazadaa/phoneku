@@ -1,4 +1,3 @@
-<!-- Footer -->
 <footer class="bg-white pt-10 pb-6">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">

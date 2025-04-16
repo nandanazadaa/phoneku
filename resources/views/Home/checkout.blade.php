@@ -203,6 +203,26 @@
             border: 1px dashed #0FA6EB;
             background-color: #f0f9ff;
         }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .check-icon {
+            background-color: #22c55e;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -246,20 +266,25 @@
                             <div class="flex-grow">
                                 <h3 class="text-xl font-medium mb-2">Iphone 11</h3>
                                 <div class="mb-2">Red</div>
-                                <div class="mb-2">SKU: 8100019113</div>
-                                <div class="mb-4">Tersedia</div>
-                                
-                                <div class="border rounded-lg p-3 mb-4">
-                                    <div class="font-medium">Reguler</div>
-                                    <div>JNE (20.000)</div>
-                                    <div class="text-gray-600">Estimasi Tiba 10 - 15 April</div>
-                                </div>
-                                
-                                <div class="flex border-t border-gray-200 pt-4">
-                                    <button class="flex items-center text-blue-400">
-                                        <i class="far fa-sticky-note mr-2"></i>
-                                        <span>Beri Catatan</span>
-                                    </button>
+                                <div class="text-gray-700 text-xs">
+                                    <div class="check-item">
+                                        <div class="check-icon">
+                                            <i class="fas fa-check text-xs"></i>
+                                        </div>
+                                        <span>Layar: 6.1 inci Liquid Retina HD Display</span>
+                                    </div>
+                                    <div class="check-item">
+                                        <div class="check-icon">
+                                            <i class="fas fa-check text-xs"></i>
+                                        </div>
+                                        <span>Prosesor: A13 Bionic Chip – Cepat dan Efisien</span>
+                                    </div>
+                                    <div class="check-item">
+                                        <div class="check-icon">
+                                            <i class="fas fa-check text-xs"></i>
+                                        </div>
+                                        <span>Kamera: Dual 12 MP (Wide & Ultra-Wide) + Night Mode</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex flex-col items-end mt-4 md:mt-0">
@@ -714,7 +739,6 @@
                     
                     <!-- Map container with search box -->
                     <div class="map-container mb-4 relative">
-                        <input id="map-search" class="map-search-box w-full" type="text" placeholder="Cari lokasi...">
                         
                         <!-- This div will contain the Leaflet Map -->
                         <div id="map"></div>
