@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Dashboard\DashboardController;
 
-
+// Route yang dapat diakses semua orang
 Route::get('/', function () {
     return view('Home/welcome');
 })->name('welcome');
@@ -11,18 +12,6 @@ Route::get('/', function () {
 Route::get('/tim', function () {
     return view('Home/tim');
 })->name('tim');
-
-Route::get('/cart', function () {
-    return view('Home/cart');
-})->name('cart');
-
-Route::get('/login', function () {
-    return view('Auth/login');
-})->name('login');
-
-Route::get('/registrasi', function () {
-    return view('Auth/registrasi');
-})->name('registrasi');
 
 Route::get('/aboutus', function () {
     return view('home.aboutus');
@@ -32,38 +21,66 @@ Route::get('/product', function () {
     return view('Home/product');
 })->name('product');
 
-Route::get('/checkout', function () {
-    return view('Home/checkout');
-})->name('checkout');
-
-Route::get('/profilebayar', function () {
-    return view('profile/atur_pembayaran');
-})->name('profilebayar');
-
 Route::get('/kontak', function () {
     return view('home.kontak');
 })->name('kontak');
-
-Route::get('/profile', function () {
-    return view('profile/tentang_saya');
-})->name('profile');
 
 Route::get('/allproduct', function () {
     return view('Home/allproduct');
 })->name('allproduct');
 
-Route::get('/riwayatpembelian', function () {
-    return view('profile/riwayat_pembelian');
-})->name('riwayatpembelian');
+// Route autentikasi
+Route::middleware(['guest'])->group(function () {
+    Route::get('/login', function () {
+        return view('Auth/login');
+    })->name('login');
+    
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    
+    Route::get('/registrasi', function () {
+        return view('Auth/registrasi');
+    })->name('registrasi');
+    
+    Route::post('/registrasi', [AuthController::class, 'register'])->name('registrasi.post');
+});
 
-Route::get('/profilekeamanan', function () {
-    return view('profile/keamanan_privasi');
-})->name('profilekeamanan');
+// Route yang memerlukan login
+Route::middleware(['auth'])->group(function () {
+    // Profile routes
+    Route::get('/profile', function () {
+        return view('profile/tentang_saya');
+    })->name('profile');
+    
+    Route::get('/profilebayar', function () {
+        return view('profile/atur_pembayaran');
+    })->name('profilebayar');
+    
+    Route::get('/profilekeamanan', function () {
+        return view('profile/keamanan_privasi');
+    })->name('profilekeamanan');
+    
+    // Checkout dan Cart
+    Route::get('/cart', function () {
+        return view('Home/cart');
+    })->name('cart');
+    
+    Route::get('/checkout', function () {
+        return view('Home/checkout');
+    })->name('checkout');
+    
+    Route::get('/riwayatpembelian', function () {
+        return view('profile/riwayat_pembelian');
+    })->name('riwayatpembelian');
+    
+    // Logout routes
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    Route::get('/logout', function () {
+        return view('profile/logout');
+    })->name('logout.page');
+});
 
-Route::get('/logout', function () {
-    return view('profile/logout');
-})->name('logout');
-
+// Routes setelah logout
 Route::get('/profileout', function () {
     return view('profile/setelah_keluar');
 })->name('profileout');
@@ -72,3 +89,13 @@ Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
 })->name('setelah_logout');
 
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Login & register admin - tanpa middleware auth
+    Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'adminLogin'])->name('login.post');
+    Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
+    
+    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
+});
