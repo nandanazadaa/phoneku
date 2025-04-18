@@ -7,18 +7,8 @@
     <div class="relative">
         <!-- Blue Background -->
         <!-- Increased pb significantly: e.g., pb-80 or more depending on image height -->
-        <div class="bg-blue-500 pb-80 md:pb-96 bg-gradient-to-r from-blue-500 to-blue-400">
-            <!-- Top Navigation -->
-            <div class="container mx-auto px-4 py-2 flex justify-end">
-                
-            </div>
-
-            <!-- Main Navigation -->
-            <!-- Added relative and z-10 to ensure it's above the image -->
-            <div class="container mx-auto px-4 relative z-10">
-                
-            </div>
-            <!-- NOTE: Image div is now placed AFTER the navigation container within the blue div -->
+        <div class="bg-blue-500  h-[500px] md:h-[550px] lg:h-[400px]">
+            <!-- Konten header dibiarkan kosong untuk banner -->
         </div>
 
         <!-- Wave SVG -->
@@ -29,10 +19,12 @@
             </svg>
         </div>
 
-        <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-3/4 md:w-2/3 lg:w-1/2 z-0 pointer-events-none">
-            <!-- Adjusted max-height and position to make it stick to bottom -->
-            <img src="img/banner4.png" alt="Smartphones" class="object-contain w-full max-h-[450px] md:max-h-[500px] lg:max-h-[600px]">
-        </div>
+        <!--banner hp-->
+        <div class="absolute top-[15%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
+    <div class="relative w-full h-full" style="overflow: hidden;">
+        <img src="img/banner4.png" alt="Smartphones"
+            class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
+    </div>
     </div>
 
     <!-- Main Content - User Profile -->
@@ -40,7 +32,7 @@
     <div class="container mx-auto px-4 py-8 -mt-48 md:-mt-56 relative z-10">
         <div class="flex flex-wrap">
             <!-- Left Sidebar -->
-            <div class="w-full md:w-1/4 mb-6 md:mb-0 md:pr-4">
+            <div class="w-full md:w-1/4 mb-6 md:mb-0 md:pr-4 mt-20">
                 <div class="bg-white rounded-xl p-4 shadow-md mb-6">
                     <div class="flex flex-col items-center mb-4">
                         <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
@@ -74,7 +66,7 @@
 
             <!-- Right Content -->
             <!-- Right Content -->
-            <section class="w-full md:w-3/4">
+            <section class="w-full md:w-3/4 mt-20">
                 <div class="bg-white rounded-2xl shadow-lg p-11 text-center">
                     <h3 class="text-2xl font-semibold text-gray-700 mb-2">Anda Belum Masuk</h3>
                     <p class="text-gray-500 mb-6">Silahkan Masuk ke Akun Terlebih Dahulu atau Daftar!</p>

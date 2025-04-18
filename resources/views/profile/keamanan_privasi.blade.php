@@ -6,21 +6,9 @@
     <!-- Header Section with Wave -->
     <div class="relative">
         <!-- Increased pb significantly: e.g., pb-80 or more depending on image height -->
-<<<<<<< HEAD
+
         <div class="bg-blue-500  h-[500px] md:h-[550px] lg:h-[400px]">
             <!-- Konten header dibiarkan kosong untuk banner -->
-=======
-        <div class="bg-blue-500 pb-80 md:pb-96 bg-gradient-to-r from-blue-500 to-blue-400">
-            <!-- Top Navigation -->
-            <div class="container mx-auto px-4 py-2 flex justify-end">
-                
-            </div>
-
-            <div class="container mx-auto px-4 relative z-10">
-                
-            </div>
-            <!-- NOTE: Image div is now placed AFTER the navigation container within the blue div -->
->>>>>>> 87350c343f8558977ed661e59f93fe5c79d5c2c9
         </div>
 
         <!-- Wave SVG -->
@@ -32,7 +20,7 @@
         </div>
 
         <!-- Hero Image with Phones - Adjusted Positioning -->
-<<<<<<< HEAD
+
         <!-- Positioned relative to the outer 'relative' div -->
         <!-- Adjusted top to push it below the nav bar. Adjusted max-height. Kept z-0 -->
         <!-- Fine-tune 'top' and 'max-h' values as needed -->
@@ -42,12 +30,10 @@
     <div class="relative w-full h-full" style="overflow: hidden;">
         <img src="img/banner4.png" alt="Smartphones"
             class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
-=======
         <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-3/4 md:w-2/3 lg:w-1/2 z-0 pointer-events-none">
             <!-- Adjusted max-height and position to make it stick to bottom -->
             <img src="img/banner4.png" alt="Smartphones" class="object-contain w-full max-h-[450px] md:max-h-[500px] lg:max-h-[600px]">
         </div>
->>>>>>> 87350c343f8558977ed661e59f93fe5c79d5c2c9
     </div>
 </div>
 
