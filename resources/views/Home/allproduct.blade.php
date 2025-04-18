@@ -3,7 +3,6 @@
 @section('title', 'Belanja - PhoneKu Semua Produk')
 
 @section('content')
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <div class="container mx-auto px-4 pt-12 pb-8">
         <div class="relative w-full">
@@ -17,42 +16,26 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-2">
             <!-- Dropdown Brand -->
-            <div x-data="{ open: false, selected: 'Brand' }" class="relative w-full">
-                <button @click="open = !open"
-                        class="relative bg-blue-500 text-white p-2 rounded-full w-full text-center">
-                    <span class="block text-center w-full" x-text="selected"></span>
-                    <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2"></i>
-                </button>
-
-                <div x-show="open" @click.away="open = false"
-                    class="absolute mt-2 bg-white shadow-md rounded-md w-full z-10 text-left">
-                    <ul>
-                        <li class="p-2 bg-blue-500 text-white rounded-t-md" @click="selected = 'Brand'; open = false">Brand</li>
-                        <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="selected = 'Samsung'; open = false">Samsung</li>
-                        <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="selected = 'Xiaomi'; open = false">Xiaomi</li>
-                        <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="selected = 'Oppo'; open = false">Oppo</li>
-                    </ul>
-                </div>
+            <div class="relative w-full">   
+                <select class="appearance-none bg-blue-500 text-white p-2 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none">
+                    <option class="bg-white text-black">Samsung</option>
+                    <option class="bg-white text-black">Xiaomi</option>
+                    <option class="bg-white text-black">Oppo</option>
+                </select>
+                <i class="fas fa-chevron-down text-white absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             </div>
+
 
             <!-- Dropdown Rentang Harga -->
-            <div x-data="{ open: false, selected: 'Rentang Harga' }" class="relative w-full">
-                <button @click="open = !open"
-                        class="relative bg-blue-500 text-white p-2 rounded-full w-full text-center">
-                    <span class="block text-center w-full" x-text="selected"></span>
-                    <i class="fas fa-filter text-xl absolute right-4 top-1/2 -translate-y-1/2"></i>
-                </button>
-
-                <div x-show="open" @click.away="open = false"
-                    class="absolute mt-2 bg-white shadow-md rounded-md w-full z-10 text-left">
-                    <ul>
-                        <li class="p-2 bg-blue-500 text-white rounded-t-md" @click="selected = 'Rentang Harga'; open = false">Rentang Harga</li>
-                        <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="selected = 'Rp 0 - 1jt'; open = false">Rp 0 - 1.000.000</li>
-                        <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="selected = 'Rp 1jt - 3jt'; open = false">Rp 1.000.000 - 3.000.000</li>
-                        <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="selected = '> 3jt'; open = false">> Rp 3.000.000</li>
-                    </ul>
-                </div>
+            <div class="relative w-full mt">
+                <select class="appearance-none bg-blue-500 text-white p-2 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none ">
+                    <option class="bg-white text-black">Rp 0 - 1.000.000</option>
+                    <option class="bg-white text-black">Rp 1.000.000 - 3.000.000</option>
+                    <option class="bg-white text-black "> Rp 3.000.000</option>
+                </select>
+                <i class="fas fa-filter text-white text-xl absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             </div>
+
 
         </div>
         

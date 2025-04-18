@@ -58,16 +58,26 @@
         
         <!-- Products Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            @php
+            use Illuminate\Support\Facades\Auth;
+        @endphp
             <!-- Product Card 1 -->
             <div class="bg-blue-500 rounded-xl overflow-hidden">
-                <img src="img/iphone11.png" alt="iPhone 11" class="w-full h-64 object-contain">
+                <img src="{{ asset('img/iphone11.png') }}" alt="iPhone 11" class="w-full h-64 object-contain">
                 <div class="p-4 text-white">
                     <h3 class="font-medium">iPhone 11 256GB</h3>
                     <p class="text-2xl font-bold mt-1">Rp 7,500,000</p>
                     <p class="text-white/70 line-through">Rp 9,500,000</p>
                     <div class="flex mt-4 space-x-2">
-                        <a href="" class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
-                        <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        @auth
+                            <!-- User sudah login, tampilkan tombol dengan akses langsung -->
+                            <a href="{{ route('cart') }}" class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
+                            <a href="{{ route('product') }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        @else
+                            <!-- User belum login, arahkan ke halaman login dengan redirect kembali -->
+                            <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
+                            <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                        @endauth
                     </div>
                 </div>
             </div>

@@ -1,7 +1,23 @@
 <!-- Top Navigation -->
 <div class="bg-blue-500 relative">
-    <div class="container mx-auto px-4 py-2 flex justify-end">
-        
+    <div class="container mx-auto px-4 py-2 flex justify-end text-white space-x-4 text-sm">
+        @guest
+            <a href="{{ route('login') }}" class="hover:underline">Masuk</a>
+            <span>|</span>
+            <a href="{{ route('registrasi') }}" class="hover:underline">Daftar</a>
+        @endguest
+    
+        @auth
+            <div class="flex items-center">
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="hover:underline flex items-center">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
+                        <span>Keluar</span>
+                    </button>
+                </form>
+            </div>
+        @endauth
     </div>
     
     <!-- Main Navigation -->
@@ -9,7 +25,7 @@
         <div class="bg-white rounded-xl py-4 px-6 flex items-center justify-between">
             <!-- Logo -->
             <div class="flex items-center">
-                <a href="{{ route('welcome') }}"><img src="img/logo2.png" alt="PhoneKu Logo" class="h-10"></a>
+                <a href="{{ route('welcome') }}"><img src="{{ asset('img/logo2.png') }}" alt="PhoneKu Logo" class="h-10"></a>
             </div>
             
             <!-- Navigation Links -->
@@ -38,14 +54,26 @@
             
             <!-- Icons -->
             <div class="flex items-center space-x-4">
-                <a href="{{ route('cart') }}" 
-                    class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
-                    <i class="fas fa-shopping-cart text-xl text-blue-500"></i>
-                </a>
-                <a href="{{ route('profile') }}" 
-                    class="{{ Route::currentRouteName() == 'profile' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
-                    <i class="fas fa-user-circle text-xl text-blue-500"></i>
-                </a>
+                @auth
+                    <a href="{{ route('cart') }}" 
+                        class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </a>
+                    <a href="{{ route('profile') }}" 
+                        class="{{ Route::currentRouteName() == 'profile' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
+                        <i class="fas fa-user-circle text-xl"></i>
+                    </a>
+                @else
+                    {{-- Jika user belum login, klik icon cart akan redirect ke login --}}
+                    <a href="{{ route('login', ['redirect' => route('cart')]) }}" 
+                        class="text-gray-600 hover:text-blue-500">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </a>
+                    <a href="{{ route('login') }}" 
+                        class="text-gray-600 hover:text-blue-500">
+                        <i class="fas fa-user-circle text-xl"></i>
+                    </a>
+                @endauth
             </div>
         </div>
     </div>

@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhoneKu - Pendaftaran</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="font-sans">
     <div class="flex min-h-screen">
         <!-- Left Side with Logo and Image -->
         <div class="hidden md:flex md:w-1/2 bg-white flex-col p-8 relative overflow-hidden">
             <div class="mb-4">
-                <img src="img/logo2.png" alt="PhoneKu Logo" class="w-60">
+                <a href="{{ route('welcome') }}">
+                    <img src="{{ asset('img/logo2.png') }}" alt="PhoneKu Logo" class="w-60">
+                </a>
             </div>
             
             <div class="flex-1 flex items-center justify-center">
-                <img src="img/model.png" alt="Person with phone" 
+                <img src="{{ asset('img/model.png') }}" alt="Person with phone" 
                      class="w-full h-auto object-contain absolute inset-25 mx-auto my-8"
                      style="max-height: 90vh">
             </div>
@@ -29,27 +32,53 @@
                     <p class="text-sm opacity-90">Silahkan daftar terlebih dahulu jika belum memiliki akun!</p>
                 </div>
 
-                <form class="space-y-5">
+                <!-- Tampilkan pesan error jika ada -->
+                @if($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
+                <form class="space-y-5" method="POST" action="{{ route('registrasi.post') }}">
+                    @csrf
+                    
+                    <!-- Tambahkan hidden field untuk redirect -->
+                    @if(request()->has('redirect'))
+                        <input type="hidden" name="redirect" value="{{ request()->redirect }}">
+                    @endif
+                    
+                    <div>
+                        <label for="name" class="block text-white mb-2 text-sm">Nama Lengkap</label>
+                        <input type="text" id="name" name="name" 
+                               class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                               placeholder="Masukkan nama lengkap anda" value="{{ old('name') }}" required>
+                    </div>
+
                     <div>
                         <label for="email" class="block text-white mb-2 text-sm">Email</label>
                         <div class="relative">
-                            <input type="tel" id="email" 
-                                   class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 pr-28"
-                                   placeholder="Masukkan email anda">
+                            <input type="email" id="email" name="email" 
+                                   class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                   placeholder="Masukkan email anda" value="{{ old('email') }}" required>
                         </div>
                     </div>
 
                     <div>
-                        <label for="password1" class="block text-white mb-2 text-sm">Password</label>
-                        <input type="text" id="password1" 
+                        <label for="password" class="block text-white mb-2 text-sm">Password</label>
+                        <input type="password" id="password" name="password" 
                                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                               placeholder="Masukkan password">
+                               placeholder="Masukkan password" required>
                     </div>
+                    
                     <div>
-                        <label for="password2" class="block text-white mb-2 text-sm">Password</label>
-                        <input type="text" id="password2" 
+                        <label for="password_confirmation" class="block text-white mb-2 text-sm">Konfirmasi Password</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" 
                                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                               placeholder="Masukkan ulang password">
+                               placeholder="Masukkan ulang password" required>
                     </div>
 
                     <button type="submit" 
