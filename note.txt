@@ -1,3 +1,4 @@
 SKU hapus
 bikin page lupa password dengan menginputkan nomer telepon
 bikin testimoni di bagian page product sama stok produk di bawah jumlah kuantitas
+cek
