@@ -7,18 +7,8 @@
     <div class="relative">
         <!-- Blue Background -->
         <!-- Increased pb significantly: e.g., pb-80 or more depending on image height -->
-        <div class="bg-blue-500 pb-80 md:pb-96 bg-gradient-to-r from-blue-500 to-blue-400">
-            <!-- Top Navigation -->
-            <div class="container mx-auto px-4 py-2 flex justify-end">
-                
-            </div>
-
-            <!-- Main Navigation -->
-            <!-- Added relative and z-10 to ensure it's above the image -->
-            <div class="container mx-auto px-4 relative z-10">
-                
-            </div>
-            <!-- NOTE: Image div is now placed AFTER the navigation container within the blue div -->
+        <div class="bg-blue-500  h-[500px] md:h-[550px] lg:h-[400px]">
+            <!-- Konten header dibiarkan kosong untuk banner -->
         </div>
 
         <!-- Wave SVG -->
@@ -35,11 +25,12 @@
         <!-- Fine-tune 'top' and 'max-h' values as needed -->
         <!-- Fine-tune 'top' and 'max-h' values as needed -->
         <!-- Fine-tune 'top' and 'max-h' values as needed -->
-        <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-3/4 md:w-2/3 lg:w-1/2 z-0 pointer-events-none">
-            <!-- Adjusted max-height and position to make it stick to bottom -->
-            <img src="img/banner4.png" alt="Smartphones" class="object-contain w-full max-h-[450px] md:max-h-[500px] lg:max-h-[600px]">
-        </div>
+        <div class="absolute top-[15%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
+    <div class="relative w-full h-full" style="overflow: hidden;">
+        <img src="img/banner4.png" alt="Smartphones"
+            class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
     </div>
+</div>
 
     <!-- Main Content - User Profile -->
     <!-- Adjusted negative margin-top to match increased header height -->
@@ -58,7 +49,7 @@
 
                 <!-- Navigation Menu -->
                 <div class="bg-white rounded-xl p-4 shadow-md space-y-2">
-                    <a href="{{ route('profile') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl shadow-sm">
+                    <a href="{{ route('profile') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 shadow-sm">
                         <i class="fas fa-user w-5 mr-3 text-center"></i>
                         <span>Tentang Saya</span>
                     </a>
@@ -66,7 +57,7 @@
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
                     </a>
-                    <a href="{{ route('profilekeamanan') }}" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profilekeamanan') }}" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl transition-colors">
                         <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
                         <span>Keamanan & Privasi</span>
                     </a>

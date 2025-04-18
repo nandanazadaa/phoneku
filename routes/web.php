@@ -72,3 +72,10 @@ Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
 })->name('setelah_logout');
 
+Route::get('/lupa_password', function () {
+    return view('Auth/lupapassword');
+})->name('lupa_password');
+
+Route::get('/customer_support', function () {
+    return view('Home/customer_support');
+})->name('customer_support');

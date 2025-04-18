@@ -5,20 +5,9 @@
 @section('content')
 <!-- Header Section with Wave -->
 <div class="relative">
-        <!-- Blue Background -->
-        <!-- Increased pb significantly: e.g., pb-80 or more depending on image height -->
-        <div class="bg-blue-500 pb-80 md:pb-96 bg-gradient-to-r from-blue-500 to-blue-400">
-            <!-- Top Navigation -->
-            <div class="container mx-auto px-4 py-2 flex justify-end">
-                
-            </div>
-
-            <!-- Main Navigation -->
-            <!-- Added relative and z-10 to ensure it's above the image -->
-            <div class="container mx-auto px-4 relative z-10">
-                
-            </div>
-            <!-- NOTE: Image div is now placed AFTER the navigation container within the blue div -->
+        <!-- Background dengan height fixed daripada padding -->
+        <div class="bg-blue-500  h-[500px] md:h-[550px] lg:h-[400px]">
+            <!-- Konten header dibiarkan kosong untuk banner -->
         </div>
 
 
@@ -30,8 +19,10 @@
     </div>
 
     <!-- Hero Image with Phones -->
-    <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-3/4 md:w-2/3 lg:w-1/2 z-0 pointer-events-none">
-        <img src="img/banner4.png" alt="Smartphones" class="object-contain w-full max-h-[450px] md:max-h-[500px] lg:max-h-[600px]">
+    <div class="absolute top-[15%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
+    <div class="relative w-full h-full" style="overflow: hidden;">
+        <img src="img/banner4.png" alt="Smartphones"
+            class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
     </div>
 </div>
 
@@ -41,7 +32,7 @@
         <!-- Left Sidebar -->
         <div class="w-full md:w-1/4 mb-6 md:mb-0 md:pr-4">
             <!-- User Profile Card -->
-            <div class="bg-white rounded-xl p-4 shadow-md mb-6">
+            <div class="bg-white rounded-xl p-4 shadow-md mb-6 -mt-60">
                 <div class="flex flex-col items-center mb-4">
                     <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
                         <img src="img/profile.png" alt="User Profile" class="w-full h-full object-cover">
@@ -55,10 +46,6 @@
                 <a href="{{ route('profile') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                     <i class="fas fa-user w-5 mr-3 text-center"></i>
                     <span>Tentang Saya</span>
-                </a>
-                <a href="{{ route('profilebayar') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
-                    <i class="fas fa-credit-card w-5 mr-3 text-center"></i>
-                    <span>Pengaturan Pembayaran</span>
                 </a>
                 <a href="{{ route('riwayatpembelian') }}" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl shadow-sm">
                     <i class="fas fa-history w-5 mr-3 text-center"></i>
@@ -76,7 +63,7 @@
         </div>
 
         <!-- Right Content -->
-        <section class="w-full md:w-3/4">
+        <section class="w-full md:w-3/4 -mt-60">
             <div class="bg-white rounded-2xl shadow-lg p-6">
                 <h3 class="text-2xl font-semibold text-gray-700 mb-2">Riwayat Pembelian</h3>
                 <p class="text-gray-500 mb-6">Lihat dan Telusuri Jejak dan Transaksi Pembelian Anda</p>

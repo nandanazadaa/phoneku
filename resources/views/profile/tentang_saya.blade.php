@@ -6,7 +6,7 @@
     <!-- Header Section with Wave -->
     <div class="relative overflow-hidden">
         <!-- Background dengan height fixed daripada padding -->
-        <div class="bg-blue-500  h-[500px] md:h-[550px] lg:h-[600px]">
+        <div class="bg-blue-500  h-[500px] md:h-[550px] lg:h-[400px]">
             <!-- Konten header dibiarkan kosong untuk banner -->
         </div>
 
