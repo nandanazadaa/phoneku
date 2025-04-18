@@ -89,7 +89,7 @@ Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
 })->name('setelah_logout');
 
-<<<<<<< HEAD
+
 Route::get('/lupa_password', function () {
     return view('Auth/lupapassword');
 })->name('lupa_password');
@@ -97,7 +97,7 @@ Route::get('/lupa_password', function () {
 Route::get('/customer_support', function () {
     return view('Home/customer_support');
 })->name('customer_support');
-=======
+
 Route::prefix('admin')->name('admin.')->group(function () {
     // Login & register admin - tanpa middleware auth
     Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
@@ -108,4 +108,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
 });
->>>>>>> 87350c343f8558977ed661e59f93fe5c79d5c2c9
+
