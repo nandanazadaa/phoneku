@@ -30,10 +30,6 @@
     <div class="relative w-full h-full" style="overflow: hidden;">
         <img src="img/banner4.png" alt="Smartphones"
             class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
-        <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-3/4 md:w-2/3 lg:w-1/2 z-0 pointer-events-none">
-            <!-- Adjusted max-height and position to make it stick to bottom -->
-            <img src="img/banner4.png" alt="Smartphones" class="object-contain w-full max-h-[450px] md:max-h-[500px] lg:max-h-[600px]">
-        </div>
     </div>
 </div>
 
