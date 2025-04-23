@@ -27,7 +27,6 @@ Route::get('/kontak', function () {
 })->name('kontak');
 
 Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allproduct');
-
 // Route autentikasi
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', function () {
@@ -88,6 +87,15 @@ Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
 })->name('setelah_logout');
 
+
+Route::get('/lupa_password', function () {
+    return view('Auth/lupapassword');
+})->name('lupa_password');
+
+Route::get('/customer_support', function () {
+    return view('Home/customer_support');
+})->name('customer_support');
+
 Route::prefix('admin')->name('admin.')->group(function () {
     // Login & register admin - tanpa middleware auth
     Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
@@ -111,3 +119,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
 });
+
+    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
+});
+
+
