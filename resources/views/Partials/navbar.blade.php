@@ -59,8 +59,12 @@
                         class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
                         <i class="fas fa-shopping-cart text-xl"></i>
                     </a>
+                    @php
+                        $activeRoutes = ['profile', 'riwayatpembelian', 'profilekeamanan', 'logout.page'];
+                        $isProfileActive = in_array(Route::currentRouteName(), $activeRoutes);
+                    @endphp
                     <a href="{{ route('profile') }}" 
-                        class="{{ Route::currentRouteName() == 'profile' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
+                    class="{{ $isProfileActive ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
                         <i class="fas fa-user-circle text-xl"></i>
                     </a>
                 @else

@@ -546,44 +546,7 @@
     </div>
 </div>
 @endsection
-    
 
-@push("style")
-<style>
-/* For the product detail view in modals */
-.product-detail-image-container {
-    position: relative;
-    width: 100px;
-    padding-top: 75%; /* 4:3 Aspect Ratio to control the height */
-    background-color: #fff;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-    overflow: hidden;
-    margin-bottom: 1rem; /* Add spacing below the image */
-}
-
-.product-detail-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Keep the image contained within the container */
-}
-
-/* Ensure the modal body has proper spacing */
-.modal-body {
-    padding: 1.5rem;
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 576px) {
-    .product-detail-image-container {
-        padding-top: 100%; /* 1:1 Aspect Ratio for smaller screens */
-    }
-}
-    </style>
-@endpush
 @push('scripts')
 <script>
 // Enhanced Product Preview JavaScript
