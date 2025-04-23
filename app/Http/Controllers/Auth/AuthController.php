@@ -29,7 +29,14 @@ class AuthController extends Controller
                 ->withInput($request->except('password'));
         }
 
-        // Modifikasi credentials untuk menyesuaikan dengan primary key tabel
+        // Cek dulu apakah email ini terdaftar sebagai admin
+        $user = User::where('email', $request->email)->first();
+        if ($user && $user->role === 'admin') {
+            return redirect()->route('admin.login')
+                ->withErrors(['auth' => 'Akun ini adalah admin. Silakan login melalui halaman admin.']);
+        }
+
+        // Jika bukan admin, lanjutkan proses login user biasa
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
@@ -116,7 +123,7 @@ class AuthController extends Controller
     {
         // If already logged in as admin, redirect to dashboard
         if (Auth::check() && Auth::user()->role === 'admin') {
-            return redirect()->route('dashboard.dashboard');
+            return redirect()->route('admin.dashboard');
         }
         
         return view('auth.admin_login');
@@ -131,21 +138,21 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-
+    
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput($request->except('password'));
         }
-
-        $credentials = $request->only('email', 'password');
-        $remember = $request->has('remember');
-        
+    
         // Cek apakah email ada di database
         $user = User::where('email', $request->email)->first();
         
         // Jika user ditemukan dan rolenya admin, coba login
         if ($user && $user->role === 'admin') {
+            $credentials = $request->only('email', 'password');
+            $remember = $request->has('remember');
+            
             if (Auth::attempt($credentials, $remember)) {
                 $request->session()->regenerate();
                 return redirect()->intended(route('admin.dashboard'));
@@ -204,12 +211,12 @@ class AuthController extends Controller
      * Handle admin logout request
      */
     public function adminLogout(Request $request)
-    {
-        Auth::logout();
+{
+    Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
-    }
+    return redirect()->route('admin.login');
+}
 }

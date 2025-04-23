@@ -3,11 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Home\HomeController;
 
 // Route yang dapat diakses semua orang
-Route::get('/', function () {
-    return view('Home/welcome');
-})->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('welcome');
 
 Route::get('/tim', function () {
     return view('Home/tim');
@@ -17,6 +17,7 @@ Route::get('/aboutus', function () {
     return view('home.aboutus');
 })->name('aboutus');
 
+Route::get('/product/{product}', [HomeController::class, 'showProduct'])->name('product.show');
 Route::get('/product', function () {
     return view('Home/product');
 })->name('product');
@@ -25,9 +26,7 @@ Route::get('/kontak', function () {
     return view('home.kontak');
 })->name('kontak');
 
-Route::get('/allproduct', function () {
-    return view('Home/allproduct');
-})->name('allproduct');
+Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allproduct');
 
 // Route autentikasi
 Route::middleware(['guest'])->group(function () {
@@ -96,6 +95,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
     Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
     
-    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-    Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
+    // Admin Routes protected by auth middleware saja
+    Route::middleware(['auth'])->group(function() {
+        // Controller sudah melakukan pengecekan admin sendiri
+        Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+        
+        // Product Management Routes
+        Route::get('/products', [ProductController::class, 'index'])->name('products');
+        Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+        Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+        Route::post('/products/preview', [ProductController::class, 'preview'])->name('products.preview');
+        
+        // Ubah dari GET menjadi POST
+        Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
+    });
 });
