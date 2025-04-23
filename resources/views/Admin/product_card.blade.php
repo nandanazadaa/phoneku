@@ -585,7 +585,6 @@
 </div>
 @endsection
     
-@endpush
 @push('scripts')
 <script>
 // Enhanced Product Preview JavaScript
