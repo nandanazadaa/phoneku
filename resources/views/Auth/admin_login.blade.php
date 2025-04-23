@@ -28,7 +28,7 @@
         <div class="w-full md:w-[45%] ml-auto bg-gradient-to-b from-blue-500 to-cyan-400 flex items-center justify-center p-8">
             <div class="w-full max-w-md transform transition-all">
                 <div class="text-center text-white mb-8">
-                    <h2 class="text-3xl font-bold mb-2">Masuk</h2>
+                    <h2 class="text-3xl font-bold mb-2">Masuk Sebagai Admin</h2>
                     <p class="text-sm opacity-90">Silahkan masuk jika sudah memiliki akun!</p>
                 </div>
 

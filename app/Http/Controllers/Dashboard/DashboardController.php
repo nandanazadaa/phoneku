@@ -54,7 +54,8 @@ class DashboardController extends Controller
             return $redirect;
         }
         
-        return view('admin.products.index');
+        // Ubah dari admin.products.index menjadi admin.card_product
+        return view('admin.card_product');
     }
     
     /**

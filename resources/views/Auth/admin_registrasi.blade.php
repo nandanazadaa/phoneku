@@ -130,7 +130,7 @@
                     <div class="border-t border-white/20 pt-4 mt-6">
                         <p class="text-center text-white text-sm">
                             Sudah memiliki akun? 
-                            <a href="{{ route('login') }}" class="text-blue-200 hover:underline">Kembali login!</a>
+                            <a href="{{ route('admin.login') }}" class="text-blue-200 hover:underline">Kembali login!</a>
                         </p>
                     </div>
                 </form>

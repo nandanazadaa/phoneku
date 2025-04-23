@@ -39,25 +39,10 @@
             </div>
             <ul class="nav nav-primary">
                 <li class="nav-item active">
-                    <a data-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
+                    <a  href="#dashboard" class="collapsed" aria-expanded="false">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
-                        <span class="caret"></span>
                     </a>
-                    <div class="collapse" id="dashboard">
-                        <ul class="nav nav-collapse">
-                            <li>
-                                <a href="">
-                                    <span class="sub-item">Dashboard 1</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <span class="sub-item">Dashboard 2</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
                 <li class="nav-section">
                     <span class="sidebar-mini-icon">
@@ -65,17 +50,17 @@
                     </span>
                     <h4 class="text-section">Components</h4>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
                     <a data-toggle="collapse" href="#base">
                         <i class="fas fa-layer-group"></i>
-                        <p>Base</p>
+                        <p>Product</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse" id="base">
+                    <div class="collapse {{ request()->routeIs('admin.products*') ? 'show' : '' }}" id="base">
                         <ul class="nav nav-collapse">
-                            <li>
-                                <a href="">
-                                    <span class="sub-item">Avatars</span>
+                            <li class="{{ request()->routeIs('admin.products') && request('tab', 'list') == 'list' ? 'active' : '' }}">
+                                <a href="{{ route('admin.products') }}?tab=list">
+                                    <span class="sub-item">Card Product</span>
                                 </a>
                             </li>
                             <li>
