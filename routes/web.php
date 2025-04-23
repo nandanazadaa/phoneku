@@ -27,7 +27,8 @@ Route::get('/kontak', function () {
 })->name('kontak');
 
 Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allproduct');
-// Route autentikasi
+
+// Rout autentikasi
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', function () {
         return view('Auth/login');
@@ -119,9 +120,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
 });
-
-    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-    Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
-});
-
 

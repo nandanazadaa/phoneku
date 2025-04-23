@@ -84,7 +84,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>No</th>
                                     <th>Image</th>
                                     <th>Name</th>
                                     <th>Category</th>
@@ -96,12 +96,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($products ?? [] as $product)
+                                @forelse($products ?? [] as $index => $product)
                                     <tr>
-                                        <td>{{ $product->id }}</td>
+                                        <td>{{ $products->firstItem() + $index }}</td>
                                         <td>
                                             @if($product->image)
-                                                <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" width="50">
+                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-table-image" width="100" >
                                             @else
                                                 <span class="badge badge-secondary">No Image</span>
                                             @endif
@@ -149,12 +149,14 @@
                                                             <div class="row">
                                                                 <div class="col-md-6">
                                                                     @if($product->image)
-                                                                        <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="img-fluid">
+                                                                    <div class="product-detail-image-container">
+                                                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-detail-image" width="400">
+                                                                    </div>
                                                                     @else
-                                                                        <div class="text-center p-5 bg-light">
-                                                                            <i class="fa fa-image fa-3x text-muted"></i>
-                                                                            <p class="mt-2">No image available</p>
-                                                                        </div>
+                                                                    <div class="text-center p-5 bg-light rounded">
+                                                                        <i class="fa fa-image fa-3x text-muted"></i>
+                                                                        <p class="mt-2">No image available</p>
+                                                                    </div>
                                                                     @endif
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -250,7 +252,7 @@
         <!-- Create Tab -->
         <div class="tab-pane fade {{ (request('tab') === 'create') ? 'show active' : '' }}" id="create" role="tabpanel" aria-labelledby="create-tab">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Add New Product</h4>
@@ -345,19 +347,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Live Preview</h4>
-                        </div>
-                        <div class="card-body" id="create-preview-container">
-                            <div class="text-center mt-4 mb-4">
-                                <p>Fill out the form to see a live preview</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -365,7 +354,7 @@
         @if(isset($editProduct) && request('tab') === 'edit')
         <div class="tab-pane fade show active" id="edit" role="tabpanel" aria-labelledby="edit-tab">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Edit Product</h4>
@@ -444,11 +433,15 @@
                                     @enderror
                                     <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
                                     
-                                    @if ($editProduct->image)
-                                        <div class="mt-2">
-                                            <p>Current Image:</p>
-                                            <img src="{{ Storage::url($editProduct->image) }}" alt="{{ $editProduct->name }}" class="img-thumbnail" style="max-height: 100px;">
-                                        </div>
+                                    @if($product->image)
+                                    <div class="text-start mb-3">
+                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-detail-image" width="100">
+                                    </div>
+                                    @else
+                                    <div class="text-center p-5 bg-light rounded">
+                                        <i class="fa fa-image fa-3x text-muted"></i>
+                                        <p class="mt-2">No image available</p>
+                                    </div>
                                     @endif
                                 </div>
 
@@ -465,37 +458,6 @@
                                     <a href="{{ route('admin.products') }}?tab=list" class="btn btn-secondary">Cancel</a>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Live Preview</h4>
-                        </div>
-                        <div class="card-body" id="edit-preview-container">
-                            <!-- Product Card Preview for Edit -->
-                            <div class="bg-blue-500 rounded-xl overflow-hidden">
-                                @if($editProduct->image)
-                                    <img src="{{ Storage::url($editProduct->image) }}" alt="{{ $editProduct->name }}" class="w-full h-64 object-contain">
-                                @else
-                                    <div class="bg-blue-400 flex items-center justify-center h-64">
-                                        <i class="fa fa-image text-white text-5xl"></i>
-                                    </div>
-                                @endif
-                                <div class="p-4 text-white">
-                                    <h3 class="font-medium">{{ $editProduct->name }}</h3>
-                                    <p class="text-2xl font-bold mt-1">{{ $editProduct->formatted_price }}</p>
-                                    @if($editProduct->original_price)
-                                        <p class="text-white/70 line-through">{{ $editProduct->formatted_original_price }}</p>
-                                    @endif
-                                    <div class="flex mt-4 space-x-2">
-                                        <a href="#" class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
-                                        <a href="#" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -585,6 +547,42 @@
 </div>
 @endsection
     
+
+@push("style")
+<style>
+/* For the product detail view in modals */
+.product-detail-image-container {
+    position: relative;
+    width: 100px;
+    padding-top: 75%; /* 4:3 Aspect Ratio to control the height */
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    overflow: hidden;
+    margin-bottom: 1rem; /* Add spacing below the image */
+}
+
+.product-detail-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Keep the image contained within the container */
+}
+
+/* Ensure the modal body has proper spacing */
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 576px) {
+    .product-detail-image-container {
+        padding-top: 100%; /* 1:1 Aspect Ratio for smaller screens */
+    }
+}
+    </style>
 @endpush
 @push('scripts')
 <script>
@@ -617,108 +615,103 @@ $(document).ready(function() {
 
     // Create a preview card based on form data
     function createPreviewCard(data) {
-        let imageHtml;
-        
-        if (data.imageUrl) {
-            // Use existing image
-            imageHtml = `<img src="${data.imageUrl}" alt="${data.name}" class="w-full h-64 object-contain">`;
-        } else if (data.imageFile) {
-            // Use new image selected by file input
-            imageHtml = `<img src="${data.imageFile}" alt="${data.name}" class="w-full h-64 object-contain">`;
-        } else {
-            // No image placeholder
-            imageHtml = `
-                <div class="bg-blue-400 flex items-center justify-center h-64">
-                    <i class="fa fa-image text-white text-5xl"></i>
-                </div>
-            `;
-        }
-        
-        // Format prices
-        const formattedPrice = 'Rp ' + formatPrice(data.price);
-        const hasOriginalPrice = data.originalPrice && data.originalPrice > 0;
-        const formattedOriginalPrice = hasOriginalPrice ? 'Rp ' + formatPrice(data.originalPrice) : null;
-        
-        // Build card HTML
-        return `
-            <div class="bg-blue-500 rounded-xl overflow-hidden">
-                ${imageHtml}
-                <div class="p-4 text-white">
-                    <h3 class="font-medium">${data.name}</h3>
-                    <p class="text-2xl font-bold mt-1">${formattedPrice}</p>
-                    ${hasOriginalPrice ? `<p class="text-white/70 line-through">${formattedOriginalPrice}</p>` : ''}
-                    <div class="flex mt-4 space-x-2">
-                        <a href="#" class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
-                        <a href="#" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
-                    </div>
+    let imageHtml;
+
+    if (data.imageFile) {
+        // Use new image from file input
+        imageHtml = `<div class="preview-image-container">
+                        <img src="${data.imageFile}" alt="${data.name}" class="preview-image" width:"200";>
+                      </div>`;
+    } else if (data.imageUrl) {
+        // Use existing image
+        imageHtml = `<div class="preview-image-container">
+                        <img src="${data.imageUrl}" alt="${data.name}" class="preview-image" width:"200";>
+                      </div>`;
+    } else {
+        // Placeholder if no image
+        imageHtml = `<div class="preview-image-container">
+                        <div class="preview-no-image">
+                            <i class="fa fa-image text-muted" style="font-size: 2rem;"></i>
+                        </div>
+                      </div>`;
+    }
+
+    // Format prices
+    const formattedPrice = 'Rp ' + formatPrice(data.price);
+    const hasOriginalPrice = data.originalPrice && data.originalPrice > 0;
+    const formattedOriginalPrice = hasOriginalPrice ? 'Rp ' + formatPrice(data.originalPrice) : null;
+
+    // Build card HTML with improved layout
+    return `
+        <div class="preview-card bg-blue-500">
+            ${imageHtml}
+            <div class="p-4 text-white">
+                <h3 class="font-medium text-lg truncate">${data.name}</h3>
+                <p class="text-xl font-bold mt-1">${formattedPrice}</p>
+                ${hasOriginalPrice ? `<p class="text-white/70 line-through text-sm">${formattedOriginalPrice}</p>` : ''}
+                <div class="flex mt-3 space-x-2">
+                    <a href="#" class="bg-white text-blue-500 rounded py-1.5 px-3 text-sm flex-1 text-center no-underline hover:bg-gray-100 transition">+Keranjang</a>
+                    <a href="#" class="bg-blue-600 text-white rounded py-1.5 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-700 transition">Beli</a>
                 </div>
             </div>
-        `;
-    }
+        </div>
+    `;
+}
 
     // Function to update create preview
     function updateCreatePreview() {
-        // Get values from create form
         const name = $('#create_name').val() || 'Product Name';
         const price = parseFloat($('#create_price').val()) || 0;
         const originalPrice = parseFloat($('#create_original_price').val()) || 0;
         const category = $('#create_category').val() || 'handphone';
-        
-        // Handle image
-        let imageFile = null;
+
         const fileInput = document.getElementById('create_image');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Create preview data
                 const data = {
                     name: name,
                     price: price,
                     originalPrice: originalPrice,
                     category: category,
-                    imageFile: e.target.result
+                    imageFile: e.target.result,
+                    imageUrl: null
                 };
-                
-                // Update preview container
                 $('#create-preview-container').html(createPreviewCard(data));
+            };
+            reader.onerror = function(e) {
+                console.error('Error reading file:', e);
             };
             reader.readAsDataURL(fileInput.files[0]);
         } else {
-            // Create preview data without image
             const data = {
                 name: name,
                 price: price,
                 originalPrice: originalPrice,
                 category: category,
-                imageFile: null
+                imageFile: null,
+                imageUrl: null
             };
-            
-            // Update preview container
             $('#create-preview-container').html(createPreviewCard(data));
         }
     }
 
-    // Function to update edit preview
+    // Function to update edit preview (removed duplicate)
     function updateEditPreview() {
-        // Get values from edit form
         const name = $('#edit_name').val() || 'Product Name';
         const price = parseFloat($('#edit_price').val()) || 0;
         const originalPrice = parseFloat($('#edit_original_price').val()) || 0;
         const category = $('#edit_category').val() || 'handphone';
-        
-        // Handle existing image
+
         let imageUrl = null;
         if ($('.mt-2 img.img-thumbnail').length) {
             imageUrl = $('.mt-2 img.img-thumbnail').attr('src');
         }
-        
-        // Check if a new file is selected
-        let imageFile = null;
+
         const fileInput = document.getElementById('edit_image');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Create preview data with new image
                 const data = {
                     name: name,
                     price: price,
@@ -727,13 +720,13 @@ $(document).ready(function() {
                     imageUrl: null,
                     imageFile: e.target.result
                 };
-                
-                // Update preview container
                 $('#edit-preview-container').html(createPreviewCard(data));
+            };
+            reader.onerror = function(e) {
+                console.error('Error reading file:', e);
             };
             reader.readAsDataURL(fileInput.files[0]);
         } else {
-            // Create preview data with existing image
             const data = {
                 name: name,
                 price: price,
@@ -742,8 +735,6 @@ $(document).ready(function() {
                 imageUrl: imageUrl,
                 imageFile: null
             };
-            
-            // Update preview container
             $('#edit-preview-container').html(createPreviewCard(data));
         }
     }
