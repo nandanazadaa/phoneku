@@ -1,10 +1,10 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Home\HomeController;
+use App\Http\Controllers\Home\ProfileController;
 
 // Route yang dapat diakses semua orang
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -46,9 +46,8 @@ Route::middleware(['guest'])->group(function () {
 // Route yang memerlukan login
 Route::middleware(['auth'])->group(function () {
     // Profile routes
-    Route::get('/profile', function () {
-        return view('profile/tentang_saya');
-    })->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update'); // Added update route
     
     Route::get('/profilebayar', function () {
         return view('profile/atur_pembayaran');
@@ -87,7 +86,6 @@ Route::get('/profileout', function () {
 Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
 })->name('setelah_logout');
-
 
 Route::get('/lupa_password', function () {
     return view('Auth/lupapassword');

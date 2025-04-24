@@ -7,17 +7,17 @@
     <div class="page-inner py-5">
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
             <div>
-                <h2 class="pb-2 fw-bold">Products</h2>
-                <h5 class="op-7 mb-2">Manage all products in your store</h5>
+                <h2 class="pb-2 fw-bold">Produk Management</h2>
+                <h5 class="op-7 mb-2">Manage Produk yang ada di toko anda!</h5>
             </div>
             <div class="ml-md-auto py-2 py-md-0">
                 @if(isset($activeTab) && $activeTab === 'list')
                     <button class="btn btn-white btn-border btn-round mr-2" data-toggle="modal" data-target="#createProductModal">
-                        <i class="fa fa-plus"></i> Add New Product
+                        <i class="fa fa-plus"></i> Tambah Produk Produk
                     </button>
                 @else
                     <a href="{{ route('admin.products') }}?tab=list" class="btn btn-white btn-border btn-round mr-2">
-                        <i class="fa fa-arrow-left"></i> Back to Products
+                        <i class="fa fa-arrow-left"></i> Kembali ke Produk
                     </a>
                 @endif
             </div>
@@ -32,21 +32,21 @@
             <a class="nav-link {{ (request('tab', 'list') === 'list') ? 'active' : '' }}" 
                 id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" 
                 aria-selected="{{ (request('tab', 'list') === 'list') ? 'true' : 'false' }}">
-                <i class="fa fa-list"></i> Product List
+                <i class="fa fa-list"></i> List Produk
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ (request('tab') === 'create') ? 'active' : '' }}" 
                 id="create-tab" data-toggle="tab" href="#create" role="tab" aria-controls="create" 
                 aria-selected="{{ (request('tab') === 'create') ? 'true' : 'false' }}">
-                <i class="fa fa-plus"></i> Add New Product
+                <i class="fa fa-plus"></i> Tambah Produk Baru
             </a>
         </li>
         @if(isset($product) && request('tab') === 'edit')
             <li class="nav-item">
                 <a class="nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" 
                     aria-controls="edit" aria-selected="true">
-                    <i class="fa fa-edit"></i> Edit Product
+                    <i class="fa fa-edit"></i> Edit Produk
                 </a>
             </li>
         @endif
@@ -59,11 +59,11 @@
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
-                        <h4 class="card-title">All Products</h4>
+                        <h4 class="card-title">Semua Produk</h4>
                         <form class="ml-auto" action="{{ route('admin.products') }}" method="GET">
                             <input type="hidden" name="tab" value="list">
                             <div class="input-group">
-                                <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request('search') }}">
+                                <input type="text" name="search" class="form-control" placeholder="Cari produk..." value="{{ request('search') }}">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">
                                         <i class="fa fa-search"></i>
@@ -85,14 +85,13 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Image</th>
-                                    <th>Name</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Original Price</th>
-                                    <th>Stock</th>
-                                    <th>Featured</th>
-                                    <th>Actions</th>
+                                    <th>Foto Produk</th>
+                                    <th>Nama Produk</th>
+                                    <th>Kategori</th>
+                                    <th>Harga</th>
+                                    <th>Harga Asli</th>
+                                    <th>Stok</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -115,13 +114,6 @@
                                         <td>{{ $product->formatted_price }}</td>
                                         <td>{{ $product->formatted_original_price ?? '-' }}</td>
                                         <td>{{ $product->stock }}</td>
-                                        <td>
-                                            @if($product->is_featured)
-                                                <span class="badge badge-success">Yes</span>
-                                            @else
-                                                <span class="badge badge-secondary">No</span>
-                                            @endif
-                                        </td>
                                         <td>
                                             <div class="btn-group">
                                                 <a href="{{ route('admin.products') }}?tab=edit&id={{ $product->id }}" class="btn btn-sm btn-warning">
@@ -255,14 +247,14 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Add New Product</h4>
+                            <h4 class="card-title">Tambah Produk Baru</h4>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="create-product-form">
                                 @csrf
 
                                 <div class="form-group">
-                                    <label for="create_name">Product Name <span class="text-danger">*</span></label>
+                                    <label for="create_name">Nama Produk <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="create_name" name="name" value="{{ old('name') }}" required>
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -270,7 +262,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="create_description">Description</label>
+                                    <label for="create_description">Deskripsi</label>
                                     <textarea class="form-control @error('description') is-invalid @enderror" id="create_description" name="description" rows="4">{{ old('description') }}</textarea>
                                     @error('description')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -289,7 +281,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="create_original_price">Original Price (Rp)</label>
+                                            <label for="create_original_price">Harga Asli (Rp)</label>
                                             <input type="number" class="form-control @error('original_price') is-invalid @enderror" id="create_original_price" name="original_price" value="{{ old('original_price') }}" min="0" step="1000">
                                             @error('original_price')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -301,7 +293,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="create_category">Category <span class="text-danger">*</span></label>
+                                            <label for="create_category">Kategori <span class="text-danger">*</span></label>
                                             <select class="form-control @error('category') is-invalid @enderror" id="create_category" name="category" required>
                                                 <option value="handphone" {{ old('category') == 'handphone' ? 'selected' : '' }}>Handphone</option>
                                                 <option value="accessory" {{ old('category') == 'accessory' ? 'selected' : '' }}>Accessory</option>
@@ -313,7 +305,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="create_stock">Stock <span class="text-danger">*</span></label>
+                                            <label for="create_stock">Stok <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control @error('stock') is-invalid @enderror" id="create_stock" name="stock" value="{{ old('stock', 0) }}" min="0" required>
                                             @error('stock')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -323,7 +315,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="create_image">Product Image</label>
+                                    <label for="create_image">Foto Produk</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="create_image" name="image" accept="image/*">
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -332,16 +324,8 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="create_is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="create_is_featured">Featured Product</label>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">Create Product</button>
-                                    <button type="button" class="btn btn-info" id="create-preview-btn">Preview</button>
-                                    <button type="reset" class="btn btn-secondary">Reset</button>
+                                    <button type="submit" class="btn btn-success">Tambahkan Produk</button>
+                                    <button type="reset" class="btn btn-danger">Reset</button>
                                 </div>
                             </form>
                         </div>
@@ -472,7 +456,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createProductModalLabel">Add New Product</h5>
+                <h5 class="modal-title" id="createProductModalLabel">Tambah Produk Baru</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
