@@ -39,7 +39,7 @@
             </div>
             <ul class="nav nav-primary">
                 <li class="nav-item active">
-                    <a  href="#dashboard" class="collapsed" aria-expanded="false">
+                    <a  href="{{ route('admin.dashboard') }}" class="collapsed" aria-expanded="false">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
                     </a>
@@ -50,11 +50,35 @@
                     </span>
                     <h4 class="text-section">Components</h4>
                 </li>
-                <li class="nav-item {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.products') }}?tab=list" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-cube"></i>
+                        <p>Produk</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.products') }}?tab=list" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-users"></i>
+                        <p>Management Users </p>
+                    </a>
+                </li>
+                <li class="nav-section">
+                    <span class="sidebar-mini-icon">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </span>
+                    <h4 class="text-section">Customer Support</h4>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.products') }}?tab=list" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-comment"></i>
+                        <p>Chat</p>
+                    </a>
+                </li>
+                {{-- <li class="nav-item {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
                     <a data-toggle="collapse" href="#base">
                         <i class="fas fa-layer-group"></i>
                         <p>Product</p>
-                        <span class="caret"></span>
                     </a>
                     <div class="collapse {{ request()->routeIs('admin.products*') ? 'show' : '' }}" id="base">
                         <ul class="nav nav-collapse">
@@ -70,7 +94,7 @@
                             </li>
                         </ul>
                     </div>
-                </li>
+                </li> --}}
                 <!-- Additional sidebar menu items -->
                 <li class="mx-4 mt-2">
                     <a href="http://themekita.com/atlantis-bootstrap-dashboard.html" class="btn btn-primary btn-block"><span class="btn-label mr-2"> <i class="fa fa-heart"></i> </span>Buy Pro</a> 
