@@ -65,7 +65,7 @@
                             </li>
                             <li>
                                 <a href="">
-                                    <span class="sub-item">Buttons</span>
+                                    <span class="sub-item">Cart</span>
                                 </a>
                             </li>
                         </ul>

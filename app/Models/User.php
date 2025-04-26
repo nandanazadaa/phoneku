@@ -10,6 +10,10 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    public function profile()
+    {
+        return $this->hasOne(\App\Models\Profile::class, 'user_id', 'id_user');
+    }
     /**
      * The primary key for the model.
      *
@@ -55,5 +59,6 @@ class User extends Authenticatable
         'password' => 'hashed',
         'new_password' => 'hashed',
     ];
+
 
 }

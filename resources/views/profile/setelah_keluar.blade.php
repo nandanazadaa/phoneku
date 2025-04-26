@@ -3,29 +3,28 @@
 @section('title', 'Setelah Keluar - PhoneKu')
 
 @section('content')
-    <!-- Header Section with Wave -->
-    <div class="relative">
-        <!-- Blue Background -->
-        <!-- Increased pb significantly: e.g., pb-80 or more depending on image height -->
-        <div class="bg-blue-500  h-[500px] md:h-[550px] lg:h-[400px]">
-            <!-- Konten header dibiarkan kosong untuk banner -->
-        </div>
-
-        <!-- Wave SVG -->
-        <!-- Added wave-container class -->
-        <div class="absolute bottom-0 left-0 w-full overflow-hidden wave-container" style="line-height: 0;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full">
-                <path fill="#f9fafb" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,266.7C960,267,1056,245,1152,224C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-            </svg>
-        </div>
-
-        <!--banner hp-->
-        <div class="absolute top-[15%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
-    <div class="relative w-full h-full" style="overflow: hidden;">
-        <img src="img/banner4.png" alt="Smartphones"
-            class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
+<div class="relative">
+    <div class="bg-blue-500 h-[500px] md:h-[550px] lg:h-[400px]">
+        <!-- Kosongkan konten header jika tidak ada teks -->
     </div>
+
+    <!-- Wave SVG -->
+    <div class="absolute bottom-[-24px] left-0 w-full overflow-hidden wave-container" style="line-height: 0;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full">
+            <path fill="#f9fafb" fill-opacity="1"
+                d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,266.7C960,267,1056,245,1152,224C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+            </path>
+        </svg>
     </div>
+
+    <!-- Banner Image -->
+    <div class="absolute top-[5%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
+        <div class="relative w-full h-full" style="overflow: hidden;">
+            <img src="{{ asset('img/banner4.png') }}" alt="Smartphones"
+                class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
+        </div>
+    </div>
+</div>
 
     <!-- Main Content - User Profile -->
     <!-- Adjusted negative margin-top to match increased header height -->

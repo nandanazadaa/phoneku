@@ -7,17 +7,17 @@
     <div class="page-inner py-5">
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
             <div>
-                <h2 class="pb-2 fw-bold">Products</h2>
-                <h5 class="op-7 mb-2">Manage all products in your store</h5>
+                <h2 class="pb-2 fw-bold">Produk Management</h2>
+                <h5 class="op-7 mb-2">Manage Produk yang ada di toko anda!</h5>
             </div>
             <div class="ml-md-auto py-2 py-md-0">
                 @if(isset($activeTab) && $activeTab === 'list')
                     <button class="btn btn-white btn-border btn-round mr-2" data-toggle="modal" data-target="#createProductModal">
-                        <i class="fa fa-plus"></i> Add New Product
+                        <i class="fa fa-plus"></i> Tambah Produk Produk
                     </button>
                 @else
                     <a href="{{ route('admin.products') }}?tab=list" class="btn btn-white btn-border btn-round mr-2">
-                        <i class="fa fa-arrow-left"></i> Back to Products
+                        <i class="fa fa-arrow-left"></i> Kembali ke Produk
                     </a>
                 @endif
             </div>
@@ -32,21 +32,21 @@
             <a class="nav-link {{ (request('tab', 'list') === 'list') ? 'active' : '' }}" 
                 id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" 
                 aria-selected="{{ (request('tab', 'list') === 'list') ? 'true' : 'false' }}">
-                <i class="fa fa-list"></i> Product List
+                <i class="fa fa-list"></i> List Produk
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ (request('tab') === 'create') ? 'active' : '' }}" 
                 id="create-tab" data-toggle="tab" href="#create" role="tab" aria-controls="create" 
                 aria-selected="{{ (request('tab') === 'create') ? 'true' : 'false' }}">
-                <i class="fa fa-plus"></i> Add New Product
+                <i class="fa fa-plus"></i> Tambah Produk Baru
             </a>
         </li>
         @if(isset($product) && request('tab') === 'edit')
             <li class="nav-item">
                 <a class="nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" 
                     aria-controls="edit" aria-selected="true">
-                    <i class="fa fa-edit"></i> Edit Product
+                    <i class="fa fa-edit"></i> Edit Produk
                 </a>
             </li>
         @endif
@@ -59,11 +59,11 @@
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
-                        <h4 class="card-title">All Products</h4>
+                        <h4 class="card-title">Semua Produk</h4>
                         <form class="ml-auto" action="{{ route('admin.products') }}" method="GET">
                             <input type="hidden" name="tab" value="list">
                             <div class="input-group">
-                                <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request('search') }}">
+                                <input type="text" name="search" class="form-control" placeholder="Cari produk..." value="{{ request('search') }}">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">
                                         <i class="fa fa-search"></i>
@@ -84,24 +84,23 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Image</th>
-                                    <th>Name</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Original Price</th>
-                                    <th>Stock</th>
-                                    <th>Featured</th>
-                                    <th>Actions</th>
+                                    <th>No</th>
+                                    <th>Foto Produk</th>
+                                    <th>Nama Produk</th>
+                                    <th>Kategori</th>
+                                    <th>Harga</th>
+                                    <th>Harga Asli</th>
+                                    <th>Stok</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($products ?? [] as $product)
+                                @forelse($products ?? [] as $index => $product)
                                     <tr>
-                                        <td>{{ $product->id }}</td>
+                                        <td>{{ $products->firstItem() + $index }}</td>
                                         <td>
                                             @if($product->image)
-                                                <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" width="50">
+                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-table-image" width="100" >
                                             @else
                                                 <span class="badge badge-secondary">No Image</span>
                                             @endif
@@ -115,13 +114,6 @@
                                         <td>{{ $product->formatted_price }}</td>
                                         <td>{{ $product->formatted_original_price ?? '-' }}</td>
                                         <td>{{ $product->stock }}</td>
-                                        <td>
-                                            @if($product->is_featured)
-                                                <span class="badge badge-success">Yes</span>
-                                            @else
-                                                <span class="badge badge-secondary">No</span>
-                                            @endif
-                                        </td>
                                         <td>
                                             <div class="btn-group">
                                                 <a href="{{ route('admin.products') }}?tab=edit&id={{ $product->id }}" class="btn btn-sm btn-warning">
@@ -149,12 +141,14 @@
                                                             <div class="row">
                                                                 <div class="col-md-6">
                                                                     @if($product->image)
-                                                                        <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="img-fluid">
+                                                                    <div class="product-detail-image-container">
+                                                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-detail-image" width="400">
+                                                                    </div>
                                                                     @else
-                                                                        <div class="text-center p-5 bg-light">
-                                                                            <i class="fa fa-image fa-3x text-muted"></i>
-                                                                            <p class="mt-2">No image available</p>
-                                                                        </div>
+                                                                    <div class="text-center p-5 bg-light rounded">
+                                                                        <i class="fa fa-image fa-3x text-muted"></i>
+                                                                        <p class="mt-2">No image available</p>
+                                                                    </div>
                                                                     @endif
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -250,17 +244,17 @@
         <!-- Create Tab -->
         <div class="tab-pane fade {{ (request('tab') === 'create') ? 'show active' : '' }}" id="create" role="tabpanel" aria-labelledby="create-tab">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Add New Product</h4>
+                            <h4 class="card-title">Tambah Produk Baru</h4>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="create-product-form">
                                 @csrf
 
                                 <div class="form-group">
-                                    <label for="create_name">Product Name <span class="text-danger">*</span></label>
+                                    <label for="create_name">Nama Produk <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="create_name" name="name" value="{{ old('name') }}" required>
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -268,7 +262,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="create_description">Description</label>
+                                    <label for="create_description">Deskripsi</label>
                                     <textarea class="form-control @error('description') is-invalid @enderror" id="create_description" name="description" rows="4">{{ old('description') }}</textarea>
                                     @error('description')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -287,7 +281,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="create_original_price">Original Price (Rp)</label>
+                                            <label for="create_original_price">Harga Asli (Rp)</label>
                                             <input type="number" class="form-control @error('original_price') is-invalid @enderror" id="create_original_price" name="original_price" value="{{ old('original_price') }}" min="0" step="1000">
                                             @error('original_price')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -299,7 +293,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="create_category">Category <span class="text-danger">*</span></label>
+                                            <label for="create_category">Kategori <span class="text-danger">*</span></label>
                                             <select class="form-control @error('category') is-invalid @enderror" id="create_category" name="category" required>
                                                 <option value="handphone" {{ old('category') == 'handphone' ? 'selected' : '' }}>Handphone</option>
                                                 <option value="accessory" {{ old('category') == 'accessory' ? 'selected' : '' }}>Accessory</option>
@@ -311,7 +305,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="create_stock">Stock <span class="text-danger">*</span></label>
+                                            <label for="create_stock">Stok <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control @error('stock') is-invalid @enderror" id="create_stock" name="stock" value="{{ old('stock', 0) }}" min="0" required>
                                             @error('stock')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -321,7 +315,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="create_image">Product Image</label>
+                                    <label for="create_image">Foto Produk</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="create_image" name="image" accept="image/*">
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -330,31 +324,10 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" id="create_is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
-                                        <label class="custom-control-label" for="create_is_featured">Featured Product</label>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">Create Product</button>
-                                    <button type="button" class="btn btn-info" id="create-preview-btn">Preview</button>
-                                    <button type="reset" class="btn btn-secondary">Reset</button>
+                                    <button type="submit" class="btn btn-success">Tambahkan Produk</button>
+                                    <button type="reset" class="btn btn-danger">Reset</button>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Live Preview</h4>
-                        </div>
-                        <div class="card-body" id="create-preview-container">
-                            <div class="text-center mt-4 mb-4">
-                                <p>Fill out the form to see a live preview</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -365,7 +338,7 @@
         @if(isset($editProduct) && request('tab') === 'edit')
         <div class="tab-pane fade show active" id="edit" role="tabpanel" aria-labelledby="edit-tab">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Edit Product</h4>
@@ -444,11 +417,15 @@
                                     @enderror
                                     <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
                                     
-                                    @if ($editProduct->image)
-                                        <div class="mt-2">
-                                            <p>Current Image:</p>
-                                            <img src="{{ Storage::url($editProduct->image) }}" alt="{{ $editProduct->name }}" class="img-thumbnail" style="max-height: 100px;">
-                                        </div>
+                                    @if($product->image)
+                                    <div class="text-start mb-3">
+                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-detail-image" width="100">
+                                    </div>
+                                    @else
+                                    <div class="text-center p-5 bg-light rounded">
+                                        <i class="fa fa-image fa-3x text-muted"></i>
+                                        <p class="mt-2">No image available</p>
+                                    </div>
                                     @endif
                                 </div>
 
@@ -468,37 +445,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Live Preview</h4>
-                        </div>
-                        <div class="card-body" id="edit-preview-container">
-                            <!-- Product Card Preview for Edit -->
-                            <div class="bg-blue-500 rounded-xl overflow-hidden">
-                                @if($editProduct->image)
-                                    <img src="{{ Storage::url($editProduct->image) }}" alt="{{ $editProduct->name }}" class="w-full h-64 object-contain">
-                                @else
-                                    <div class="bg-blue-400 flex items-center justify-center h-64">
-                                        <i class="fa fa-image text-white text-5xl"></i>
-                                    </div>
-                                @endif
-                                <div class="p-4 text-white">
-                                    <h3 class="font-medium">{{ $editProduct->name }}</h3>
-                                    <p class="text-2xl font-bold mt-1">{{ $editProduct->formatted_price }}</p>
-                                    @if($editProduct->original_price)
-                                        <p class="text-white/70 line-through">{{ $editProduct->formatted_original_price }}</p>
-                                    @endif
-                                    <div class="flex mt-4 space-x-2">
-                                        <a href="#" class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
-                                        <a href="#" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         @endif
@@ -510,7 +456,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createProductModalLabel">Add New Product</h5>
+                <h5 class="modal-title" id="createProductModalLabel">Tambah Produk Baru</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -584,7 +530,10 @@
     </div>
 </div>
 @endsection
+<<<<<<< HEAD
     
+=======
+>>>>>>> dc091b58857e808a93dde18172a60060bbca83c8
 
 @push('scripts')
 <script>
@@ -617,108 +566,103 @@ $(document).ready(function() {
 
     // Create a preview card based on form data
     function createPreviewCard(data) {
-        let imageHtml;
-        
-        if (data.imageUrl) {
-            // Use existing image
-            imageHtml = `<img src="${data.imageUrl}" alt="${data.name}" class="w-full h-64 object-contain">`;
-        } else if (data.imageFile) {
-            // Use new image selected by file input
-            imageHtml = `<img src="${data.imageFile}" alt="${data.name}" class="w-full h-64 object-contain">`;
-        } else {
-            // No image placeholder
-            imageHtml = `
-                <div class="bg-blue-400 flex items-center justify-center h-64">
-                    <i class="fa fa-image text-white text-5xl"></i>
-                </div>
-            `;
-        }
-        
-        // Format prices
-        const formattedPrice = 'Rp ' + formatPrice(data.price);
-        const hasOriginalPrice = data.originalPrice && data.originalPrice > 0;
-        const formattedOriginalPrice = hasOriginalPrice ? 'Rp ' + formatPrice(data.originalPrice) : null;
-        
-        // Build card HTML
-        return `
-            <div class="bg-blue-500 rounded-xl overflow-hidden">
-                ${imageHtml}
-                <div class="p-4 text-white">
-                    <h3 class="font-medium">${data.name}</h3>
-                    <p class="text-2xl font-bold mt-1">${formattedPrice}</p>
-                    ${hasOriginalPrice ? `<p class="text-white/70 line-through">${formattedOriginalPrice}</p>` : ''}
-                    <div class="flex mt-4 space-x-2">
-                        <a href="#" class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
-                        <a href="#" class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
-                    </div>
+    let imageHtml;
+
+    if (data.imageFile) {
+        // Use new image from file input
+        imageHtml = `<div class="preview-image-container">
+                        <img src="${data.imageFile}" alt="${data.name}" class="preview-image" width:"200";>
+                      </div>`;
+    } else if (data.imageUrl) {
+        // Use existing image
+        imageHtml = `<div class="preview-image-container">
+                        <img src="${data.imageUrl}" alt="${data.name}" class="preview-image" width:"200";>
+                      </div>`;
+    } else {
+        // Placeholder if no image
+        imageHtml = `<div class="preview-image-container">
+                        <div class="preview-no-image">
+                            <i class="fa fa-image text-muted" style="font-size: 2rem;"></i>
+                        </div>
+                      </div>`;
+    }
+
+    // Format prices
+    const formattedPrice = 'Rp ' + formatPrice(data.price);
+    const hasOriginalPrice = data.originalPrice && data.originalPrice > 0;
+    const formattedOriginalPrice = hasOriginalPrice ? 'Rp ' + formatPrice(data.originalPrice) : null;
+
+    // Build card HTML with improved layout
+    return `
+        <div class="preview-card bg-blue-500">
+            ${imageHtml}
+            <div class="p-4 text-white">
+                <h3 class="font-medium text-lg truncate">${data.name}</h3>
+                <p class="text-xl font-bold mt-1">${formattedPrice}</p>
+                ${hasOriginalPrice ? `<p class="text-white/70 line-through text-sm">${formattedOriginalPrice}</p>` : ''}
+                <div class="flex mt-3 space-x-2">
+                    <a href="#" class="bg-white text-blue-500 rounded py-1.5 px-3 text-sm flex-1 text-center no-underline hover:bg-gray-100 transition">+Keranjang</a>
+                    <a href="#" class="bg-blue-600 text-white rounded py-1.5 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-700 transition">Beli</a>
                 </div>
             </div>
-        `;
-    }
+        </div>
+    `;
+}
 
     // Function to update create preview
     function updateCreatePreview() {
-        // Get values from create form
         const name = $('#create_name').val() || 'Product Name';
         const price = parseFloat($('#create_price').val()) || 0;
         const originalPrice = parseFloat($('#create_original_price').val()) || 0;
         const category = $('#create_category').val() || 'handphone';
-        
-        // Handle image
-        let imageFile = null;
+
         const fileInput = document.getElementById('create_image');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Create preview data
                 const data = {
                     name: name,
                     price: price,
                     originalPrice: originalPrice,
                     category: category,
-                    imageFile: e.target.result
+                    imageFile: e.target.result,
+                    imageUrl: null
                 };
-                
-                // Update preview container
                 $('#create-preview-container').html(createPreviewCard(data));
+            };
+            reader.onerror = function(e) {
+                console.error('Error reading file:', e);
             };
             reader.readAsDataURL(fileInput.files[0]);
         } else {
-            // Create preview data without image
             const data = {
                 name: name,
                 price: price,
                 originalPrice: originalPrice,
                 category: category,
-                imageFile: null
+                imageFile: null,
+                imageUrl: null
             };
-            
-            // Update preview container
             $('#create-preview-container').html(createPreviewCard(data));
         }
     }
 
-    // Function to update edit preview
+    // Function to update edit preview (removed duplicate)
     function updateEditPreview() {
-        // Get values from edit form
         const name = $('#edit_name').val() || 'Product Name';
         const price = parseFloat($('#edit_price').val()) || 0;
         const originalPrice = parseFloat($('#edit_original_price').val()) || 0;
         const category = $('#edit_category').val() || 'handphone';
-        
-        // Handle existing image
+
         let imageUrl = null;
         if ($('.mt-2 img.img-thumbnail').length) {
             imageUrl = $('.mt-2 img.img-thumbnail').attr('src');
         }
-        
-        // Check if a new file is selected
-        let imageFile = null;
+
         const fileInput = document.getElementById('edit_image');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Create preview data with new image
                 const data = {
                     name: name,
                     price: price,
@@ -727,13 +671,13 @@ $(document).ready(function() {
                     imageUrl: null,
                     imageFile: e.target.result
                 };
-                
-                // Update preview container
                 $('#edit-preview-container').html(createPreviewCard(data));
+            };
+            reader.onerror = function(e) {
+                console.error('Error reading file:', e);
             };
             reader.readAsDataURL(fileInput.files[0]);
         } else {
-            // Create preview data with existing image
             const data = {
                 name: name,
                 price: price,
@@ -742,8 +686,6 @@ $(document).ready(function() {
                 imageUrl: imageUrl,
                 imageFile: null
             };
-            
-            // Update preview container
             $('#edit-preview-container').html(createPreviewCard(data));
         }
     }

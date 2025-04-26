@@ -1,10 +1,11 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Product\CartController;
 use App\Http\Controllers\Home\HomeController;
+use App\Http\Controllers\Home\ProfileController;
 
 // Route yang dapat diakses semua orang
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -27,7 +28,8 @@ Route::get('/kontak', function () {
 })->name('kontak');
 
 Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allproduct');
-// Route autentikasi
+
+// Rout autentikasi
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', function () {
         return view('Auth/login');
@@ -45,9 +47,8 @@ Route::middleware(['guest'])->group(function () {
 // Route yang memerlukan login
 Route::middleware(['auth'])->group(function () {
     // Profile routes
-    Route::get('/profile', function () {
-        return view('profile/tentang_saya');
-    })->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update'); // Added update route
     
     Route::get('/profilebayar', function () {
         return view('profile/atur_pembayaran');
@@ -58,9 +59,10 @@ Route::middleware(['auth'])->group(function () {
     })->name('profilekeamanan');
     
     // Checkout dan Cart
-    Route::get('/cart', function () {
-        return view('Home/cart');
-    })->name('cart');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::post('/cart/add/{product}', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
     
     Route::get('/checkout', function () {
         return view('Home/checkout');
@@ -86,7 +88,6 @@ Route::get('/profileout', function () {
 Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
 })->name('setelah_logout');
-
 
 Route::get('/lupa_password', function () {
     return view('Auth/lupapassword');
@@ -118,6 +119,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Ubah dari GET menjadi POST
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
+<<<<<<< HEAD
 });
 
 
+=======
+});
+>>>>>>> dc091b58857e808a93dde18172a60060bbca83c8
