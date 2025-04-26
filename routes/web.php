@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Product\CartController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Home\ProfileController;
 
@@ -58,9 +59,10 @@ Route::middleware(['auth'])->group(function () {
     })->name('profilekeamanan');
     
     // Checkout dan Cart
-    Route::get('/cart', function () {
-        return view('Home/cart');
-    })->name('cart');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::post('/cart/add/{product}', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
     
     Route::get('/checkout', function () {
         return view('Home/checkout');

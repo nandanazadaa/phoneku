@@ -56,8 +56,11 @@
             <div class="flex items-center space-x-4">
                 @auth
                     <a href="{{ route('cart') }}" 
-                        class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
+                        class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }} relative">
                         <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center {{ \App\Models\Cart::where('user_id', Auth::user()->id_user ?? 0)->sum('quantity') > 0 ? '' : 'hidden' }}">
+                            {{ \App\Models\Cart::where('user_id', Auth::user()->id_user ?? 0)->sum('quantity') }}
+                        </span>
                     </a>
                     @php
                         $activeRoutes = ['profile', 'riwayatpembelian', 'profilekeamanan', 'logout.page'];
@@ -68,7 +71,6 @@
                         <i class="fas fa-user-circle text-xl"></i>
                     </a>
                 @else
-                    {{-- Jika user belum login, klik icon cart akan redirect ke login --}}
                     <a href="{{ route('login', ['redirect' => route('cart')]) }}" 
                         class="text-gray-600 hover:text-blue-500">
                         <i class="fas fa-shopping-cart text-xl"></i>
