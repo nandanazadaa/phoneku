@@ -119,10 +119,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Ubah dari GET menjadi POST
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
-<<<<<<< HEAD
 });
-
-
-=======
-});
->>>>>>> dc091b58857e808a93dde18172a60060bbca83c8

@@ -39,7 +39,7 @@
             <div>
                 <h3 class="text-lg font-bold mb-4 uppercase">Produk & Layanan</h3>
                 <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-600 hover:text-blue-500">Customer Support</a></li>
+                    <li><a href="{{ route('customer_support') }}" class="text-gray-600 hover:text-blue-500">Customer Support</a></li>
                 </ul>
             </div>
             
