@@ -35,9 +35,10 @@
                 <div class="bg-white rounded-xl p-4 shadow-md mb-6">
                     <div class="flex flex-col items-center mb-4">
                         <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
-                            <img src="img/profile.png" alt="User Profile" class="w-full h-full object-cover">
-                        </div>
-                        <h2 class="text-xl font-bold mb-1 text-gray-800">Ahmed Rusdi</h2>
+                            <img src="{{ $user->profile && $user->profile->profile_picture ? asset('storage/' . $user->profile->profile_picture) : asset('img/profile.png') }}"
+                            alt="User Profile" class="w-full h-full object-cover">
+                    </div>
+                    <h2 class="text-xl font-bold mb-1 text-gray-800">{{ $user->name }}</h2>
                     </div>
                 </div>
 

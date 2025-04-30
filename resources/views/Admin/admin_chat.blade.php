@@ -127,7 +127,9 @@
 @section('content')
 <div class="panel-header bg-primary-gradient">
     <div class="page-inner py-5">
-        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md
+
+-row">
             <div>
                 <h2 class="text-white pb-2 fw-bold">Chat Management</h2>
                 <h5 class="text-white op-7 mb-2">Communicate with Customers</h5>
@@ -169,13 +171,19 @@
                             </button>
                         </div>
                     @endif
+                    <div class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="error-alert">
+                        <span id="error-message"></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
                     <div class="chat-container">
                         <div class="contact-list">
                             @forelse ($customers as $customer)
                                 <div class="contact-item" data-user-id="{{ $customer->id }}">
-                                    <div class="contact-avatar">{{ strtoupper(substr($customer->name, 0, 1)) }}</div>
+                                    <div class="contact-avatar">{{ strtoupper(substr($customer->name ?? $customer->email, 0, 1)) }}</div>
                                     <div>
-                                        <div><strong>{{ $customer->name }}</strong></div>
+                                        <div><strong>{{ $customer->name ?? $customer->email }}</strong></div>
                                         <div class="text-muted" style="font-size: 12px;">
                                             {{ $customer->email }}
                                             @php
@@ -199,7 +207,10 @@
                                 Select a customer to start chatting
                             </div>
                             <div class="chat-messages" id="chat-messages">
-                                <!-- Messages will be dynamically added here -->
+                                <div class="message received">
+                                    Select a customer to start chatting.
+                                    <div class="message-time">{{ now()->format('H:i') }}</div>
+                                </div>
                             </div>
                             <div class="message-input">
                                 <form id="message-form">
@@ -224,15 +235,31 @@
 <script>
 $(document).ready(function() {
     // Initialize Pusher
-    Pusher.logToConsole = true; // For debugging
-    var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
-        cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
-        encrypted: true
+    const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+        cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
+        encrypted: true,
+        authEndpoint: '/pusher/auth',
+        // Add for debugging
+        logToConsole: true
     });
 
-    // Subscribe to channel
-    var channel = pusher.subscribe('private-chat');
-    var currentUserId = null;
+    // Subscribe to private channel
+    const channel = pusher.subscribe('private-chat.{{ Auth::id() }}');
+
+    let currentUserId = null;
+
+    // Listen for new messages
+    channel.bind('App\\Events\\MessageSent', function(data) {
+        if (data.sender_id == currentUserId && data.receiver_id == '{{ Auth::id() }}') {
+            appendMessage(data.message, 'received', new Date(data.created_at));
+            playNotificationSound();
+            // Update unread count
+            updateUnreadCount(data.sender_id, 0); // Reset since message is displayed
+        } else {
+            // Update unread count for other customers
+            updateUnreadCount(data.sender_id);
+        }
+    });
 
     // Handle contact selection
     $('.contact-item').on('click', function() {
@@ -240,46 +267,26 @@ $(document).ready(function() {
         $(this).addClass('active');
 
         currentUserId = $(this).data('user-id');
-        var userName = $(this).find('strong').text();
+        const userName = $(this).find('strong').text();
         $('#chat-header').html(`<strong>${userName}</strong><br><small>Online</small>`);
         $('#message-input, .btn-send').prop('disabled', false);
 
-        // Load messages
-        $.ajax({
-            url: '{{ route('admin.chat.messages', ':receiverId') }}'.replace(':receiverId', currentUserId),
-            method: 'GET',
-            success: function(response) {
-                $('#chat-messages').empty();
-                response.forEach(function(msg) {
-                    var messageClass = msg.is_sent ? 'sent' : 'received';
-                    $('#chat-messages').append(`
-                        <div class="message ${messageClass}">
-                            ${msg.message}
-                            <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
-                        </div>
-                    `);
-                });
-                $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
-            },
-            error: function(xhr) {
-                alert('Failed to load messages. Please try again.');
-            }
-        });
+        loadMessages(currentUserId);
     });
 
     // Send message
     $('#message-form').on('submit', function(e) {
         e.preventDefault();
         if (!currentUserId) {
-            alert('Please select a customer to chat with.');
+            showError('Please select a customer to chat with.');
             return;
         }
 
-        var message = $('#message-input').val().trim();
+        const message = $('#message-input').val().trim();
         if (!message) return;
 
         $.ajax({
-            url: '{{ route('admin.chat.send') }}',
+            url: '{{ route("admin.chat.send") }}',
             method: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
@@ -288,38 +295,89 @@ $(document).ready(function() {
             },
             success: function(response) {
                 $('#message-input').val('');
-                $('#chat-messages').append(`
-                    <div class="message sent">
-                        ${response.message}
-                        <div class="message-time">${new Date(response.created_at).toLocaleTimeString()}</div>
-                    </div>
-                `);
-                $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+                appendMessage(response.message, 'sent', new Date(response.created_at));
+                scrollToBottom();
             },
             error: function(xhr) {
-                alert('Failed to send message. Please try again.');
+                showError('Failed to send message. Please try again.');
             }
         });
     });
 
-    // Listen for new messages
-    channel.bind('App\\Events\\MessageSent', function(data) {
-        if (data.sender_id == currentUserId && data.receiver_id == '{{ Auth::id() }}') {
-            $('#chat-messages').append(`
-                <div class="message received">
-                    ${data.message}
-                    <div class="message-time">${new Date(data.created_at).toLocaleTimeString()}</div>
-                </div>
-            `);
-            $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+    // Function to load messages
+    function loadMessages(userId) {
+        $.ajax({
+            url: '{{ route("admin.chat.messages", ["receiverId" => ":receiverId"]) }}'.replace(':receiverId', userId),
+            method: 'GET',
+            success: function(response) {
+                $('#chat-messages').empty();
+                if (response.length === 0) {
+                    appendMessage('No messages yet. Start the conversation!', 'received', new Date());
+                } else {
+                    response.forEach(function(msg) {
+                        const messageClass = msg.is_sent ? 'sent' : 'received';
+                        appendMessage(msg.message, messageClass, new Date(msg.created_at));
+                    });
+                }
+                scrollToBottom();
+                // Reset unread count for this customer
+                updateUnreadCount(userId, 0);
+            },
+            error: function(xhr) {
+                showError('Failed to load messages. Please try again.');
+            }
+        });
+    }
 
-            // Update unread count
-            var contactItem = $(`.contact-item[data-user-id="${data.sender_id}"]`);
-            var unreadBadge = contactItem.find('.badge');
-            var currentCount = parseInt(unreadBadge.text()) || 0;
-            unreadBadge.text(currentCount + 1);
+    // Function to append message
+    function appendMessage(text, type, time) {
+        $('#chat-messages').append(`
+            <div class="message ${type}">
+                ${text}
+                <div class="message-time">${time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+            </div>
+        `);
+        scrollToBottom();
+    }
+
+    // Function to update unread count
+    function updateUnreadCount(userId, count = null) {
+        const $contactItem = $(`.contact-item[data-user-id="${userId}"]`);
+        let $badge = $contactItem.find('.badge');
+        if (count === 0) {
+            $badge.remove();
+        } else {
+            if ($badge.length) {
+                const currentCount = parseInt($badge.text()) || 0;
+                $badge.text(currentCount + 1);
+            } else {
+                $contactItem.find('.text-muted').append('<span class="badge badge-primary">1</span>');
+            }
         }
-    });
+    }
+
+    // Function to scroll chat to bottom
+    function scrollToBottom() {
+        const container = $('#chat-messages');
+        container.scrollTop(container[0].scrollHeight);
+    }
+
+    // Function to show error
+    function showError(message) {
+        $('#error-message').text(message);
+        $('#error-alert').removeClass('d-none').addClass('show');
+        setTimeout(function() {
+            $('#error-alert').removeClass('show').addClass('d-none');
+        }, 5000);
+    }
+
+    // Function to play notification sound
+    function playNotificationSound() {
+        const audio = new Audio('/assets/sounds/notification.mp3');
+        audio.play().catch(function(error) {
+            console.error('Failed to play notification sound:', error);
+        });
+    }
 });
 </script>
 @endpush

@@ -226,125 +226,156 @@
 
 @section('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Banner slider functionality
-            const slides = document.querySelectorAll('.slide');
-            const dots = document.querySelectorAll('.slider-dot');
-            let currentSlide = 0;
-            let slideInterval;
+document.addEventListener('DOMContentLoaded', function() {
+    // Banner slider functionality
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.slider-dot');
+    let currentSlide = 0;
+    let slideInterval;
 
-            function showSlide(index) {
-                slides.forEach(slide => {
-                    slide.style.display = 'none';
-                    slide.classList.remove('active');
-                });
-                dots.forEach(dot => {
-                    dot.classList.remove('active');
-                    dot.classList.remove('bg-blue-500');
-                    dot.classList.add('bg-gray-300');
-                });
+    function showSlide(index) {
+        slides.forEach(slide => {
+            slide.style.display = 'none';
+            slide.classList.remove('active');
+        });
+        dots.forEach(dot => {
+            dot.classList.remove('active');
+            dot.classList.remove('bg-blue-500');
+            dot.classList.add('bg-gray-300');
+        });
 
-                slides[index].style.display = 'block';
-                slides[index].classList.add('active');
-                dots[index].classList.add('active');
-                dots[index].classList.remove('bg-gray-300');
-                dots[index].classList.add('bg-blue-500');
-                currentSlide = index;
-            }
+        slides[index].style.display = 'block';
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        dots[index].classList.remove('bg-gray-300');
+        dots[index].classList.add('bg-blue-500');
+        currentSlide = index;
+    }
 
-            function startSlideShow() {
-                slideInterval = setInterval(function() {
-                    let nextSlide = (currentSlide + 1) % slides.length;
-                    showSlide(nextSlide);
-                }, 5000);
-            }
+    function startSlideShow() {
+        slideInterval = setInterval(function() {
+            let nextSlide = (currentSlide + 1) % slides.length;
+            showSlide(nextSlide);
+        }, 5000);
+    }
 
-            dots.forEach(dot => {
-                dot.addEventListener('click', function() {
-                    let slideIndex = parseInt(this.getAttribute('data-slide'));
-                    showSlide(slideIndex);
-                    clearInterval(slideInterval);
-                    startSlideShow();
-                });
-            });
-
-            showSlide(0);
-            startSlideShow();
-
-            // Add to Cart AJAX functionality
-            document.querySelectorAll('[data-cart-action="add"]').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-
-                    const form = this.closest('form');
-                    const productId = this.getAttribute('data-product-id');
-                    const formData = new FormData(form);
-
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                    })
-                    .then(response => {
-                        if (response.status === 401) {
-                            throw new Error('User not authenticated');
-                        }
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: data.message || 'Produk berhasil ditambahkan ke keranjang!',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 2000,
-                            timerProgressBar: true,
-                        });
-
-                        const cartCount = document.getElementById('cart-count');
-                        if (cartCount && data.cartCount !== undefined) {
-                            cartCount.textContent = data.cartCount;
-                        }
-                    })
-                    .catch(error => {
-                        if (error.message === 'User not authenticated') {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Login Diperlukan',
-                                text: 'Silakan login untuk menambahkan produk ke keranjang.',
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true,
-                            }).then(() => {
-                                window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal!',
-                                text: 'Terjadi kesalahan saat menambahkan produk ke keranjang.',
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 2000,
-                                timerProgressBar: true,
-                            });
-                        }
-                        console.error('Error:', error);
-                    });
-                });
+    if (slides.length > 0 && dots.length > 0) {
+        dots.forEach(dot => {
+            dot.addEventListener('click', function() {
+                let slideIndex = parseInt(this.getAttribute('data-slide'));
+                showSlide(slideIndex);
+                clearInterval(slideInterval);
+                startSlideShow();
             });
         });
+
+        showSlide(0);
+        startSlideShow();
+    }
+
+    // Add to Cart AJAX functionality
+    document.querySelectorAll('[data-cart-action="add"]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const form = this.closest('form');
+            const productId = this.getAttribute('data-product-id');
+            
+            // Check if user is logged in before proceeding
+            const isLoggedIn = document.body.classList.contains('user-logged-in') || 
+                               document.querySelector('meta[name="user-logged-in"]') !== null;
+            
+            if (!isLoggedIn) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Login Diperlukan',
+                    text: 'Silakan login untuk menambahkan produk ke keranjang.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                }).then(() => {
+                    window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                });
+                return;
+            }
+                
+            const formData = new FormData(form);
+
+            // Add CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (!csrfToken) {
+                console.error('CSRF token not found');
+                return;
+            }
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin' // Include cookies in the request
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('User not authenticated');
+                }
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: data.message || 'Produk berhasil ditambahkan ke keranjang!',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                });
+
+                const cartCount = document.getElementById('cart-count');
+                if (cartCount && data.cartCount !== undefined) {
+                    cartCount.textContent = data.cartCount;
+                }
+            })
+            .catch(error => {
+                if (error.message === 'User not authenticated') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Login Diperlukan',
+                        text: 'Silakan login untuk menambahkan produk ke keranjang.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                    }).then(() => {
+                        window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan saat menambahkan produk ke keranjang.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                    });
+                }
+                console.error('Error:', error);
+            });
+        });
+    });
+});
     </script>
 @endsection

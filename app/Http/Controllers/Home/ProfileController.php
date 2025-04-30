@@ -25,6 +25,18 @@ class ProfileController extends Controller
         // Pass the user to the view
         return view('profile.tentang_saya', compact('user'));
     }
+    public function profileKeamanan()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.keamanan_privasi', compact('user'));
+    }
 
     public function update(Request $request)
     {
