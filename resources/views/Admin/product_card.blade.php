@@ -530,10 +530,7 @@
     </div>
 </div>
 @endsection
-<<<<<<< HEAD
-    
-=======
->>>>>>> dc091b58857e808a93dde18172a60060bbca83c8
+
 
 @push('scripts')
 <script>
