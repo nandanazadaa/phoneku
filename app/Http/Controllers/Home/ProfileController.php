@@ -26,6 +26,97 @@ class ProfileController extends Controller
         return view('profile.tentang_saya', compact('user'));
     }
 
+    public function riwayat()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.riwayat_pembelian', compact('user'));
+    }
+
+    public function privasiKeamanan()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.keamanan_privasi', compact('user'));
+    }
+
+    public function logOut()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.logout', compact('user'));
+    }
+
+    public function ubahEmail()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.ubah_email', compact('user'));
+    }
+
+    public function ubahEmailOTP()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.ubah_email_otp', compact('user'));
+    }
+
+    public function tambahNoTelepon()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.ubah_no_tlp', compact('user'));
+    }
+
+    public function tambahNoTeleponOTP()
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+        
+        // Pass the user to the view
+        return view('profile.ubah_no_tlp_otp', compact('user'));
+    }
+
     public function update(Request $request)
     {
         // Get authenticated user
