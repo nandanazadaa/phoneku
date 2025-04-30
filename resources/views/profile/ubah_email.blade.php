@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Keluar Akun - PhoneKu')
+@section('title', 'Ubah Email - PhoneKu')
 
 @section('content')
 <div class="relative">
@@ -27,24 +27,23 @@
 </div>
 
     <!-- Main Content - User Profile -->
-    <div class="container mx-auto px-4 py-8 relative -mt-48 z-10">
+    <!-- Adjusted negative margin-top to match increased header height -->
+    <div class="container mx-auto px-4 py-8 -mt-48 relative z-10">
         <div class="flex flex-wrap">
             <!-- Left Sidebar -->
             <div class="w-full md:w-1/4 mb-6 md:mb-0 md:pr-4">
-                <!-- User Profile Card -->
                 <div class="bg-white rounded-xl p-4 shadow-md mb-6">
                     <div class="flex flex-col items-center mb-4">
-                    <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
-                        <img src="{{ $user->profile && $user->profile->profile_picture ? asset('storage/' . $user->profile->profile_picture) : asset('img/profile.png') }}"
-                            alt="User Profile" class="w-full h-full object-cover">
-                    </div>
-                    <h2 class="text-xl font-bold mb-1 text-gray-800">{{ $user->name }}</h2>
+                        <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
+                            <img src="{{ $user->profile && $user->profile->profile_picture ? asset('storage/' . $user->profile->profile_picture) : asset('img/profile.png') }}"
+                                alt="User Profile" class="w-full h-full object-cover">
+                        </div>
+                        <h2 class="text-xl font-bold mb-1 text-gray-800">{{ $user->name }}</h2>
                     </div>
                 </div>
-
                 <!-- Navigation Menu -->
                 <div class="bg-white rounded-xl p-4 shadow-md space-y-2">
-                    <a href="{{ route('profile') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profile') }}" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl hover:bg-gray-200 shadow-sm">
                         <i class="fas fa-user w-5 mr-3 text-center"></i>
                         <span>Tentang Saya</span>
                     </a>
@@ -52,11 +51,12 @@
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
                     </a>
-                    <a href="{{ route('profilekeamanan') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profilekeamanan') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl transition-colors">
                         <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
                         <span>Keamanan & Privasi</span>
                     </a>
-                    <a href="{{ route('logout') }}" class="flex items-center py-3 px-4 bg-blue-500 text-gray-100 rounded-xl shadow-sm">
+                    
+                    <a href="{{ route('logout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>
                         <span>Keluar Akun</span>
                     </a>
@@ -64,21 +64,29 @@
             </div>
 
             <!-- Right Content -->
-            <section class="w-full md:w-3/4 ">
-                <div class="bg-white rounded-xl p-12 text-center shadow-md border border-gray-100">
-                    <h3 class="text-2xl font-semibold text-gray-700 mb-2">Keluar Akun</h3>
-                    <p class="text-gray-500 mb-6">Anda Yakin Ingin Keluar Dari Akun Anda?</p>
-                    <div class="flex justify-center">
-                        <form class="inline" action="{{ route('profileout') }}" method="GET">
-                            <button 
-                                class="bg-red-500 hover:bg-red-600 text-white py-2 px-12 rounded-full text-sm font-medium transition-all duration-200">
-                                Keluar
-                            </button>
-                        </form>
+            <!-- Content Area -->
+        <section class="w-full md:w-3/4">
+            <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                <h3 class="text-2xl font-semibold text-gray-700 mb-2">Ubah Email</h3>
+                <p class="text-gray-500 mb-6">Masukkan email baru Anda untuk memperbarui informasi akun.</p>
+                <form>
+                    <div class="container">
+                        <!-- Ubah Email -->
+                        <div class="mb-6">
+                            <label for="ubahemail" class="block text-sm font-medium text-gray-700 mb-3">Email</label>
+                            <input type="email" id="ubahemail" placeholder="Masukkan Email Baru"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700">  
+                            <p class="text-gray-500 mt-2">Kami akan mengirimkan kode verifikasi melalui Email.</p>
+                        </div>
+                    
+                        <button type="submit"
+                            class=" w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-300">
+                            Lanjutkan
+                        </button>
                     </div>
-                </div>
-            </section>
+                </form>
+            </div>
+        </section>
         </div>
     </div>
 @endsection
-

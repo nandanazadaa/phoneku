@@ -35,9 +35,10 @@
                 <div class="bg-white rounded-xl p-4 shadow-md mb-6">
                     <div class="flex flex-col items-center mb-4">
                         <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
-                            <img src="img/profile.png" alt="User Profile" class="w-full h-full object-cover">
+                            <img src="{{ $user->profile && $user->profile->profile_picture ? asset('storage/' . $user->profile->profile_picture) : asset('img/profile.png') }}"
+                                alt="User Profile" class="w-full h-full object-cover">
                         </div>
-                        <h2 class="text-xl font-bold mb-1 text-gray-800">Ahmed Rusdi</h2>
+                        <h2 class="text-xl font-bold mb-1 text-gray-800">{{ $user->name }}</h2>
                     </div>
                 </div>
 
@@ -47,7 +48,7 @@
                         <i class="fas fa-user w-5 mr-3 text-center"></i>
                         <span>Tentang Saya</span>
                     </a>
-                    <a href="{{ route('riwayatpembelian') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('riwayatbeli') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-history w-5 mr-3 text-center"></i>
                         <span>Riwayat Pembelian</span>
                     </a>
