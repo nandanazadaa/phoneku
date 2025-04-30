@@ -45,10 +45,18 @@ Route::middleware(['auth'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::get('/profilebayar', function () {
-        return view('profile/atur_pembayaran');
-    })->name('profilebayar');
-    Route::get('/profilekeamanan',[ProfileController::class, 'keamanan_privasi'])->name('profilekeamanan');
+    Route::get('/riwayatbeli', [ProfileController::class, 'riwayat'])->name('riwayatbeli');
+    Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
+
+
+
+    // Profile - ubah email 
+    Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
+    Route::get('/ubah_email_otp', [ProfileController::class, 'ubahEmailOTP'])->name('ubah_email_otp');
+
+    // Profile - ubah nomer telepon 
+    Route::get('/ubah_no_tlp', [ProfileController::class, 'tambahNoTelepon'])->name('ubah_no_tlp');
+    Route::get('/ubah_no_tlp_otp', [ProfileController::class, 'tambahNoTeleponOTP'])->name('ubah_no_tlp_otp');
     
     // Cart and checkout
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
@@ -58,18 +66,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', function () {
         return view('Home/checkout');
     })->name('checkout');
-    Route::get('/riwayatpembelian', function () {
-        return view('profile/riwayat_pembelian');
-    })->name('riwayatpembelian');
+
     
     // Customer chat
     Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support');
     
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/logout', function () {
-        return view('profile/logout');
-    })->name('logout.page');
+    Route::get('/logout', [ProfileController::class, 'logOut'])->name('logout');
 });
 
 // Post-logout routes

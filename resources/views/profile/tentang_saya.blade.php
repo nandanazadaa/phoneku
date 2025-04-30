@@ -47,7 +47,7 @@
                     <i class="fas fa-user w-5 mr-3 text-center"></i>
                     <span>Tentang Saya</span>
                 </a>
-                <a href="{{ route('riwayatpembelian') }}"
+                <a href="{{ route('riwayatbeli') }}"
                     class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                     <i class="fas fa-history w-5 mr-3 text-center"></i>
                     <span>Riwayat Pembelian</span>
@@ -119,8 +119,10 @@
                             <div>
                                 <div class="flex justify-between items-center mb-1">
                                     <label for="phone" class="block text-sm font-medium text-gray-600">Nomor Telepon</label>
-                                    <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Tambah</a>
-                                </div>
+                                    <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium"> 
+                                        {{ $user->profile->phone ? 'Ganti' : 'Tambah' }}
+                                    </a>       
+                               </div>
                                 <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->profile->phone ?? '') }}"
                                     placeholder="Belum ditambahkan"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">
