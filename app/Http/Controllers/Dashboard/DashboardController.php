@@ -54,43 +54,6 @@ class DashboardController extends Controller
             return $redirect;
         }
         
-        // Ubah dari admin.products.index menjadi admin.card_product
         return view('admin.card_product');
-    }
-    
-    /**
-     * Show the orders page
-     */
-    public function ordersIndex()
-    {
-        if ($redirect = $this->redirectIfNotAdmin()) {
-            return $redirect;
-        }
-        
-        return view('admin.orders.index');
-    }
-    
-    /**
-     * Show the users page
-     */
-    public function usersIndex()
-    {
-        if ($redirect = $this->redirectIfNotAdmin()) {
-            return $redirect;
-        }
-        
-        return view('admin.users.index');
-    }
-    
-    /**
-     * Show the settings page
-     */
-    public function settings()
-    {
-        if ($redirect = $this->redirectIfNotAdmin()) {
-            return $redirect;
-        }
-        
-        return view('admin.settings');
     }
 }

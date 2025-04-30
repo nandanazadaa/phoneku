@@ -36,7 +36,7 @@ class ProfileController extends Controller
         }
 
         // Get user's profile
-        $profile = DB::table('profiles')->where('user_id', $user->id_user)->first();
+        $profile = DB::table('profiles')->where('user_id', $user->id)->first();
         $profileId = $profile ? $profile->profile_id : null;
 
         // Validate the request
@@ -56,7 +56,7 @@ class ProfileController extends Controller
         }
 
         // Update user data directly in the database
-        DB::table('users')->where('id_user', $user->id_user)->update([
+        DB::table('users')->where('id', $user->id)->update([
             'name' => $request->name
         ]);
 
@@ -85,7 +85,7 @@ class ProfileController extends Controller
         if ($profile) {
             DB::table('profiles')->where('profile_id', $profile->profile_id)->update($profileData);
         } else {
-            $profileData['user_id'] = $user->id_user;
+            $profileData['user_id'] = $user->id;
             DB::table('profiles')->insert($profileData);
         }
 
