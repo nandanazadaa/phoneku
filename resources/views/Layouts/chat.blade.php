@@ -33,20 +33,14 @@
     @stack('styles')
 </head>
 <body>
-    <div class="wrapper">
-        @include('partials.admin_header')
-        
-        @include('partials.admin_sidebar')
+    <div class="wrapper">        
 
         <div class="main-panel">
             <div class="content">
                 @yield('content')
             </div>
-            
-            @include('partials.admin_footer')
-        </div>
-        
-        @include('partials.admin_settings')
+            @include('partials.chat_footer')
+        </div>        
     </div>
 
     <!--   Core JS Files   -->

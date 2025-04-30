@@ -9,6 +9,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
         body {
             margin: 0;
@@ -74,6 +76,7 @@
     <!-- Footer Include - pastikan path ini benar -->
     @include('partials.footer')
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @yield('scripts')
 </body>
 </html>

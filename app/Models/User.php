@@ -12,14 +12,14 @@ class User extends Authenticatable
 
     public function profile()
     {
-        return $this->hasOne(\App\Models\Profile::class, 'user_id', 'id_user');
+        return $this->hasOne(\App\Models\Profile::class, 'user_id', 'id');
     }
     /**
      * The primary key for the model.
      *
      * @var string
      */
-    protected $primaryKey = 'id_user';
+    protected $primaryKey = 'id';
 
     /**
      * The attributes that are mass assignable.
@@ -61,4 +61,13 @@ class User extends Authenticatable
     ];
 
 
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+    
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
 }

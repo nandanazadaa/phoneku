@@ -10,7 +10,8 @@ class CreateProfilesTable extends Migration
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id('profile_id');
-            $table->foreignId('user_id')->constrained('users', 'id_user')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id'); // <-- Tambahkan kolom user_id
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('username')->nullable();
             $table->string('phone')->nullable();
             $table->enum('gender', ['male', 'female'])->nullable();
