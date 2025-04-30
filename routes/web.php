@@ -1,122 +1,126 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\ChatController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\CartController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Home\ProfileController;
 
-// Route yang dapat diakses semua orang
+// Public routes
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
-
 Route::get('/tim', function () {
     return view('Home/tim');
 })->name('tim');
-
 Route::get('/aboutus', function () {
     return view('home.aboutus');
 })->name('aboutus');
-
 Route::get('/product/{product}', [HomeController::class, 'showProduct'])->name('product.show');
 Route::get('/product', function () {
     return view('Home/product');
 })->name('product');
-
 Route::get('/kontak', function () {
     return view('home.kontak');
 })->name('kontak');
-
 Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allproduct');
 
-// Rout autentikasi
+// Authentication routes (guest only)
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', function () {
         return view('Auth/login');
     })->name('login');
-    
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-    
     Route::get('/registrasi', function () {
         return view('Auth/registrasi');
     })->name('registrasi');
-    
     Route::post('/registrasi', [AuthController::class, 'register'])->name('registrasi.post');
 });
 
-// Route yang memerlukan login
+// Authenticated routes
 Route::middleware(['auth'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update'); // Added update route
-    
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profilebayar', function () {
         return view('profile/atur_pembayaran');
     })->name('profilebayar');
-    
     Route::get('/profilekeamanan', function () {
         return view('profile/keamanan_privasi');
     })->name('profilekeamanan');
     
-    // Checkout dan Cart
+    // Cart and checkout
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add/{product}', [CartController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
-    
     Route::get('/checkout', function () {
         return view('Home/checkout');
     })->name('checkout');
-    
     Route::get('/riwayatpembelian', function () {
         return view('profile/riwayat_pembelian');
     })->name('riwayatpembelian');
     
-    // Logout routes
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Customer chat
+    Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support');
     
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/logout', function () {
         return view('profile/logout');
     })->name('logout.page');
 });
 
-// Routes setelah logout
+// Post-logout routes
 Route::get('/profileout', function () {
     return view('profile/setelah_keluar');
 })->name('profileout');
-
 Route::get('/setelah_logout', function () {
     return view('profile/setelah_logout');
 })->name('setelah_logout');
-
 Route::get('/lupa_password', function () {
     return view('Auth/lupapassword');
 })->name('lupa_password');
 
-Route::get('/customer_support', function () {
-    return view('Home/customer_support');
-})->name('customer_support');
-
+// Admin routes
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Login & register admin - tanpa middleware auth
+    // Admin login/register (no auth middleware)
     Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'adminLogin'])->name('login.post');
     Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
     Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
     
-    // Admin Routes protected by auth middleware saja
+    // Admin protected routes
     Route::middleware(['auth'])->group(function() {
-        // Controller sudah melakukan pengecekan admin sendiri
         Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-        
-        // Product Management Routes
         Route::get('/products', [ProductController::class, 'index'])->name('products');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-        Route::post('/products/preview', [ProductController::class, 'preview'])->name('products.preview');
+        Route::post('/products/preview', [ProductController::class, 'preview']); Route::get('/users', [UserController::class, 'index'])->name('users');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         
-        // Ubah dari GET menjadi POST
+        Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+        Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
+        Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
 });
+
+// Pusher authentication
+Route::post('/pusher/auth', function (Request $request) {
+    $pusher = new Pusher\Pusher(
+        env('PUSHER_APP_KEY'),
+        env('PUSHER_APP_SECRET'),
+        env('PUSHER_APP_ID'),
+        ['cluster' => env('PUSHER_APP_CLUSTER'), 'useTLS' => true]
+    );
+
+    return $pusher->socket_auth($request->channel_name, $request->socket_id);
+})->middleware('auth');
