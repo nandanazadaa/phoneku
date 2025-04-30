@@ -50,7 +50,18 @@ Route::middleware(['auth:web'])->group(function () {
         return view('profile/atur_pembayaran');
     })->name('profilebayar');
 
-    Route::get('/profilekeamanan', [ProfileController::class, 'profileKeamanan'])->name('profilekeamanan');
+    Route::get('/riwayatbeli', [ProfileController::class, 'riwayat'])->name('riwayatbeli');
+    Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
+
+
+
+    // Profile - ubah email 
+    Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
+    Route::get('/ubah_email_otp', [ProfileController::class, 'ubahEmailOTP'])->name('ubah_email_otp');
+
+    // Profile - ubah nomer telepon 
+    Route::get('/ubah_no_tlp', [ProfileController::class, 'tambahNoTelepon'])->name('ubah_no_tlp');
+    Route::get('/ubah_no_tlp_otp', [ProfileController::class, 'tambahNoTeleponOTP'])->name('ubah_no_tlp_otp');
     
     // Cart and checkout
     Route::post('/cart/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');
@@ -65,6 +76,7 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/riwayatpembelian', function () {
         return view('profile/riwayat_pembelian');
     })->name('riwayatpembelian');
+
     
     Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support');
     
@@ -74,9 +86,7 @@ Route::middleware(['auth:web'])->group(function () {
     
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/logout', function () {
-        return view('profile/logout');
-    })->name('logout.page');
+    Route::get('/logout', [ProfileController::class, 'logOut'])->name('logout');
 });
 
 // Post-logout routes
