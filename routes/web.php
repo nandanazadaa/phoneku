@@ -48,9 +48,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profilebayar', function () {
         return view('profile/atur_pembayaran');
     })->name('profilebayar');
-    Route::get('/profilekeamanan', function () {
-        return view('profile/keamanan_privasi');
-    })->name('profilekeamanan');
+    Route::get('/profilekeamanan',[ProfileController::class, 'keamanan_privasi'])->name('profilekeamanan');
     
     // Cart and checkout
     Route::get('/cart', [CartController::class, 'index'])->name('cart');

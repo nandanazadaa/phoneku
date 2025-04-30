@@ -134,21 +134,45 @@
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="viewProductModalLabel{{ $product->id }}">{{ $product->name }}</h5>
                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
+                                                                <span aria-hidden="true">×</span>
                                                             </button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <div class="row">
                                                                 <div class="col-md-6">
-                                                                    @if($product->image)
-                                                                    <div class="product-detail-image-container">
-                                                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-detail-image" width="400">
-                                                                    </div>
+                                                                    @if($product->image || $product->image2 || $product->image3)
+                                                                        <div id="productCarousel{{ $product->id }}" class="carousel slide" data-ride="carousel">
+                                                                            <div class="carousel-inner">
+                                                                                @if($product->image)
+                                                                                    <div class="carousel-item active">
+                                                                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="d-block w-100">
+                                                                                    </div>
+                                                                                @endif
+                                                                                @if($product->image2)
+                                                                                    <div class="carousel-item {{ !$product->image ? 'active' : '' }}">
+                                                                                        <img src="{{ asset('storage/' . $product->image2) }}" alt="{{ $product->name }}" class="d-block w-100">
+                                                                                    </div>
+                                                                                @endif
+                                                                                @if($product->image3)
+                                                                                    <div class="carousel-item {{ !$product->image && !$product->image2 ? 'active' : '' }}">
+                                                                                        <img src="{{ asset('storage/' . $product->image3) }}" alt="{{ $product->name }}" class="d-block w-100">
+                                                                                    </div>
+                                                                                @endif
+                                                                            </div>
+                                                                            <a class="carousel-control-prev" href="#productCarousel{{ $product->id }}" role="button" data-slide="prev">
+                                                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                                <span class="sr-only">Previous</span>
+                                                                            </a>
+                                                                            <a class="carousel-control-next" href="#productCarousel{{ $product->id }}" role="button" data-slide="next">
+                                                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                                <span class="sr-only">Next</span>
+                                                                            </a>
+                                                                        </div>
                                                                     @else
-                                                                    <div class="text-center p-5 bg-light rounded">
-                                                                        <i class="fa fa-image fa-3x text-muted"></i>
-                                                                        <p class="mt-2">No image available</p>
-                                                                    </div>
+                                                                        <div class="text-center p-5 bg-light rounded">
+                                                                            <i class="fa fa-image fa-3x text-muted"></i>
+                                                                            <p class="mt-2">No image available</p>
+                                                                        </div>
                                                                     @endif
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -205,7 +229,7 @@
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="deleteProductModalLabel{{ $product->id }}">Confirm Delete</h5>
                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
+                                                                <span aria-hidden="true">×</span>
                                                             </button>
                                                         </div>
                                                         <div class="modal-body">
@@ -315,9 +339,27 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="create_image">Foto Produk</label>
+                                    <label for="create_image">Foto Produk 1</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="create_image" name="image" accept="image/*">
                                     @error('image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="create_image2">Foto Produk 2</label>
+                                    <input type="file" class="form-control @error('image2') is-invalid @enderror" id="create_image2" name="image2" accept="image/*">
+                                    @error('image2')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="create_image3">Foto Produk 3</label>
+                                    <input type="file" class="form-control @error('image3') is-invalid @enderror" id="create_image3" name="image3" accept="image/*">
+                                    @error('image3')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                     <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
@@ -410,22 +452,49 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="edit_image">Product Image</label>
+                                    <label for="edit_image">Product Image 1</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="edit_image" name="image" accept="image/*">
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                     <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
-                                    
-                                    @if($product->image)
-                                    <div class="text-start mb-3">
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-detail-image" width="100">
-                                    </div>
+                                    @if($editProduct->image)
+                                        <div class="text-start mb-3">
+                                            <img src="{{ asset('storage/' . $editProduct->image) }}" alt="{{ $editProduct->name }}" class="product-detail-image" width="100">
+                                        </div>
                                     @else
-                                    <div class="text-center p-5 bg-light rounded">
-                                        <i class="fa fa-image fa-3x text-muted"></i>
-                                        <p class="mt-2">No image available</p>
-                                    </div>
+                                        <div class="text-center p-5 bg-light rounded">
+                                            <i class="fa fa-image fa-3x text-muted"></i>
+                                            <p class="mt-2">No image available</p>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit_image2">Product Image 2</label>
+                                    <input type="file" class="form-control @error('image2') is-invalid @enderror" id="edit_image2" name="image2" accept="image/*">
+                                    @error('image2')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
+                                    @if($editProduct->image2)
+                                        <div class="text-start mb-3">
+                                            <img src="{{ asset('storage/' . $editProduct->image2) }}" alt="{{ $editProduct->name }}" class="product-detail-image" width="100">
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="edit_image3">Product Image 3</label>
+                                    <input type="file" class="form-control @error('image3') is-invalid @enderror" id="edit_image3" name="image3" accept="image/*">
+                                    @error('image3')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
+                                    @if($editProduct->image3)
+                                        <div class="text-start mb-3">
+                                            <img src="{{ asset('storage/' . $editProduct->image3) }}" alt="{{ $editProduct->name }}" class="product-detail-image" width="100">
+                                        </div>
                                     @endif
                                 </div>
 
@@ -458,7 +527,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="createProductModalLabel">Tambah Produk Baru</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -509,8 +578,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="modal_create_image">Product Image</label>
+                        <label for="modal_create_image">Product Image 1</label>
                         <input type="file" class="form-control" id="modal_create_image" name="image" accept="image/*">
+                        <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modal_create_image2">Product Image 2</label>
+                        <input type="file" class="form-control" id="modal_create_image2" name="image2" accept="image/*">
+                        <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modal_create_image3">Product Image 3</label>
+                        <input type="file" class="form-control" id="modal_create_image3" name="image3" accept="image/*">
                         <small class="form-text text-muted">Recommended size: 400x400 pixels</small>
                     </div>
 
@@ -643,7 +724,7 @@ $(document).ready(function() {
         }
     }
 
-    // Function to update edit preview (removed duplicate)
+    // Function to update edit preview
     function updateEditPreview() {
         const name = $('#edit_name').val() || 'Product Name';
         const price = parseFloat($('#edit_price').val()) || 0;
