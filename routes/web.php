@@ -27,7 +27,7 @@ Route::get('/kontak', function () {
 
 
 // Authentication routes (guest only)
-Route::middleware(['guest'])->group(function () {
+Route::middleware(['guest:web'])->group(function () {
     Route::get('/login', function () {
         return view('Auth/login');
     })->name('login');
@@ -41,8 +41,7 @@ Route::middleware(['guest'])->group(function () {
     })->name('lupa_password'); // Pastikan view ini ada
 });
 
-
-// Authenticated routes for regular users
+// Authenticated routes
 Route::middleware(['auth:web'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -50,30 +49,46 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/riwayatbeli', [ProfileController::class, 'riwayat'])->name('riwayatbeli');
     Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
 
-    // Profile - ubah email & telepon (Contoh rute, viewsnya perlu disiapkan)
-    // Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
-    // Route::get('/ubah_email_otp', [ProfileController::class, 'ubahEmailOTP'])->name('ubah_email_otp');
-    // Route::get('/ubah_no_tlp', [ProfileController::class, 'tambahNoTelepon'])->name('ubah_no_tlp');
-    // Route::get('/ubah_no_tlp_otp', [ProfileController::class, 'tambahNoTeleponOTP'])->name('ubah_no_tlp_otp');
+    // Profile - ubah email 
+    Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
+    Route::get('/ubah_email_otp', [ProfileController::class, 'ubahEmailOTP'])->name('ubah_email_otp');
 
-    // Cart routes
+    // Form ubah email - kirim OTP ke email lama
+    Route::post('/kirim_otp_email_lama', [ProfileController::class, 'kirimOtpEmailLama'])->name('kirim_otp_email_lama');
+    // Verifikasi OTP dan ubah email
+    Route::post('/verifikasi_otp_ubah_email', [ProfileController::class, 'verifikasiOtpUbahEmail'])->name('verifikasi_otp_ubah_email');    
+
+    // Profile - ubah nomer telepon 
+    Route::get('/ubah_no_tlp', [ProfileController::class, 'tambahNoTelepon'])->name('ubah_no_tlp');
+    Route::get('/ubah_no_tlp_otp', [ProfileController::class, 'tambahNoTeleponOTP'])->name('ubah_no_tlp_otp');
+
+    // Form tambah/ubah nomer telepon - kirim OTP ke email lama
+    Route::post('/kirim_otp', [ProfileController::class, 'kirimOtpAturNotlp'])->name('kirim_otp');
+    // Verifikasi OTP dan tambah/ubah nomer telepon
+    Route::post('/verifikasi_otp', [ProfileController::class, 'verifikasiOtpAturNoTlp'])->name('verifikasi_otp');
+    
+    // Cart and checkout
+    Route::post('/cart/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::post('/cart/add/{product}', [CartController::class, 'addToCart'])->name('cart.add'); // Menggunakan Route Model Binding Product
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 
-    // Checkout route
-    Route::get('/checkout', [CartController::class, 'showCheckout'])->name('checkout'); // Memanggil method showCheckout di CartController
-    // Optional: Route POST untuk memproses pembayaran jika tombol "Bayar Sekarang" adalah form submit
-    // Route::post('/checkout/process', [CheckoutController::class, 'processCheckout'])->name('checkout.process'); // Perlu Controller/method terpisah
+    Route::get('/checkout', function () {
+        return view('Home/checkout');
+    })->name('checkout');
 
+    Route::get('/riwayatpembelian', function () {
+        return view('profile/riwayat_pembelian');
+    })->name('riwayatpembelian');
 
-    // Customer chat
-    // *** PERBAIKAN: HAPUS TANDA KOMENTAR PADA BARIS INI ***
-    Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support'); // Perlu method customerChat di ChatController
-
-
-    // Logout for web guard
+    
+    Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support');
+    
+    // Add routes for customers to send and fetch messages
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
+    
+    // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 });
@@ -88,22 +103,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Admin login (no auth middleware)
     Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'adminLogin'])->name('login.post');
-    // Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register'); // Registrasi admin sebaiknya tidak di public route
-    // Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
-
+    Route::middleware(['guest:admin'])->group(function () {
+        
+        Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
+        Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
+    });
+    
     // Admin protected routes
     Route::middleware(['auth:admin'])->group(function() {
-        Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard'); // Perlu DashboardController
-
-        // Product management routes
-        Route::get('/products', [ProductController::class, 'index'])->name('products'); // Pastikan ProductController ada
+        Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+        Route::get('/products', [ProductController::class, 'index'])->name('products');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-        Route::post('/products/preview', [ProductController::class, 'preview']); // Preview needs a route if using AJAX/form submit
-
-        // User management routes
-        Route::get('/users', [UserController::class, 'index'])->name('users'); // Pastikan UserController ada
+        Route::post('/products/preview', [ProductController::class, 'preview']); 
+        Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
@@ -120,41 +134,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // Pusher authentication (Jika menggunakan Websockets)
 Route::post('/pusher/auth', function (Request $request) {
-    // Pastikan Pusher\Pusher sudah terinstal via Composer dan di-import
-    // use Pusher\Pusher; // <-- tambahkan ini di bagian atas file
-
-    // Cek apakah user terautentikasi menggunakan guard 'web' atau 'admin'
-    if (Auth::guard('web')->check() || Auth::guard('admin')->check()) {
-         $pusher = new Pusher\Pusher(
-             env('PUSHER_APP_KEY'),
-             env('PUSHER_APP_SECRET'),
-             env('PUSHER_APP_ID'),
-             ['cluster' => env('PUSHER_APP_CLUSTER'), 'useTLS' => true]
-         );
-
-         // Dapatkan user yang sedang login
-         $user = Auth::guard('admin')->user() ?? Auth::guard('web')->user();
-
-         // Socket authentication for private channels
-         // Channel name format expected: 'private-chat.user.<user_id>' (dari kode chat Anda)
-         if (Str::startsWith($request->channel_name, 'private-chat.user.')) {
-             $channelUserId = (int) Str::after($request->channel_name, 'private-chat.user.');
-             if ($user && $user->id === $channelUserId) {
-                  // User yang login adalah pemilik channel pribadi ini
-                 return $pusher->socket_auth($request->channel_name, $request->socket_id);
-             } else {
-                  // User tidak memiliki akses ke channel pribadi ini
-                 return response('Unauthorized', 403);
-             }
-         }
-
-         // Tambahkan logika otorisasi untuk jenis channel lain (misalnya presence channels) jika ada
-
-         // Jika channel type tidak dikenali atau user tidak diizinkan
-         return response('Unauthorized', 403);
-
-    }
-
-     // Jika user tidak terautentikasi sama sekali
-    return response('Unauthorized', 401);
-});
+    $pusher = new Pusher\Pusher(
+        env('PUSHER_APP_KEY'),
+        env('PUSHER_APP_SECRET'),
+        env('PUSHER_APP_ID'),
+        ['cluster' => env('PUSHER_APP_CLUSTER'), 'useTLS' => true]
+    );
+    return $pusher->socket_auth($request->channel_name, $request->socket_id);
+})->middleware('auth:web,admin');

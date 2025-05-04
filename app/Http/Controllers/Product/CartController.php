@@ -7,134 +7,91 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
-    /**
-     * Add product to cart.
-     * Menggunakan Route Model Binding untuk $product.
-     */
-    public function addToCart(Request $request, Product $product)
-    {
-        if (!Auth::guard('web')->check()) {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Silakan login untuk menambahkan produk.'], 401);
-            }
-            Session::put('redirect_url', route('product.show', $product->id));
-            return redirect()->route('login')->with('warning', 'Silakan login untuk menambahkan produk ke keranjang.');
+    public function addToCart(Request $request, $productId)
+{
+    try {
+        Log::info('Attempting to add product to cart', ['productId' => $productId, 'userId' => Auth::id()]);
+
+        $product = Product::findOrFail($productId);
+        $user = Auth::user();
+
+        if (!$user) {
+            Log::warning('User not authenticated', ['productId' => $productId]);
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
 
-        $user = Auth::guard('web')->user();
-        $userId = $user->id; // Gunakan ID user yang sedang login
+        $cart = Cart::firstOrCreate(
+            ['user_id' => $user->id, 'product_id' => $product->id],
+            ['quantity' => 0]
+        );
 
-        if ($product->stock <= 0) {
-             if ($request->ajax()) {
-                 return response()->json(['success' => false, 'message' => 'Stok produk habis.'], 400);
-             }
-             return redirect()->back()->with('error', 'Stok produk habis.');
+        $cart->quantity += 1;
+        if (!$cart->save()) {
+            Log::error('Failed to save cart', ['cartId' => $cart->id]);
+            throw new \Exception('Failed to save cart');
         }
 
-        $quantity = (int) $request->input('quantity', 1);
-        if ($quantity < 1) $quantity = 1;
+        $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
 
-        $cartItem = Cart::where('user_id', $userId)
-            ->where('product_id', $product->id)
-            ->first();
+        Log::info('Product added to cart successfully', ['cartId' => $cart->id, 'cartCount' => $cartCount]);
 
-        if ($cartItem) {
-            $newQuantity = $cartItem->quantity + $quantity;
-            if ($newQuantity > $product->stock) {
-                 if ($request->ajax()) {
-                     return response()->json(['success' => false, 'message' => 'Gagal menambahkan, jumlah di keranjang (' . $cartItem->quantity . ') + jumlah tambah (' . $quantity . ') melebihi stok (' . $product->stock . ')'], 400);
-                 }
-                return redirect()->back()->with('error', 'Gagal menambahkan, jumlah di keranjang (' . $cartItem->quantity . ') + jumlah tambah (' . $quantity . ') melebihi stok (' . $product->stock . ')');
-            }
-            $cartItem->quantity = $newQuantity;
-            $cartItem->save();
-            $message = 'Kuantitas produk di keranjang diperbarui!';
-        } else {
-             if ($quantity > $product->stock) {
-                 if ($request->ajax()) {
-                      return response()->json(['success' => false, 'message' => 'Jumlah yang diminta (' . $quantity . ') melebihi stok (' . $product->stock . ')'], 400);
-                  }
-                 return redirect()->back()->with('error', 'Jumlah yang diminta (' . $quantity . ') melebihi stok (' . $product->stock . ')');
-             }
-            Cart::create([
-                'user_id' => $userId,
-                'product_id' => $product->id,
-                'quantity' => $quantity,
-            ]);
-            $message = 'Produk berhasil ditambahkan ke keranjang!';
-        }
-
-        $cartCount = Cart::where('user_id', $userId)->sum('quantity'); // Hitung total kuantitas di cart
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'cartCount' => $cartCount,
-            ]);
-        }
-
-        // Redirect ke halaman keranjang setelah berhasil
-        return redirect()->route('cart')->with('success', $message);
-    }
-
-    /**
-     * Display the shopping cart.
-     */
-    public function index()
-    {
-        $userId = Auth::guard('web')->id();
-        if (!$userId) {
-            return redirect()->route('login');
-        }
-
-        // Mengambil item cart beserta data produk terkait
-        $cartItems = Cart::where('user_id', $userId)
-            ->whereHas('product') // Hanya ambil item yang produknya masih ada di DB
-            ->with(['product' => function ($query) {
-                // Pilih kolom yang relevan dari tabel produk untuk efisiensi
-                $query->select('id', 'name', 'price', 'image', 'stock', 'original_price'); // Pastikan kolom yang dibutuhkan ada
-            }])
-            ->latest() // Urutkan berdasarkan yang terbaru ditambahkan/diupdate
-            ->get();
-
-        // Hitung subtotal berdasarkan item yang valid (produk ada & stok > 0)
-        $subtotal = $cartItems->sum(function ($item) {
-            // Pastikan produk ada dan stok cukup
-            if ($item->product && $item->product->stock > 0 && $item->quantity > 0) {
-                 // Gunakan kuantitas yang bisa dibeli (min antara kuantitas di cart dan stok)
-                 $quantityToCalculate = min($item->quantity, $item->product->stock);
-                return $item->product->price * $quantityToCalculate;
-            }
-            return 0; // Abaikan item jika produk tidak valid atau stok habis
-        });
-
-        // Redirect ke checkout jika subtotal > 0
-        // if ($subtotal > 0) {
-        //     // Logika opsional: Jika user langsung ke /cart dan ada item valid, bisa langsung arahkan ke checkout
-        //     // Tapi biasanya user melihat cart dulu. Jadi, ini di-comment.
-        //     // return redirect()->route('checkout');
-        // }
-
-        return view('Home.cart', [
-            'cartItems' => $cartItems,
-            'subtotal' => $subtotal, // Subtotal item yang valid
+        return response()->json([
+            'message' => 'Produk berhasil ditambahkan ke keranjang!',
+            'cartCount' => $cartCount
+        ], 200);
+    } catch (\Exception $e) {
+        Log::error('Error adding product to cart', [
+            'error' => $e->getMessage(),
+            'productId' => $productId,
+            'userId' => Auth::id(),
+            'trace' => $e->getTraceAsString()
         ]);
+        return response()->json([
+            'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+        ], 500);
     }
+}
+
+public function index()
+{
+    if (!Auth::check()) {
+        return redirect()->route('login', ['redirect' => url()->current()]);
+    }
+    
+    $user = Auth::user();
+    
+    $cartItems = Cart::where('user_id', $user->id)
+        ->with('product')
+        ->get();
+
+    $subtotal = $cartItems->sum(function ($item) {
+        return $item->product->price * $item->quantity;
+    });
+
+    return view('Home.cart', [
+        'cartItems' => $cartItems,
+        'subtotal' => $subtotal,
+    ]);
+}
 
     /**
      * Update item quantity in the cart.
      */
     public function updateQuantity(Request $request, $id)
     {
-        $userId = Auth::guard('web')->id();
-        $cartItem = Cart::where('id', $id)
-                        ->where('user_id', $userId)
-                        ->firstOrFail(); // Gagal jika item tidak ditemukan atau bukan milik user
+        $cartItem = Cart::findOrFail($id);
+        
+        // Make sure this cart item belongs to the current user
+        if ($cartItem->user_id != Auth::user()->id_user) {
+            return redirect()->route('cart')->with('error', 'Anda tidak memiliki akses.');
+        }
+        
+        $cartItem->quantity = $request->quantity;
+        $cartItem->save();
 
         $product = $cartItem->product;
         // Cek jika produk sudah tidak ada
@@ -180,9 +137,14 @@ class CartController extends Controller
      */
     public function removeFromCart($id)
     {
-        $userId = Auth::guard('web')->id();
-        // Gunakan findOrFail untuk item milik user yang sedang login
-        $cartItem = Cart::where('id', $id)->where('user_id', $userId)->firstOrFail();
+        $cartItem = Cart::findOrFail($id);
+        
+        // Make sure this cart item belongs to the current user
+        if ($cartItem->user_id != Auth::user()->id_user) {
+            return redirect()->route('cart')->with('error', 'Anda tidak memiliki akses.');
+        }
+        
+        $cartItem->delete();
 
         $cartItem->delete();
         return redirect()->route('cart')->with('success', 'Produk berhasil dihapus dari keranjang!');

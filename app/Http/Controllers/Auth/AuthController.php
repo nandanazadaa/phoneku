@@ -131,52 +131,55 @@ class AuthController extends Controller
      */
     public function showAdminLoginForm()
     {
-        // If already logged in as admin, redirect to dashboard
+        // If already logged in as admin, you can still show the login page
+        // Optionally, display a message indicating they are already logged in
         if (Auth::guard('admin')->check()) {
-            return redirect()->route('admin.dashboard');
+            return view('auth.admin_login')->with('info', 'You are already logged in as an admin.');
         }
-
-        return view('auth.admin_login'); // Pastikan view ini ada
+    
+        return view('auth.admin_login');
     }
 
     /**
      * Handle admin login request
      */
     public function adminLogin(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($request->except('password'));
-        }
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput($request->except('password'));
+    }
 
-        // Verify this is an admin user
-        $user = User::where('email', $request->email)->where('role', 'admin')->first();
+    // Check if the user exists and has role 'admin'
+    $user = User::where('email', $request->email)
+                ->where('role', 'admin')
+                ->first();
 
-        if (!$user) {
-            return redirect()->back()
-                ->withErrors(['auth' => 'Invalid credentials or you don\'t have admin privileges'])
-                ->withInput($request->except('password'));
-        }
-
-        // Attempt login with admin guard
-        $credentials = $request->only('email', 'password');
-        $remember = $request->has('remember');
-
-        if (Auth::guard('admin')->attempt($credentials, $remember)) {
-            $request->session()->regenerate(); // Regenerate session ID on login for security
-            return redirect()->intended(route('admin.dashboard'));
-        }
-
+    if (!$user) {
         return redirect()->back()
             ->withErrors(['auth' => 'Invalid credentials'])
             ->withInput($request->except('password'));
     }
+
+    $credentials = $request->only('email', 'password');
+    $remember = $request->has('remember');
+
+    // Use the 'admin' guard to attempt login
+    if (Auth::guard('admin')->attempt($credentials, $remember)) {
+        $request->session()->regenerate();
+        return redirect()->intended(route('admin.dashboard'));
+    }
+
+    return redirect()->back()
+        ->withErrors(['auth' => 'Invalid credentials'])
+        ->withInput($request->except('password'));
+}
 
     /**
      * Show admin registration form
@@ -225,9 +228,8 @@ class AuthController extends Controller
      * Handle admin logout request
      */
     public function adminLogout(Request $request)
-    {
-        // Hanya logout guard 'admin'
-        Auth::guard('admin')->logout();
+{
+    Auth::guard('admin')->logout();
 
         // Tidak memanggil invalidate() agar tidak mengganggu sesi guard lain (misal 'web')
         // $request->session()->invalidate();

@@ -108,7 +108,7 @@
                             <div>
                                 <div class="flex justify-between items-center mb-1">
                                     <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
-                                    <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Ubah</a>
+                                    <a href="{{ route('ubah_email') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Ubah</a>
                                 </div>
                                 <input type="email" id="email" value="{{ $user->email }}"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100 text-gray-500 cursor-not-allowed"
@@ -119,13 +119,13 @@
                             <div>
                                 <div class="flex justify-between items-center mb-1">
                                     <label for="phone" class="block text-sm font-medium text-gray-600">Nomor Telepon</label>
-                                    <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium"> 
-                                        {{ $user->profile->phone ? 'Ganti' : 'Tambah' }}
-                                    </a>       
+                                    <a href="{{ route('ubah_no_tlp') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium"> 
+                                    {{ $user->profile && $user->profile->phone ? 'Ubah' : 'Tambah' }}                                    
+                                </a>            
                                </div>
-                                <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->profile->phone ?? '') }}"
+                                <input type="tel" id="phone" name="phone" value="{{ $user->profile->phone ?? ''}}"
                                     placeholder="Belum ditambahkan"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700" readonly>
                                 @error('phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror

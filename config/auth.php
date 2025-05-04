@@ -8,13 +8,18 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+        'driver' => 'session',
+        'provider' => 'users',
         ],
-        
         'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
+        ],
+
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => false,
         ],
     ],
 
@@ -34,21 +39,27 @@ return [
                 'role' => 'admin',
             ],
         ],
+
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class, // Same model, but we'll filter by role in the guard
+        ],
     ],
 
-    // Password reset settings
     'passwords' => [
         'users' => [
             'provider' => 'users',
-            'table' => 'password_reset_tokens',
+            'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],
-        'admins' => [
+        'admins' => [ // Add a separate password reset configuration for admins
             'provider' => 'admins',
-            'table' => 'password_reset_tokens',
+            'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],
     ],
+
+    'password_timeout' => 10800,
 ];
