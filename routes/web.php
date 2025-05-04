@@ -52,9 +52,19 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
     Route::get('/ubah_email_otp', [ProfileController::class, 'ubahEmailOTP'])->name('ubah_email_otp');
 
+    // Form ubah email - kirim OTP ke email lama
+    Route::post('/kirim_otp_email_lama', [ProfileController::class, 'kirimOtpEmailLama'])->name('kirim_otp_email_lama');
+    // Verifikasi OTP dan ubah email
+    Route::post('/verifikasi_otp_ubah_email', [ProfileController::class, 'verifikasiOtpUbahEmail'])->name('verifikasi_otp_ubah_email');    
+
     // Profile - ubah nomer telepon 
     Route::get('/ubah_no_tlp', [ProfileController::class, 'tambahNoTelepon'])->name('ubah_no_tlp');
     Route::get('/ubah_no_tlp_otp', [ProfileController::class, 'tambahNoTeleponOTP'])->name('ubah_no_tlp_otp');
+
+    // Form tambah/ubah nomer telepon - kirim OTP ke email lama
+    Route::post('/kirim_otp', [ProfileController::class, 'kirimOtpAturNotlp'])->name('kirim_otp');
+    // Verifikasi OTP dan tambah/ubah nomer telepon
+    Route::post('/verifikasi_otp', [ProfileController::class, 'verifikasiOtpAturNoTlp'])->name('verifikasi_otp');
     
     // Cart and checkout
     Route::post('/cart/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');

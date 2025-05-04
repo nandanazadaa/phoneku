@@ -65,7 +65,7 @@
                         </span>
                     </a>
                     @php
-                        $activeRoutes = ['profile', 'riwayatpembelian', 'profilekeamanan', 'logout.page'];
+                        $activeRoutes = ['profile', 'riwayatbeli', 'profilekeamanan', 'logout', 'ubah_email', 'ubah_email_otp', 'ubah_no_tlp', 'ubah_no_tlp_otp'];
                         $isProfileActive = in_array(Route::currentRouteName(), $activeRoutes);
                     @endphp
                     <a href="{{ route('profile') }}" 
