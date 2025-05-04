@@ -3,13 +3,20 @@
 namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Config; // Tambahkan baris ini
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Profile;
+use Exception;
 
 class ProfileController extends Controller
 {
@@ -117,6 +124,145 @@ class ProfileController extends Controller
         return view('profile.ubah_no_tlp_otp', compact('user'));
     }
 
+    public function kirimOtpEmailLama(Request $request)
+    {
+        $request->validate([
+            'email_baru' => 'required|email|unique:users,email,' . Auth::id(),
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+
+        if ($request->email_baru == $user->email) {
+            return back()->with('validation_error', 'Silakan masukkan email yang berbeda dari email saat ini.');
+        }
+
+        // Generate kode OTP
+        $otp = random_int(100000, 999999);
+
+        // Simpan data OTP dan email baru di session
+        Session::put('otp_email', $otp);
+        Session::put('email_baru', $request->email_baru);
+
+        // ini buat ngecek email benar2 email bukan (dummy) tapi keknya juga butuh pihak ke tiga juga
+        try {
+            Mail::raw("Kode OTP untuk mengubah email Anda: $otp", function ($message) use ($request) {
+                $message->to($request->email_baru)
+                        ->subject('Kode OTP Ubah Email');
+            });
+        } catch (Exception $e) {
+            Log::error('Gagal mengirim email OTP: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengirim OTP ke email Anda. Pastikan email aktif dan bisa menerima pesan.');
+        }
+
+        // Kirim OTP ke email lama (email saat ini)
+        Mail::raw("Kode OTP untuk mengubah email Anda: $otp", function ($message) use ($user) {
+            $message->to($user->email)
+                    ->subject('Kode OTP Ubah Email');
+        });
+
+        return redirect()->route('ubah_email_otp')->with('success', 'Kode OTP telah dikirim ke email Anda.');
+    }
+
+    public function verifikasiOtpUbahEmail(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|numeric',
+        ]);
+
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+
+        $otpSession = Session::get('otp_email');
+        $emailBaru = Session::get('email_baru');
+
+        if ($request->otp != $otpSession) {
+            return back()->with('error', 'Kode OTP salah.');
+        }
+
+        // Ubah email user
+        $user->email = $emailBaru;
+        $user->save();
+
+        // Hapus session
+        Session::forget('otp_email');
+        Session::forget('email_baru');
+
+        return redirect()->route('profile')->with('success', 'Email berhasil diubah.');
+    }
+
+    public function kirimOtpAturNotlp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|numeric|digits_between:10,15',
+        ], [
+            'phone.digits_between' => 'Nomor telepon harus terdiri dari 10 hingga 15 digit.',
+        ]);
+    
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+
+        if ($request->phone == $user->profile->phone) {
+            return back()->with('validation_error', 'Nomor telepon tidak boleh sama dengan nomor yang sudah terdaftar.');
+        }
+    
+        // Generate OTP
+        $otp = rand(100000, 999999); // 6 digit OTP
+        
+        // Store OTP in session
+        Session::put('otp_tlp', $otp);
+        Session::put('phone', $request->phone);
+    
+        // Send OTP as raw text to email
+        Mail::raw("Kode OTP untuk mengubah nomor telepon Anda: $otp", function ($message) use ($user) {
+            $message->to($user->email)
+                    ->subject('Kode OTP Ubah Nomor Telepon');
+        });
+
+        // Redirect to OTP input page
+        return redirect()->route('ubah_no_tlp_otp')->with('success', 'Kode OTP telah dikirim ke email Anda.');
+    }
+
+    public function verifikasiOtpAturNoTlp(Request $request)
+    {
+        // Get authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+
+        // Validate OTP
+        $request->validate([
+            'otp' => 'required|numeric',
+        ]);
+
+        // Check if the OTP matches 
+        if ($request->otp == Session::get('otp_tlp')) {
+            // Update phone number
+            if ($user->profile) {
+                $user->profile->phone = Session::get('phone');
+                $user->profile->save();
+            }
+
+            // Clear OTP session
+            Session::forget('otp');
+            Session::forget('phone');
+
+            return redirect()->route('profile')->with('success', 'Nomer telepon berhasil diubah.');
+        } 
+        return back()->with('error', 'Kode OTP salah.');
+    }
+
     public function update(Request $request)
     {
         // Get authenticated user
@@ -134,7 +280,7 @@ class ProfileController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'username' => 'nullable|string|max:255|unique:profiles,username,' . $profileId . ',profile_id',
-            'phone' => 'nullable|string|max:20',
+            // 'phone' => 'nullable|string|max:20',
             'gender' => 'nullable|in:male,female',
             'birth_day' => 'nullable|integer|min:1|max:31',
             'birth_month' => 'nullable|integer|min:1|max:12',
@@ -154,7 +300,7 @@ class ProfileController extends Controller
         // Prepare profile data
         $profileData = [
             'username' => $request->username,
-            'phone' => $request->phone,
+            // 'phone' => $request->phone,
             'gender' => $request->gender,
             'birth_day' => $request->birth_day,
             'birth_month' => $request->birth_month,

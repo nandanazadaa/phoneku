@@ -1,4 +1,14 @@
 SKU hapus
 bikin page lupa password dengan menginputkan nomer telepon
 bikin testimoni di bagian page product sama stok produk di bawah jumlah kuantitas
-cek
+
+di .env ganti jadi:
+MAIL_MAILER=smtp
+MAIL_SCHEME=null
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=yusufwahid2005@gmail.com
+MAIL_PASSWORD=zpumvsgmpoxqtmzf // buat dapetin app password ini akun gmail nya harus udah 2 step verification, sementara pake punya ku dulu jg gpp 
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=yusufwahid2005@gmail.com
+MAIL_FROM_NAME="${APP_NAME}"

@@ -65,28 +65,42 @@
 
             <!-- Right Content -->
             <!-- Content Area -->
-        <section class="w-full md:w-3/4">
-            <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <h3 class="text-2xl font-semibold text-gray-700 mb-2">Ubah Email</h3>
-                <p class="text-gray-500 mb-6">Masukkan email baru Anda untuk memperbarui informasi akun.</p>
-                <form>
-                    <div class="container">
-                        <!-- Ubah Email -->
-                        <div class="mb-6">
-                            <label for="ubahemail" class="block text-sm font-medium text-gray-700 mb-3">Email</label>
-                            <input type="email" id="ubahemail" placeholder="Masukkan Email Baru"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700">  
-                            <p class="text-gray-500 mt-2">Kami akan mengirimkan kode verifikasi melalui Email.</p>
-                        </div>
-                    
-                        <button type="submit"
-                            class=" w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-300">
-                            Lanjutkan
-                        </button>
+            <section class="w-full md:w-3/4">
+                @if (session('validation_error'))
+                    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+                        {{ session('validation_error') }}
                     </div>
-                </form>
-            </div>
-        </section>
+                @endif
+                @if (session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-2">Ubah Email</h3>
+                    <p class="text-gray-500 mb-6">Masukkan email baru Anda untuk memperbarui informasi akun.
+                    <span class="text-yellow-600 font-semibold"> ⚠️ Pastikan email baru aktif dan bisa menerima email.</span>
+
+                    </p>
+                    <form method="POST" action="{{ route('kirim_otp_email_lama') }}">
+                    @csrf
+                        <div class="container">
+                            <!-- Ubah Email -->
+                            <div class="mb-6">
+                                <label for="ubahemail" class="block text-sm font-medium text-gray-700 mb-3">Email</label>
+                                <input type="email" name="email_baru" id="ubahemail" required placeholder="Masukkan Email Baru"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-700">  
+                                <p class="text-gray-500 mt-2">Kami akan mengirimkan kode verifikasi melalui Email.</p>
+                            </div>
+                        
+                            <button type="submit"
+                                class=" w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-300">
+                                Lanjutkan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
     </div>
 @endsection
