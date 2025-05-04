@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
@@ -20,11 +20,13 @@ return new class extends Migration
             $table->enum('category', ['handphone', 'accessory']);
             $table->boolean('is_featured')->default(false);
             $table->integer('stock');
-            $table->json('images')->nullable();  // Store images as a JSON array
+            // PERBAIKAN: Menggunakan string untuk 1 gambar utama
+            $table->string('image')->nullable();
+            // Jika Anda benar-benar butuh multi-image, Anda perlu model terpisah (ProductImage)
+            // dan relasi hasMany, serta menyesuaikan Controller & View
             $table->timestamps();
         });
     }
-    
 
     /**
      * Reverse the migrations.
