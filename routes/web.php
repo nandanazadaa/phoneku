@@ -45,15 +45,8 @@ Route::middleware(['auth:web'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
-    Route::get('/profilebayar', function () {
-        return view('profile/atur_pembayaran');
-    })->name('profilebayar');
-
     Route::get('/riwayatbeli', [ProfileController::class, 'riwayat'])->name('riwayatbeli');
     Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
-
-
 
     // Profile - ubah email 
     Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');

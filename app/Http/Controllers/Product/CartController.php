@@ -11,79 +11,71 @@ use Illuminate\Support\Facades\Log;
 class CartController extends Controller
 {
     public function addToCart(Request $request, $productId)
-    {
-        // Check if user is authenticated
-        if (!Auth::check()) {
-            if ($request->ajax()) {
-                return response()->json(['message' => 'Silakan login untuk menambahkan produk ke keranjang.'], 401);
-            }
-            return redirect()->route('login', ['redirect' => url()->current()]);
-        }
-
-        // Get authenticated user
-        $user = Auth::user();
-        
-        // Debug: Make sure we have a valid user ID
-        if (!$user || !$user->id_user) {
-            Log::error('User ID is missing', ['user' => $user]);
-            if ($request->ajax()) {
-                return response()->json(['message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'], 500);
-            }
-            return redirect()->back()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi.');
-        }
+{
+    try {
+        Log::info('Attempting to add product to cart', ['productId' => $productId, 'userId' => Auth::id()]);
 
         $product = Product::findOrFail($productId);
-
-        $cartItem = Cart::where('user_id', $user->id_user)
-            ->where('product_id', $productId)
-            ->first();
-
-        if ($cartItem) {
-            $cartItem->quantity += 1;
-            $cartItem->save();
-        } else {
-            // Create new cart item with explicit user_id
-            Cart::create([
-                'user_id' => $user->id_user,
-                'product_id' => $productId,
-                'quantity' => 1,
-            ]);
-        }
-
-        $cartCount = Cart::where('user_id', $user->id_user)->sum('quantity');
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Produk berhasil ditambahkan ke keranjang!',
-                'cartCount' => $cartCount,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
-    }
-
-    public function index()
-    {
-        if (!Auth::check()) {
-            return redirect()->route('login', ['redirect' => url()->current()]);
-        }
-        
         $user = Auth::user();
-        
-        $cartItems = Cart::where('user_id', $user->id_user)
-            ->with('product')
-            ->get();
 
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
-        });
+        if (!$user) {
+            Log::warning('User not authenticated', ['productId' => $productId]);
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
 
-        return view('Home.cart', [
-            'cartItems' => $cartItems,
-            'subtotal' => $subtotal,
+        $cart = Cart::firstOrCreate(
+            ['user_id' => $user->id, 'product_id' => $product->id],
+            ['quantity' => 0]
+        );
+
+        $cart->quantity += 1;
+        if (!$cart->save()) {
+            Log::error('Failed to save cart', ['cartId' => $cart->id]);
+            throw new \Exception('Failed to save cart');
+        }
+
+        $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
+
+        Log::info('Product added to cart successfully', ['cartId' => $cart->id, 'cartCount' => $cartCount]);
+
+        return response()->json([
+            'message' => 'Produk berhasil ditambahkan ke keranjang!',
+            'cartCount' => $cartCount
+        ], 200);
+    } catch (\Exception $e) {
+        Log::error('Error adding product to cart', [
+            'error' => $e->getMessage(),
+            'productId' => $productId,
+            'userId' => Auth::id(),
+            'trace' => $e->getTraceAsString()
         ]);
+        return response()->json([
+            'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+        ], 500);
     }
+}
+
+public function index()
+{
+    if (!Auth::check()) {
+        return redirect()->route('login', ['redirect' => url()->current()]);
+    }
+    
+    $user = Auth::user();
+    
+    $cartItems = Cart::where('user_id', $user->id)
+        ->with('product')
+        ->get();
+
+    $subtotal = $cartItems->sum(function ($item) {
+        return $item->product->price * $item->quantity;
+    });
+
+    return view('Home.cart', [
+        'cartItems' => $cartItems,
+        'subtotal' => $subtotal,
+    ]);
+}
 
     public function updateQuantity(Request $request, $id)
     {

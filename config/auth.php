@@ -8,13 +8,12 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+        'driver' => 'session',
+        'provider' => 'users',
         ],
-
         'admin' => [
             'driver' => 'session',
-            'provider' => 'admins', // Use a separate provider for admins
+            'provider' => 'admins',
         ],
 
         'api' => [

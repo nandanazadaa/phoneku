@@ -31,23 +31,23 @@
             <!-- Navigation Links -->
             <div class="hidden md:flex space-x-8">
                 <a href="{{ route('welcome') }}"
-                class="{{ Route::currentRouteName() == 'welcome' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    class="{{ Route::currentRouteName() == 'welcome' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
                     Beranda
                 </a>
                 <a href="{{ route('aboutus') }}"
-                class="{{ Route::currentRouteName() == 'aboutus' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    class="{{ Route::currentRouteName() == 'aboutus' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
                     Tentang
                 </a>
                 <a href="{{ route('tim') }}"
-                class="{{ Route::currentRouteName() == 'tim' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    class="{{ Route::currentRouteName() == 'tim' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
                     Tim
                 </a>
                 <a href="{{ route('allproduct') }}"
-                class="{{ Route::currentRouteName() == 'allproduct' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    class="{{ Route::currentRouteName() == 'allproduct' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
                     Belanja
                 </a>
                 <a href="{{ route('kontak') }}"
-                class="{{ Route::currentRouteName() == 'kontak' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
+                    class="{{ Route::currentRouteName() == 'kontak' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
                     Kontak
                 </a>
             </div>
@@ -58,8 +58,8 @@
                     <a href="{{ route('cart') }}" 
                         class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }} relative">
                         <i class="fas fa-shopping-cart text-xl"></i>
-                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center {{ \App\Models\Cart::where('user_id', Auth::user()->id ?? 0)->sum('quantity') > 0 ? '' : 'hidden' }}">
-                            {{ \App\Models\Cart::where('user_id', Auth::user()->id ?? 0)->sum('quantity') }}
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center {{ $cartCount > 0 ? '' : 'hidden' }}">
+                            {{ $cartCount }}
                         </span>
                     </a>
                     @php
@@ -67,7 +67,7 @@
                         $isProfileActive = in_array(Route::currentRouteName(), $activeRoutes);
                     @endphp
                     <a href="{{ route('profile') }}" 
-                    class="{{ $isProfileActive ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
+                        class="{{ $isProfileActive ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }}">
                         <i class="fas fa-user-circle text-xl"></i>
                     </a>
                 @else

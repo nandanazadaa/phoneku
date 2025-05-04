@@ -120,7 +120,7 @@
                                 <div class="flex justify-between items-center mb-1">
                                     <label for="phone" class="block text-sm font-medium text-gray-600">Nomor Telepon</label>
                                     <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium"> 
-                                        {{ $user->profile->phone ? 'Ganti' : 'Tambah' }}
+                                        {{-- {{ $user->profile->phone ? 'Ganti' : 'Tambah' }} --}}
                                     </a>       
                                </div>
                                 <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->profile->phone ?? '') }}"
