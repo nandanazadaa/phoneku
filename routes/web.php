@@ -29,7 +29,7 @@ Route::get('/kontak', function () {
 Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allproduct');
 
 // Authentication routes (guest only)
-Route::middleware(['guest'])->group(function () {
+Route::middleware(['guest:web'])->group(function () {
     Route::get('/login', function () {
         return view('Auth/login');
     })->name('login');
@@ -41,7 +41,7 @@ Route::middleware(['guest'])->group(function () {
 });
 
 // Authenticated routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -67,17 +67,25 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/verifikasi_otp', [ProfileController::class, 'verifikasiOtpAturNoTlp'])->name('verifikasi_otp');
     
     // Cart and checkout
+    Route::post('/cart/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::post('/cart/add/{product}', [CartController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+
     Route::get('/checkout', function () {
         return view('Home/checkout');
     })->name('checkout');
 
+    Route::get('/riwayatpembelian', function () {
+        return view('profile/riwayat_pembelian');
+    })->name('riwayatpembelian');
+
     
-    // Customer chat
     Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support');
+    
+    // Add routes for customers to send and fetch messages
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
     
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -100,17 +108,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Admin login/register (no auth middleware)
     Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'adminLogin'])->name('login.post');
-    Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
+    Route::middleware(['guest:admin'])->group(function () {
+        
+        Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
+        Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
+    });
     
     // Admin protected routes
-    Route::middleware(['auth'])->group(function() {
+    Route::middleware(['auth:admin'])->group(function() {
         Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
         Route::get('/products', [ProductController::class, 'index'])->name('products');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-        Route::post('/products/preview', [ProductController::class, 'preview']); Route::get('/users', [UserController::class, 'index'])->name('users');
+        Route::post('/products/preview', [ProductController::class, 'preview']); 
+        Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
@@ -131,6 +143,5 @@ Route::post('/pusher/auth', function (Request $request) {
         env('PUSHER_APP_ID'),
         ['cluster' => env('PUSHER_APP_CLUSTER'), 'useTLS' => true]
     );
-
     return $pusher->socket_auth($request->channel_name, $request->socket_id);
-})->middleware('auth');
+})->middleware('auth:web,admin');
