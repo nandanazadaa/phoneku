@@ -121,10 +121,7 @@
                                     <label for="phone" class="block text-sm font-medium text-gray-600">Nomor Telepon</label>
                                     <a href="{{ route('ubah_no_tlp') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium"> 
                                     {{ $user->profile && $user->profile->phone ? 'Ubah' : 'Tambah' }}                                    
-                                </a>       
-                                    <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium"> 
-                                        {{-- {{ $user->profile->phone ? 'Ganti' : 'Tambah' }} --}}
-                                    </a>       
+                                </a>            
                                </div>
                                 <input type="tel" id="phone" name="phone" value="{{ $user->profile->phone ?? ''}}"
                                     placeholder="Belum ditambahkan"

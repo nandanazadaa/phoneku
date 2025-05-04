@@ -148,15 +148,15 @@ class ProfileController extends Controller
         Session::put('email_baru', $request->email_baru);
 
         // ini buat ngecek email benar2 email bukan (dummy) tapi keknya juga butuh pihak ke tiga juga
-        try {
-            Mail::raw("Kode OTP untuk mengubah email Anda: $otp", function ($message) use ($request) {
-                $message->to($request->email_baru)
-                        ->subject('Kode OTP Ubah Email');
-            });
-        } catch (Exception $e) {
-            Log::error('Gagal mengirim email OTP: ' . $e->getMessage());
-            return back()->with('error', 'Gagal mengirim OTP ke email Anda. Pastikan email aktif dan bisa menerima pesan.');
-        }
+        // try {
+        //     Mail::raw("Kode OTP untuk mengubah email Anda: $otp", function ($message) use ($request) {
+        //         $message->to($request->email_baru)
+        //                 ->subject('Kode OTP Ubah Email');
+        //     });
+        // } catch (Exception $e) {
+        //     Log::error('Gagal mengirim email OTP: ' . $e->getMessage());
+        //     return back()->with('error', 'Gagal mengirim OTP ke email Anda. Pastikan email aktif dan bisa menerima pesan.');
+        // }
 
         // Kirim OTP ke email lama (email saat ini)
         Mail::raw("Kode OTP untuk mengubah email Anda: $otp", function ($message) use ($user) {
@@ -164,7 +164,7 @@ class ProfileController extends Controller
                     ->subject('Kode OTP Ubah Email');
         });
 
-        return redirect()->route('ubah_email_otp')->with('success', 'Kode OTP telah dikirim ke email Anda.');
+        return redirect()->route('ubah_email_otp')->with('success', 'Kode OTP telah dikirim ke email ' . $user->email . '.');
     }
 
     public function verifikasiOtpUbahEmail(Request $request)
@@ -229,7 +229,7 @@ class ProfileController extends Controller
         });
 
         // Redirect to OTP input page
-        return redirect()->route('ubah_no_tlp_otp')->with('success', 'Kode OTP telah dikirim ke email Anda.');
+        return redirect()->route('ubah_no_tlp_otp')->with('success', 'Kode OTP telah dikirim ke email ' . $user->email . '.');
     }
 
     public function verifikasiOtpAturNoTlp(Request $request)
