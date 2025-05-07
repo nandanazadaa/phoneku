@@ -121,11 +121,12 @@ class AuthController extends Controller
      */
     public function showAdminLoginForm()
     {
-        // If already logged in as admin, redirect to dashboard
-        if (Auth::check() && Auth::user()->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+        // If already logged in as admin, you can still show the login page
+        // Optionally, display a message indicating they are already logged in
+        if (Auth::guard('admin')->check()) {
+            return view('auth.admin_login')->with('info', 'You are already logged in as an admin.');
         }
-        
+    
         return view('auth.admin_login');
     }
 
@@ -133,36 +134,42 @@ class AuthController extends Controller
      * Handle admin login request
      */
     public function adminLogin(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-    
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($request->except('password'));
-        }
-    
-        // Cek apakah email ada di database
-        $user = User::where('email', $request->email)->first();
-        
-        // Jika user ditemukan dan rolenya admin, coba login
-        if ($user && $user->role === 'admin') {
-            $credentials = $request->only('email', 'password');
-            $remember = $request->has('remember');
-            
-            if (Auth::attempt($credentials, $remember)) {
-                $request->session()->regenerate();
-                return redirect()->intended(route('admin.dashboard'));
-            }
-        }
-    
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput($request->except('password'));
+    }
+
+    // Check if the user exists and has role 'admin'
+    $user = User::where('email', $request->email)
+                ->where('role', 'admin')
+                ->first();
+
+    if (!$user) {
         return redirect()->back()
             ->withErrors(['auth' => 'Invalid credentials or you don\'t have admin privileges'])
             ->withInput($request->except('password'));
     }
+
+    $credentials = $request->only('email', 'password');
+    $remember = $request->has('remember');
+
+    // Use the 'admin' guard to attempt login
+    if (Auth::guard('admin')->attempt($credentials, $remember)) {
+        $request->session()->regenerate();
+        return redirect()->intended(route('admin.dashboard'));
+    }
+
+    return redirect()->back()
+        ->withErrors(['auth' => 'Invalid credentials'])
+        ->withInput($request->except('password'));
+}
 
     /**
      * Show admin registration form
@@ -212,7 +219,7 @@ class AuthController extends Controller
      */
     public function adminLogout(Request $request)
 {
-    Auth::logout();
+    Auth::guard('admin')->logout();
 
     $request->session()->invalidate();
     $request->session()->regenerateToken();

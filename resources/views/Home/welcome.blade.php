@@ -42,15 +42,15 @@
     </div>
 
     <!-- Handphone Section -->
-    <div class="container mx-auto px-4 pt-32 pb-8">
-        <div class="flex justify-between items-center mb-6">
+    <div class="container mx-auto px-4 pt-16 pb-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
                 <p class="text-sm text-gray-600">Produk kami</p>
                 <h2 class="text-2xl font-bold">Handphone</h2>
             </div>
 
-            <div class="relative max-w-md w-full">
-                <form action="{{ route('allproduct') }}" method="GET">
+            <div class="w-full md:w-auto max-w-md">
+                <form action="{{ route('allproduct') }}" method="GET" class="search-form">
                     <div class="flex items-center bg-blue-500 rounded-full overflow-hidden">
                         <input type="text" name="search"
                             class="w-full bg-blue-500 text-white placeholder-white/80 py-3 px-6 outline-none"
@@ -65,7 +65,7 @@
         </div>
 
         <!-- Products Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @forelse($phones as $product)
                 <!-- Product Card -->
                 <div class="bg-blue-500 rounded-xl overflow-hidden">
@@ -104,7 +104,7 @@
                     </div>
                 </div>
             @empty
-                <div class="col-span-4 text-center py-8">
+                <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center py-8">
                     <p class="text-gray-500">Tidak ada produk handphone tersedia saat ini.</p>
                 </div>
             @endforelse
@@ -127,7 +127,7 @@
         </div>
 
         <!-- Products Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @forelse($accessories as $product)
                 <!-- Product Card -->
                 <div class="bg-blue-500 rounded-xl overflow-hidden">
@@ -166,7 +166,7 @@
                     </div>
                 </div>
             @empty
-                <div class="col-span-4 text-center py-8">
+                <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center py-8">
                     <p class="text-gray-500">Tidak ada produk aksesoris tersedia saat ini.</p>
                 </div>
             @endforelse
@@ -184,6 +184,55 @@
 
 @section('styles')
     <style>
+        /* General Responsive Styles */
+        .container {
+            max-width: 1200px;
+        }
+
+        /* Banner Styles */
+        .banner-image {
+            width: 100%;
+            object-fit: cover;
+            max-height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            .banner-image {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .banner-image {
+                max-height: 200px;
+            }
+        }
+
+        /* Wave Section */
+        .wave-section {
+            position: relative;
+            height: 100px;
+            margin-top: -1px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .wave-svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: translateY(1px);
+        }
+
+        @media (max-width: 768px) {
+            .wave-section {
+                height: 80px;
+            }
+        }
+
+        /* Product Card */
         .product-image-container {
             height: 240px;
             display: flex;
@@ -198,28 +247,30 @@
             object-fit: contain;
         }
 
-        .wave-section {
-            position: relative;
-            height: 150px;
-            margin-top: -1px;
-            width: 100%;
-            overflow: hidden;
+        @media (max-width: 640px) {
+            .product-image-container {
+                height: 200px;
+            }
+
+            .product-image {
+                max-height: 180px;
+            }
         }
 
-        .wave-svg {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100vw;
-            min-width: 100%;
-            height: 100%;
-            transform: translateY(1px);
+        /* Search Bar */
+        .search-form {
+            width: 100%;
         }
 
-        .banner-image {
-            width: 100%;
-            object-fit: cover;
-            max-height: 400px;
+        @media (max-width: 768px) {
+            .search-form input {
+                font-size: 0.875rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .search-form button {
+                padding: 0.75rem;
+            }
         }
     </style>
 @endsection
@@ -227,7 +278,37 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Banner slider functionality
+            // Hamburger Menu Toggle
+            const hamburger = document.querySelector('.hamburger');
+            const mobileNavbarMenu = document.querySelector('.mobile-navbar-menu');
+
+            if (hamburger && mobileNavbarMenu) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('active');
+                    mobileNavbarMenu.classList.toggle('hidden');
+                    mobileNavbarMenu.classList.toggle('active');
+                });
+
+                // Close menu when clicking a link
+                mobileNavbarMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        mobileNavbarMenu.classList.add('hidden');
+                        mobileNavbarMenu.classList.remove('active');
+                    });
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!hamburger.contains(event.target) && !mobileNavbarMenu.contains(event.target)) {
+                        hamburger.classList.remove('active');
+                        mobileNavbarMenu.classList.add('hidden');
+                        mobileNavbarMenu.classList.remove('active');
+                    }
+                });
+            }
+
+            // Banner Slider Functionality
             const slides = document.querySelectorAll('.slide');
             const dots = document.querySelectorAll('.slider-dot');
             let currentSlide = 0;
@@ -259,90 +340,129 @@
                 }, 5000);
             }
 
-            dots.forEach(dot => {
-                dot.addEventListener('click', function() {
-                    let slideIndex = parseInt(this.getAttribute('data-slide'));
-                    showSlide(slideIndex);
-                    clearInterval(slideInterval);
-                    startSlideShow();
+            if (slides.length > 0 && dots.length > 0) {
+                dots.forEach(dot => {
+                    dot.addEventListener('click', function() {
+                        let slideIndex = parseInt(this.getAttribute('data-slide'));
+                        showSlide(slideIndex);
+                        clearInterval(slideInterval);
+                        startSlideShow();
+                    });
                 });
-            });
 
-            showSlide(0);
-            startSlideShow();
+                showSlide(0);
+                startSlideShow();
+            }
 
-            // Add to Cart AJAX functionality
+            // Add to Cart AJAX Functionality
             document.querySelectorAll('[data-cart-action="add"]').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
 
                     const form = this.closest('form');
                     const productId = this.getAttribute('data-product-id');
-                    const formData = new FormData(form);
 
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                    })
-                    .then(response => {
-                        if (response.status === 401) {
-                            throw new Error('User not authenticated');
-                        }
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
+                    // Check if user is logged in before proceeding
+                    const isLoggedIn = document.body.classList.contains('user-logged-in') ||
+                        document.querySelector('meta[name="user-logged-in"]') !== null;
+
+                    if (!isLoggedIn) {
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: data.message || 'Produk berhasil ditambahkan ke keranjang!',
+                            icon: 'warning',
+                            title: 'Login Diperlukan',
+                            text: 'Silakan login untuk menambahkan produk ke keranjang.',
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 3000,
                             timerProgressBar: true,
+                        }).then(() => {
+                            window.location.href =
+                                `/login?redirect=${encodeURIComponent(window.location.href)}`;
                         });
+                        return;
+                    }
 
-                        const cartCount = document.getElementById('cart-count');
-                        if (cartCount && data.cartCount !== undefined) {
-                            cartCount.textContent = data.cartCount;
-                        }
-                    })
-                    .catch(error => {
-                        if (error.message === 'User not authenticated') {
+                    const formData = new FormData(form);
+
+                    // Add CSRF token
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    if (!csrfToken) {
+                        console.error('CSRF token not found');
+                        return;
+                    }
+
+                    fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(response => {
+                            if (response.status === 401) {
+                                throw new Error('User not authenticated');
+                            }
+                            if (!response.ok) {
+                                return response.json().then(data => {
+                                    throw new Error(data.message ||
+                                        'Network response was not ok');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
                             Swal.fire({
-                                icon: 'warning',
-                                title: 'Login Diperlukan',
-                                text: 'Silakan login untuk menambahkan produk ke keranjang.',
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true,
-                            }).then(() => {
-                                window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal!',
-                                text: 'Terjadi kesalahan saat menambahkan produk ke keranjang.',
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message ||
+                                    'Produk berhasil ditambahkan ke keranjang!',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
                                 timer: 2000,
                                 timerProgressBar: true,
                             });
-                        }
-                        console.error('Error:', error);
-                    });
+
+                            const cartCount = document.getElementById('cart-count');
+                            if (cartCount && data.cartCount !== undefined) {
+                                cartCount.textContent = data.cartCount;
+                                cartCount.classList.remove('hidden');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                            if (error.message === 'User not authenticated') {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Login Diperlukan',
+                                    text: 'Silakan login untuk menambahkan produk ke keranjang.',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                }).then(() => {
+                                    window.location.href =
+                                        `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: error.message ||
+                                        'Terjadi kesalahan saat menambahkan produk ke keranjang.',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                });
+                            }
+                        });
                 });
             });
         });
