@@ -63,7 +63,7 @@
                         </span>
                     </a>
                     @php
-                        $activeRoutes = ['profile', 'riwayatpembelian', 'profilekeamanan', 'logout.page'];
+                        $activeRoutes = ['profile', 'riwayatbeli', 'profilekeamanan', 'logout'];
                         $isProfileActive = in_array(Route::currentRouteName(), $activeRoutes);
                     @endphp
                     <a href="{{ route('profile') }}" 

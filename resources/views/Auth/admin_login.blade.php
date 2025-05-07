@@ -108,7 +108,7 @@
                             <label for="remember" class="ml-2 text-white text-sm">Ingat saya</label>
                         </div>
                         <div>
-                            <a href="#" class="text-white hover:underline text-xs">Lupa Password?</a>
+                            <a href="{{ route('lupa_password') }}" class="text-white hover:underline text-xs">Lupa Password?</a>
                         </div>
                     </div>
 
