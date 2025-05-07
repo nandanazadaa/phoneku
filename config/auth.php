@@ -27,6 +27,17 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+            'conditions' => [
+                'role' => 'customer',
+            ],
+        ],
+        
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+            'conditions' => [
+                'role' => 'admin',
+            ],
         ],
 
         'admins' => [
