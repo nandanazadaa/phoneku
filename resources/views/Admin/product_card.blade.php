@@ -542,13 +542,12 @@
                 <h5 class="op-7 mb-2">Manage Produk yang ada di toko anda!</h5>
             </div>
             <div class="ml-md-auto py-2 py-md-0">
-                {{-- Adjusted button visibility based on tab --}}
-                {{-- The create product modal button should always be visible --}}
+                {{-- Tombol Tambah Produk (via Modal) tetap ada di sini --}}
                  <button class="btn btn-white btn-border btn-round mr-2" data-toggle="modal" data-target="#createProductModal">
                     <i class="fa fa-plus"></i> Tambah Produk
                  </button>
-                 {{-- Back button only makes sense when not on the list tab --}}
-                @if(request('tab', 'list') !== 'list') {{-- Show back button if tab is not 'list' --}}
+                 {{-- Tombol Kembali ke List Produk hanya muncul jika tidak di tab 'list' --}}
+                @if(request('tab', 'list') !== 'list')
                      <a href="{{ route('admin.products') }}?tab=list" class="btn btn-white btn-border btn-round mr-2">
                          <i class="fa fa-arrow-left"></i> Kembali ke List Produk
                      </a>
@@ -562,18 +561,25 @@
     <!-- Tabs -->
     <ul class="nav nav-tabs" id="productTabs" role="tablist">
         <li class="nav-item">
-            {{-- Use request('tab') for active class logic --}}
+            {{-- Tab List Produk --}}
             <a class="nav-link {{ (request('tab', 'list') === 'list') ? 'active' : '' }}"
                 id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list"
                 aria-selected="{{ (request('tab', 'list') === 'list') ? 'true' : 'false' }}">
                 <i class="fa fa-list"></i> List Produk
             </a>
         </li>
-        {{-- Removed the explicit "Tambah Produk Baru" tab to rely solely on the modal --}}
-        {{-- The create form will now only exist within the modal --}}
-        @if(isset($editProduct) && request('tab') === 'edit') {{-- Check for editProduct existence and tab --}}
+         {{-- Tab Tambah Produk Baru (Dikembalikan) --}}
+         {{-- Tab ini sekarang berisi form, BUKAN hanya memicu modal --}}
+        <li class="nav-item">
+             <a class="nav-link {{ (request('tab') === 'create') ? 'active' : '' }}"
+                id="create-tab" data-toggle="tab" href="#create" role="tab" aria-controls="create"
+                aria-selected="{{ (request('tab') === 'create') ? 'true' : 'false' }}">
+                <i class="fa fa-plus"></i> Tambah Produk Baru
+            </a>
+        </li>
+        {{-- Tab Edit Produk (Dikembalikan, hanya muncul jika $editProduct ada dan tab=edit) --}}
+        @if(isset($editProduct) && request('tab') === 'edit')
             <li class="nav-item">
-                {{-- Edit tab is active only when editProduct is set and tab is 'edit' --}}
                 <a class="nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab"
                     aria-controls="edit" aria-selected="true">
                     <i class="fa fa-edit"></i> Edit Produk
@@ -584,7 +590,7 @@
 
     <!-- Tab Content -->
     <div class="tab-content mt-2" id="productTabsContent">
-        <!-- List Tab -->
+        <!-- List Tab Content -->
         <div class="tab-pane fade {{ (request('tab', 'list') === 'list') ? 'show active' : '' }}" id="list" role="tabpanel" aria-labelledby="list-tab">
             <div class="card">
                 <div class="card-header">
@@ -857,10 +863,177 @@
             </div>
         </div>
 
-        {{-- Removed the "Tambah Produk Baru" tab content as it's now in a modal --}}
-        {{-- Keeping the Edit Tab content as it's a full page form --}}
+        <!-- Create Tab Content (Dikembalikan) -->
+         {{-- Tab ini akan aktif saat URL memiliki ?tab=create --}}
+        <div class="tab-pane fade {{ (request('tab') === 'create') ? 'show active' : '' }}" id="create" role="tabpanel" aria-labelledby="create-tab">
+             <div class="row">
+                 <div class="col-md-12">
+                     <div class="card">
+                         <div class="card-header">
+                             <h4 class="card-title">Tambah Produk Baru</h4>
+                         </div>
+                         <div class="card-body">
+                              {{-- Add preview area for create form --}}
+                              <div class="row mb-4">
+                                 <div class="col-md-6">
+                                     <h5>Preview Card:</h5>
+                                     <div id="create-preview-container" class="preview-container">
+                                         {{-- Preview card will be injected here by JavaScript --}}
+                                     </div>
+                                     <small class="form-text text-muted mt-2 text-center">Ini tampilan perkiraan di halaman pembeli.</small>
+                                 </div>
+                                 <div class="col-md-6">
+                                     {{-- Optional: space for other preview elements or instructions --}}
+                                 </div>
+                             </div>
+                             <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="create-product-form">
+                                 @csrf
 
-        <!-- Edit Tab -->
+                                 <div class="form-group">
+                                     <label for="create_name">Nama Produk <span class="text-danger">*</span></label>
+                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="create_name" name="name" value="{{ old('name') }}" required>
+                                     @error('name')
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                     @enderror
+                                 </div>
+
+                                 <div class="form-group">
+                                     <label for="create_description">Deskripsi</label>
+                                     <textarea class="form-control @error('description') is-invalid @enderror" id="create_description" name="description" rows="4">{{ old('description') }}</textarea>
+                                     @error('description')
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                     @enderror
+                                 </div>
+
+                                 <div class="row">
+                                     <div class="col-md-6">
+                                         <div class="form-group">
+                                             <label for="create_price">Harga (Rp) <span class="text-danger">*</span></label>
+                                             <input type="number" class="form-control @error('price') is-invalid @enderror" id="create_price" name="price" value="{{ old('price') }}" min="0" step="1000" required>
+                                             @error('price')
+                                                 <div class="invalid-feedback">{{ $message }}</div>
+                                             @enderror
+                                         </div>
+                                     </div>
+                                     <div class="col-md-6">
+                                         <div class="form-group">
+                                             <label for="create_original_price">Harga Asli (Rp)</label>
+                                             <input type="number" class="form-control @error('original_price') is-invalid @enderror" id="create_original_price" name="original_price" value="{{ old('original_price') }}" min="0" step="1000">
+                                             @error('original_price')
+                                                 <div class="invalid-feedback">{{ $message }}</div>
+                                             @enderror
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <div class="row">
+                                     <div class="col-md-6">
+                                         <div class="form-group">
+                                             <label for="create_category">Kategori <span class="text-danger">*</span></label>
+                                             <select class="form-control @error('category') is-invalid @enderror" id="create_category" name="category" required>
+                                                 <option value="handphone" {{ old('category') == 'handphone' ? 'selected' : '' }}>Handphone</option>
+                                                 <option value="accessory" {{ old('category') == 'accessory' ? 'selected' : '' }}>Accessory</option>
+                                             </select>
+                                             @error('category')
+                                                 <div class="invalid-feedback">{{ $message }}</div>
+                                             @enderror
+                                         </div>
+                                     </div>
+                                     <div class="col-md-6">
+                                         <div class="form-group">
+                                             <label for="create_stock">Stok <span class="text-danger">*</span></label>
+                                             <input type="number" class="form-control @error('stock') is-invalid @enderror" id="create_stock" name="stock" value="{{ old('stock', 0) }}" min="0" required>
+                                             @error('stock')
+                                                 <div class="invalid-feedback">{{ $message }}</div>
+                                             @enderror
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 {{-- Multi-Color Input Section (Create Tab) --}}
+                                 <div class="form-group">
+                                     <label for="create_temp_color">Pilih Warna</label> {{-- Label for the temporary picker input --}}
+                                     {{-- data-color will set the initial picker value when initialized --}}
+                                     {{-- Use old() for the temporary input value, fallback to a default --}}
+                                     <div class="input-group colorpicker-element" data-color="{{ old('_create_temp_color', '#FFFFFF') }}">
+                                          <div class="input-group-prepend">
+                                             {{-- This span and its <i> icon will be the clickable swatch --}}
+                                             <span class="input-group-text colorpicker-color"><i></i></span>
+                                          </div>
+                                          {{-- This input holds the CURRENTLY SELECTED color in the picker UI --}}
+                                         <input type="text" class="form-control @error('color') is-invalid @enderror" id="create_temp_color" value="{{ old('_create_temp_color', '#FFFFFF') }}" autocomplete="off">
+                                         <div class="input-group-append">
+                                              <button class="btn btn-outline-secondary btn-eyedropper" type="button" title="Pick color from screen">
+                                                 <i class="fa fa-eye-dropper"></i>
+                                             </button>
+                                             {{-- This button adds the color from the temp input to the list --}}
+                                             <button class="btn btn-outline-primary btn-add-color" type="button" data-target="create">
+                                                  <i class="fa fa-plus"></i> Tambah
+                                             </button>
+                                         </div>
+                                     </div>
+                                      @error('color') {{-- Validation errors for the hidden 'color' field --}}
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                     @enderror
+                                     <small class="form-text text-muted">Pilih warna menggunakan pemilih atau masukkan kode hex, lalu klik "Tambah". Tombol pipet hanya berfungsi di browser yang mendukung.</small>
+
+                                      {{-- Display Area for Selected Colors --}}
+                                     <div id="selected-colors-list-create" class="mt-2 selected-colors-list"> {{-- Added class --}}
+                                         {{-- Selected colors will be displayed here by JS --}}
+                                     </div>
+
+                                     {{-- Hidden Input to Store Comma-Separated VALID Hex Colors for Submission --}}
+                                      <input type="hidden" name="color" id="product_colors_input_create" value="{{ old('color', '') }}">
+                                 </div>
+
+
+                                 <div class="form-group">
+                                     <label for="create_image">Foto Produk 1</label>
+                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="create_image" name="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                                     @error('image')
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                     @enderror
+                                     <small class="form-text text-muted">Ukuran rekomendasi: 400x400 pixels (JPG, JPEG, PNG)</small>
+                                 </div>
+
+                                 <div class="form-group">
+                                     <label for="create_image2">Foto Produk 2</label>
+                                     <input type="file" class="form-control @error('image2') is-invalid @enderror" id="create_image2" name="image2" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                                     @error('image2')
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                     @enderror
+                                     <small class="form-text text-muted">Ukuran rekomendasi: 400x400 pixels (JPG, JPEG, PNG)</small>
+                                 </div>
+
+                                 <div class="form-group">
+                                     <label for="create_image3">Foto Produk 3</label>
+                                     <input type="file" class="form-control @error('image3') is-invalid @enderror" id="create_image3" name="image3" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                                     @error('image3')
+                                         <div class="invalid-feedback">{{ $message }}</div>
+                                     @enderror
+                                     <small class="form-text text-muted">Ukuran rekomendasi: 400x400 pixels (JPG, JPEG, PNG)</small>
+                                 </div>
+
+                                 <div class="form-group">
+                                     <div class="custom-control custom-switch">
+                                         <input type="checkbox" class="custom-control-input" id="create_is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
+                                         <label class="custom-control-label" for="create_is_featured">Produk Unggulan</label>
+                                     </div>
+                                 </div>
+
+                                 <div class="form-group">
+                                     <button type="submit" class="btn btn-success">Tambahkan Produk</button>
+                                     <button type="reset" class="btn btn-danger">Reset</button>
+                                 </div>
+                             </form>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+
+
+        <!-- Edit Tab Content -->
         @if(isset($editProduct) && request('tab') === 'edit')
         <div class="tab-pane fade show active" id="edit" role="tabpanel" aria-labelledby="edit-tab">
             <div class="row">
@@ -1061,7 +1234,7 @@
     </div>
 </div>
 
-{{-- Create Product Modal --}}
+{{-- Create Product Modal (tetap ada sebagai opsi menambah dari tab list) --}}
 <div class="modal fade" id="createProductModal" tabindex="-1" role="dialog" aria-labelledby="createProductModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -1072,6 +1245,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                {{-- Formulir di dalam modal --}}
                 <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="modal-create-product-form">
                     @csrf
 
@@ -1208,11 +1382,10 @@
 $(document).ready(function() {
 
     // --- State Variables for Selected Colors ---
-    // Use arrays to store selected colors for each context (edit tab, create modal).
-    // These arrays temporarily hold colors, including potentially invalid ones typed by the user,
-    // for display purposes. The hidden input only stores valid hex codes.
-    let selectedColorsEdit = [];
-    let selectedColorsModalCreate = [];
+    // Use arrays to store selected colors for each context (create tab, edit tab, create modal).
+    let selectedColorsCreate = []; // State for the CREATE TAB form
+    let selectedColorsEdit = [];   // State for the EDIT TAB form
+    let selectedColorsModalCreate = []; // State for the CREATE MODAL form
 
     // --- Helper Functions ---
 
@@ -1225,9 +1398,9 @@ $(document).ready(function() {
     }
 
     // Update the visual list of selected colors below the picker input
-    // $listElement: The div where the color items are displayed (e.g., #selected-colors-list-edit)
+    // $listElement: The div where the color items are displayed (e.g., #selected-colors-list-create)
     // colorsArray: The JS array holding the color strings for this context
-    // inputId: A string identifier ('edit', 'modal-create') to target the correct remove buttons
+    // inputId: A string identifier ('create', 'edit', 'modal-create') to target the correct remove buttons
     function updateSelectedColorsDisplay($listElement, colorsArray, inputId) {
         $listElement.empty(); // Clear the current list display
         if (!colorsArray || colorsArray.length === 0) {
@@ -1238,7 +1411,7 @@ $(document).ready(function() {
             const trimmedColor = color.trim().toUpperCase(); // Trim and uppercase for consistency
             const isValid = isHexColor(trimmedColor);
             // Display the original string input by the user, but add '(Invalid Format)' if not hex
-            const displayColor = trimmedColor + (isValid ? '' : ' (Format Invalid)'); // Lebih singkat
+            const displayColor = trimmedColor + (isValid ? '' : ' (Format Invalid)'); // Use Indonesian for invalid format
             const swatchHtml = isValid ? `<span class="color-swatch" style="background-color: ${trimmedColor};"></span>` : '';
             const itemClass = isValid ? 'selected-color-item' : 'selected-color-item text-danger border-danger'; // Add classes for invalid
 
@@ -1279,7 +1452,9 @@ $(document).ready(function() {
         }
 
         // Update the correct state array based on inputId
-        if (inputId === 'edit') {
+        if (inputId === 'create') {
+            selectedColorsCreate = colorsArray;
+        } else if (inputId === 'edit') {
             selectedColorsEdit = colorsArray;
         } else if (inputId === 'modal-create') {
              selectedColorsModalCreate = colorsArray;
@@ -1297,7 +1472,8 @@ $(document).ready(function() {
         updateHiddenColorInput($hiddenInput, colorsArray);
 
          // Update preview if applicable after colors are loaded
-         if (inputId === 'edit') updateEditPreview();
+         if (inputId === 'create') updateCreatePreview();
+         else if (inputId === 'edit') updateEditPreview();
          // No preview update for modal in this example, but could be added.
     }
 
@@ -1470,18 +1646,20 @@ $(document).ready(function() {
     // --- Event Handlers ---
 
     // Handle "Remove" button click on selected color items (delegated event)
-    // Event delegation is necessary because these buttons are added dynamically
     $(document).on('click', '.btn-remove-color', function() {
-        // Get the color string exactly as it is displayed/stored in the data attribute
         const colorToRemove = $(this).data('color');
-        const inputId = $(this).data('input-id'); // e.g., 'edit', 'modal-create'
+        const inputId = $(this).data('input-id'); // 'create', 'edit', or 'modal-create'
 
         let colorsArray;
         let $listElement;
         let $hiddenInput;
 
         // Determine which state array and DOM elements to update
-        if (inputId === 'edit') {
+        if (inputId === 'create') {
+             colorsArray = selectedColorsCreate;
+             $listElement = $('#selected-colors-list-create');
+             $hiddenInput = $('#product_colors_input_create');
+        } else if (inputId === 'edit') {
             colorsArray = selectedColorsEdit;
              $listElement = $('#selected-colors-list-edit');
              $hiddenInput = $('#product_colors_input_edit');
@@ -1495,40 +1673,40 @@ $(document).ready(function() {
         }
 
         // Find the index of the color to remove in the state array
-        // We need to match the exact string stored in the array (which might include ' (Invalid Format)')
          const index = colorsArray.indexOf(colorToRemove);
 
-        // If found, remove it from the array
         if (index > -1) {
             colorsArray.splice(index, 1); // Remove the color
         } else {
              console.warn(`Color "${colorToRemove}" not found in state array for ${inputId}`);
-             return; // Color not found, shouldn't happen but good check
+             return;
         }
 
-
         // Update the visual display and the hidden input
-        updateSelectedColorsDisplay($listElement, colorsArray, inputId); // Display ALL colors including invalid ones
-        updateHiddenColorInput($hiddenInput, colorsArray); // Hidden input only gets VALID colors
+        updateSelectedColorsDisplay($listElement, colorsArray, inputId);
+        updateHiddenColorInput($hiddenInput, colorsArray);
 
          // Update the preview for the relevant form
-         if (inputId === 'edit') {
-             updateEditPreview();
-         }
-         // No preview update for modal in this example
+         if (inputId === 'create') updateCreatePreview();
+         else if (inputId === 'edit') updateEditPreview();
     });
 
 
     // Handle "Add Color" button click
     $('.btn-add-color').on('click', function() {
-         const targetId = $(this).data('target'); // 'edit' or 'modal-create'
-         let $tempInput; // The input field linked to the color picker
-         let colorsArray; // The state array for selected colors
-         let $listElement; // The div where selected colors are displayed
-         let $hiddenInput; // The hidden input for form submission
+         const targetId = $(this).data('target'); // 'create', 'edit', or 'modal-create'
+         let $tempInput;
+         let colorsArray;
+         let $listElement;
+         let $hiddenInput;
 
          // Determine which set of elements to use based on data-target
-         if (targetId === 'edit') {
+         if (targetId === 'create') {
+            $tempInput = $('#create_temp_color');
+            colorsArray = selectedColorsCreate;
+            $listElement = $('#selected-colors-list-create');
+            $hiddenInput = $('#product_colors_input_create');
+         } else if (targetId === 'edit') {
             $tempInput = $('#edit_temp_color');
             colorsArray = selectedColorsEdit;
             $listElement = $('#selected-colors-list-edit');
@@ -1543,86 +1721,57 @@ $(document).ready(function() {
              return;
          }
 
-        const newColor = $tempInput.val().trim().toUpperCase(); // Get the value from the temp input (trimmed, uppercase)
+        const newColor = $tempInput.val().trim().toUpperCase();
 
-         // Prevent adding empty strings
          if (newColor.length === 0) {
-             // alert('Silakan pilih atau masukkan warna.'); // Already handled by required on input
              return;
          }
 
-         // Check if the trimmed/uppercased color string is already in the array
-         // This handles checking "#F00" vs "#FF0000", or "invalid" vs "INVALID"
          if (colorsArray.includes(newColor)) {
               alert(`Warna ${newColor} sudah ditambahkan.`);
-               return; // Stop here if duplicate
+               return;
          }
 
-         // Add the new color (trimmed and uppercased) to the state array.
-         // We store the potentially invalid format string here for display purposes.
          colorsArray.push(newColor);
 
-        // Update the visual display and the hidden input
-        updateSelectedColorsDisplay($listElement, colorsArray, targetId); // Display ALL colors including invalid ones
-        updateHiddenColorInput($hiddenInput, colorsArray); // Hidden input only gets VALID colors
+        updateSelectedColorsDisplay($listElement, colorsArray, targetId);
+        updateHiddenColorInput($hiddenInput, colorsArray);
 
-        // Optional: Clear the temporary input and reset picker visual after adding IF the color added was valid hex
          if (isHexColor(newColor)) {
-              $tempInput.val('#FFFFFF'); // Reset temp input value
+              $tempInput.val('#FFFFFF');
               try {
-                  // Update the picker's internal state and swatch visual to the default white
                    $tempInput.closest('.colorpicker-element').colorpicker('setValue', '#FFFFFF');
               } catch (e) {
                    console.error('Error setting colorpicker value after adding valid color:', e);
               }
-         } else {
-             // If an invalid color was added, leave it in the input so the user can correct it
-             // Or clear it if you prefer, but leaving it might be more user-friendly for correction.
-             // Let's leave it for now.
          }
 
-
-        // Update the preview for the relevant form
-         if (targetId === 'edit') {
-            updateEditPreview();
-         }
-         // No preview update for modal create in this example
+         if (targetId === 'create') updateCreatePreview();
+         else if (targetId === 'edit') updateEditPreview();
     });
 
 
     // Handle Eyedropper button click (delegated event)
      $(document).on('click', '.btn-eyedropper', function() {
-         // Check if the EyeDropper API is supported by the browser
          if ('EyeDropper' in window) {
              const eyeDropper = new EyeDropper();
-             // Find the temporary color input associated with this button
              const $tempInput = $(this).closest('.input-group').find('input[type="text"].form-control');
              const $colorPickerElement = $tempInput.closest('.colorpicker-element');
-
 
              eyeDropper.open()
                  .then(result => {
                      const pickedColor = result.sRGBHex.toUpperCase();
-                     // Set the input value
                      $tempInput.val(pickedColor);
-                     // Update the colorpicker instance value and swatch icon
                      try {
                           $colorPickerElement.colorpicker('setValue', pickedColor);
                      } catch (e) {
                           console.error('Error setting colorpicker value after eyedropper pick:', e);
                      }
-
-                     // Note: The color is NOT automatically added to the list here.
-                     // The user must still click the "Tambah" button after picking.
-                     // console.log('Eyedropper picked color:', pickedColor); // Debugging
                  })
                  .catch(e => {
-                     // Handle cases where the user cancels or picker fails (e.g., security restrictions)
                      console.log('Eyedropper canceled or failed:', e);
-                      // Optionally show a message to the user
                  });
          } else {
-             // Fallback for browsers that do not support the EyeDropper API
              alert('Fungsionalitas pipet tidak didukung di browser ini. Silakan gunakan pemilih warna atau masukkan kode hex secara manual.');
              console.log('EyeDropper API not supported in this browser.');
          }
@@ -1630,87 +1779,66 @@ $(document).ready(function() {
 
 
     // --- Preview Logic ---
-    // Helper function to format price with commas (Indonesian format)
     function formatPrice(price) {
          const num = parseFloat(price);
          if (isNaN(num) || num < 0) {
-             return '0'; // Or '-' or handle as needed
+             return '0';
          }
-         // Use Intl.NumberFormat for locale-aware formatting
         try {
             return new Intl.NumberFormat('id-ID').format(num);
         } catch (e) {
              console.error('Error formatting price:', e);
-             return num.toString(); // Fallback to simple string
+             return num.toString();
         }
     }
 
-    // Create the HTML string for a preview card
     function createPreviewCardHtml(data) {
         let imageHtml;
 
-        // Check if imageFile (new upload Base64) exists first
         if (data.imageFile) {
             imageHtml = `<div class="preview-image-container">
                             <img src="${data.imageFile}" alt="${data.name || 'Product Image'}" class="preview-image">
                           </div>`;
         } else if (data.imageUrl) {
-            // Use existing image URL if no new file and URL exists
             imageHtml = `<div class="preview-image-container">
                             <img src="${data.imageUrl}" alt="${data.name || 'Product Image'}" class="preview-image">
                           </div>`;
         } else {
-            // Placeholder if no image (new file or existing URL)
             imageHtml = `<div class="preview-image-container preview-no-image">
                             <i class="fa fa-image" style="font-size: 2rem;"></i>
                             <p class="mb-0 mt-1 text-muted">No Image</p>
                           </div>`;
         }
 
-        // Format prices
         const currentPrice = parseFloat(data.price);
         const originalPrice = parseFloat(data.originalPrice);
         const formattedPrice = 'Rp ' + formatPrice(currentPrice);
-        // Only show original price if it's a number, greater than 0, and greater than current price
         const hasOriginalPrice = !isNaN(originalPrice) && originalPrice > 0 && originalPrice > currentPrice;
         const formattedOriginalPrice = hasOriginalPrice ? 'Rp ' + formatPrice(originalPrice) : null;
 
-        // Display colors if any are selected - show swatches for valid hex
         let colorsHtml = '';
         if (data.colors && data.colors.length > 0) {
-            // Filter for only valid hex colors for the preview swatches
             const validHexColors = data.colors
-                                    .map(c => c.trim().toUpperCase()) // Trim and uppercase
-                                    .filter(isHexColor); // Keep only valid hex
+                                    .map(c => c.trim().toUpperCase())
+                                    .filter(isHexColor);
 
             if (validHexColors.length > 0) {
                 colorsHtml = '<p class="card-text text-muted text-sm mb-1 preview-color-list">Warna: ';
                 validHexColors.forEach((color, index) => {
                      colorsHtml += `<span class="preview-color-swatch" style="background-color: ${color};"></span>`;
-                    // No need to display hex text in swatch preview usually, just the color itself
-                    // If you want text, add it: colorsHtml += `${color}`;
-                    // if (index < validHexColors.length - 1) {
-                    //     colorsHtml += ', '; // Comma between swatches if text is added
-                    // }
                 });
                 colorsHtml += '</p>';
-             } else {
-                 // If only invalid colors are selected in the list, don't show the "Warna:" line
-                  // colorsHtml = ''; // Or a message like '<p class="card-text text-muted text-sm mb-1">Warna: Tidak ada warna valid dipilih</p>';
              }
         }
 
-
-        // Build the full preview card HTML
         return `
             <div class="preview-card card">
                 ${imageHtml}
-                <div class="card-body"> {{-- Removed p-3, default card-body padding is fine --}}
-                    <h5 class="card-title text-truncate">${data.name || 'Nama Produk'}</h5> {{-- Removed mb-1, card-title has mb --}}
-                     ${colorsHtml} {{-- Insert colors HTML here (only valid ones with swatches) --}}
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">${data.name || 'Nama Produk'}</h5>
+                     ${colorsHtml}
                     <p class="card-text text-dark font-weight-bold mb-0">${formattedPrice}</p>
                     ${hasOriginalPrice ? `<p class="card-text text-muted line-through text-sm mt-0">${formattedOriginalPrice}</p>` : ''}
-                    {{-- Optional: Add placeholder buttons --}}
                     <div class="d-flex mt-2">
                         <a href="#" class="btn btn-primary btn-sm mr-1 flex-fill disabled"><i class="fa fa-shopping-cart"></i> Keranjang</a>
                         <a href="#" class="btn btn-success btn-sm flex-fill disabled"><i class="fa fa-money-bill-alt"></i> Beli</a>
@@ -1720,123 +1848,135 @@ $(document).ready(function() {
         `;
     }
 
+    // Function to update the preview for the Create tab form
+    function updateCreatePreview() {
+        const name = $('#create_name').val();
+        const price = $('#create_price').val();
+        const originalPrice = $('#create_original_price').val();
+        const category = $('#create_category').val();
+        const colors = selectedColorsCreate; // Use state array for create tab
 
-    // Function to update the preview for the Edit tab
+        const fileInput = document.getElementById('create_image');
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#create-preview-container').html(createPreviewCardHtml({
+                    name: name, price: price, originalPrice: originalPrice, category: category, colors: colors, imageFile: e.target.result, imageUrl: null
+                }));
+            };
+             reader.onerror = function(e) {
+                console.error('Error reading file for create preview:', e);
+                 $('#create-preview-container').html(createPreviewCardHtml({
+                     name: name, price: price, originalPrice: originalPrice, category: category, colors: colors, imageFile: null, imageUrl: null
+                 }));
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            $('#create-preview-container').html(createPreviewCardHtml({
+                name: name, price: price, originalPrice: originalPrice, category: category, colors: colors, imageFile: null, imageUrl: null
+            }));
+        }
+    }
+
+
+    // Function to update the preview for the Edit tab form
     function updateEditPreview() {
-        // Get values from the edit form fields
         const name = $('#edit_name').val();
         const price = $('#edit_price').val();
         const originalPrice = $('#edit_original_price').val();
         const category = $('#edit_category').val();
-        // Get the currently selected colors from the state array
-        const colors = selectedColorsEdit;
+        const colors = selectedColorsEdit; // Use state array for edit tab
 
-        // Get the existing image URL if it's displayed next to the file input
-        // We look for the image tag within the .mt-3 div sibling to the input
         let existingImageUrl = $('#edit_image').siblings('.mt-3').find('img').attr('src');
 
         const fileInput = document.getElementById('edit_image');
         if (fileInput && fileInput.files && fileInput.files[0]) {
-            // If a *new* file is selected, read it for preview (overrides existing)
             const reader = new FileReader();
             reader.onload = function(e) {
-                 // Render preview using the *new* image data
-                $('#edit-preview-container').html(createPreviewCardHtml({
-                    name: name,
-                    price: price,
-                    originalPrice: originalPrice,
-                    category: category,
-                    colors: colors, // Use the array
-                    imageUrl: null, // New file overrides existing URL for preview
-                    imageFile: e.target.result // Use Base64 data
-                }));
+                 $('#edit-preview-container').html(createPreviewCardHtml({
+                     name: name, price: price, originalPrice: originalPrice, category: category, colors: colors, imageUrl: null, imageFile: e.target.result
+                 }));
             };
              reader.onerror = function(e) {
                 console.error('Error reading file for edit preview:', e);
-                 // Render preview using existing image if new file read fails
                  $('#edit-preview-container').html(createPreviewCardHtml({
-                     name: name, price: price, originalPrice: originalPrice, category: category, colors: colors, imageFile: null, imageUrl: existingImageUrl // Fallback to existing
+                     name: name, price: price, originalPrice: originalPrice, category: category, colors: colors, imageFile: null, imageUrl: existingImageUrl
                  }));
             };
-            reader.readAsDataURL(fileInput.files[0]); // Read the new file as Base64
+            reader.readAsDataURL(fileInput.files[0]);
         } else {
-             // If no new file is selected, render preview using the existing image URL (or null if none)
-            $('#edit-preview-container').html(createPreviewCardHtml({
-                name: name,
-                price: price,
-                originalPrice: originalPrice,
-                category: category,
-                colors: colors, // Use the array
-                imageUrl: existingImageUrl, // Use the existing URL
-                imageFile: null
-            }));
+             $('#edit-preview-container').html(createPreviewCardHtml({
+                 name: name, price: price, originalPrice: originalPrice, category: category, colors: colors, imageUrl: existingImageUrl, imageFile: null
+             }));
         }
     }
 
 
     // --- Tab Activation & Initialization Logic ---
 
-    // Get URL params once on document ready
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
 
     // Function to handle tasks needed when a tab's content becomes active/visible
     function handleTabContentInitialized(tabId) {
-        // console.log(`handleTabContentInitialized called for tab: "${tabId}"`); // Debugging
+        console.log(`Initializing tab content: "${tabId}"`); // Debugging
 
-        // Initialize form states, color pickers, and previews for the active tab
-        if (tabId === 'edit') {
-             // console.log('Initializing Edit tab form state.'); // Debugging
-             // Load existing/old colors for the edit form
-             loadInitialColors('edit'); // Populates selectedColorsEdit & updates hidden input
-             // Initialize the color picker for the edit tab
+        if (tabId === 'create') {
+             console.log('Initializing Create tab form state.');
+             // Load initial colors from hidden input (e.g., old() data) for the CREATE TAB form
+             loadInitialColors('create');
+             // Initialize the color picker for the create tab form
+             const $colorPickerElement = $('#create_temp_color').closest('.colorpicker-element');
+             initializeColorPicker($colorPickerElement);
+             // Update preview based on loaded state
+             updateCreatePreview();
+
+        } else if (tabId === 'edit') {
+             console.log('Initializing Edit tab form state.');
+             // Load existing/old colors for the EDIT TAB form
+             loadInitialColors('edit');
+             // Initialize the color picker for the edit tab form
              const $colorPickerElement = $('#edit_temp_color').closest('.colorpicker-element');
-             initializeColorPicker($colorPickerElement); // Reads current value from input/data-color
-              // Update preview based on loaded state (color + other fields)
+             initializeColorPicker($colorPickerElement);
+              // Update preview based on loaded state
              updateEditPreview();
         }
-         // No specific setup needed for the 'list' tab beyond its content rendering.
-         // Create modal initialization is handled by modal events ('shown.bs.modal').
-         // console.log('handleTabContentInitialized finished.'); // Debugging
+         // No specific form setup needed for the 'list' tab
+         console.log('Tab content initialization finished.');
     }
 
     // Activate the correct tab based on the URL parameter or default ('list')
-    // Use Bootstrap's `tab('show')` which also emits `shown.bs.tab`
-     const defaultTab = 'list';
+    const defaultTab = 'list';
+    // Get the target tab ID from URL param, default to 'list', check if the tab element exists
      const targetTabId = tabParam && $(`#productTabs a[href="#${tabParam}"]`).length ? tabParam : defaultTab;
 
-     // Activate the tab programmatically
+     // Programmatically show the determined tab
      $(`#productTabs a[href="#${targetTabId}"]`).tab('show');
 
 
     // --- Event Listeners for Tab Activation ---
-    // Listen for Bootstrap's 'shown.bs.tab' event
-    // This ensures the tab content is visible and in the DOM before initialization
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        const tabId = $(e.target).attr('href').substring(1); // Get the ID of the newly active tab
-        const previousTabId = $(e.relatedTarget).attr('href') ? $(e.relatedTarget).attr('href').substring(1) : null; // Get the ID of the previously active tab (if any)
+        const tabId = $(e.target).attr('href').substring(1); // New active tab ID
+        const previousTabId = $(e.relatedTarget).attr('href') ? $(e.relatedTarget).attr('href').substring(1) : null; // Previous active tab ID
 
-        // Update URL only if the tab changed (excluding initial load where relatedTarget might be null)
+        // Update URL only if the tab actually changed
         if (previousTabId !== tabId) {
-             // console.log(`Tab switched to: ${tabId}`);
+             console.log(`Tab switched from "${previousTabId}" to "${tabId}"`);
              const url = new URL(window.location);
              url.searchParams.set('tab', tabId);
 
-              // Special handling for 'edit' tab: add/keep 'id' param
-             if (tabId === 'edit' && !url.searchParams.has('id')) {
-                 // If navigating to edit tab and no ID is in URL, maybe remove tab param or show error?
-                 // Assuming 'id' is manually added via links from the list table.
-                 // If we land on '?tab=edit' without an 'id', this won't automatically show an item.
-                 // The server-side check `isset($editProduct)` handles displaying the edit form.
-                  console.warn('Navigated to edit tab without an ID parameter.');
-             } else if (tabId !== 'edit' && url.searchParams.has('id')) {
-                  // If navigating away from edit tab, remove 'id' param
-                  url.searchParams.delete('id');
+              // Handle 'id' parameter for 'edit' tab
+             if (tabId === 'edit') {
+                 // When switching *to* edit, we need an ID. Assume it's already in the URL
+                 // or added by the link clicked in the list. If not, the server handles it.
+             } else {
+                 // When switching *away* from edit, remove the 'id' parameter
+                 url.searchParams.delete('id');
              }
 
-             // Preserve search query only if switching *within* the list context (to/from list)
-             // Or if staying on list tab
+             // Handle 'search' parameter for 'list' tab
             if (tabId === 'list') {
+                 // Keep search param if present from the list form
                  const currentSearch = $('#list form input[name="search"]').val();
                  if (currentSearch) {
                      url.searchParams.set('search', currentSearch);
@@ -1848,13 +1988,12 @@ $(document).ready(function() {
                   url.searchParams.delete('search');
              }
 
-
              window.history.pushState({}, '', url);
         } else {
-            // console.log(`Shown event fired for already active tab: ${tabId}`);
+             console.log(`Shown event fired for the same tab: ${tabId}`); // Debugging
         }
 
-         // Now call the initialization handler for the newly active tab
+         // Call the initialization handler for the newly shown tab
          handleTabContentInitialized(tabId);
     });
 
@@ -1863,82 +2002,78 @@ $(document).ready(function() {
 
     // When the create modal is shown
     $('#createProductModal').on('shown.bs.modal', function() {
-        // console.log('Modal shown. Initializing modal form and colorpicker.'); // Debugging
+        console.log('Create Modal shown. Initializing modal form state.');
 
         // Reset the form inside the modal
         $('#modal-create-product-form')[0].reset();
         // Clear selected colors state and display for the modal
         selectedColorsModalCreate = [];
         $('#selected-colors-list-modal-create').empty();
-        $('#product_colors_input_modal_create').val(''); // Clear hidden input
+        $('#product_colors_input_modal_create').val('');
 
          // Reset the temporary color input and swatch visual state to default white
          $('#modal_create_temp_color').val('#FFFFFF');
-         // Need to update the swatch visual separately if resetting the input
          $('#modal_create_temp_color').closest('.colorpicker-element').find('.input-group-text i').css('background-color', '#FFFFFF');
 
 
         // Initialize the color picker specifically for the modal form
-        // Need to target the element *within* the modal after it's added to the DOM and visible
          const $modalColorPickerElement = $('#modal_create_temp_color').closest('.colorpicker-element');
          initializeColorPicker($modalColorPickerElement);
 
          // Load any old input colors if validation failed and modal was re-shown
-         // Note: This will populate the list with any invalid colors from previous submission attempt
          loadInitialColors('modal-create');
 
-          // console.log('Modal shown handler finished.'); // Debugging
+          console.log('Create Modal shown handler finished.');
     });
 
      // When the modal is hidden
     $('#createProductModal').on('hidden.bs.modal', function () {
-        // console.log('Modal hidden. Resetting form state.'); // Debugging
+        console.log('Create Modal hidden. Resetting form state.');
 
         // Reset the form inside the modal
         $('#modal-create-product-form')[0].reset();
         // Clear selected colors state and display for the modal
         selectedColorsModalCreate = [];
         $('#selected-colors-list-modal-create').empty();
-        $('#product_colors_input_modal_create').val(''); // Clear hidden input
+        $('#product_colors_input_modal_create').val('');
 
          // Reset the temporary color input and swatch visual state
          $('#modal_create_temp_color').val('#FFFFFF');
          $('#modal_create_temp_color').closest('.colorpicker-element').find('.input-group-text i').css('background-color', '#FFFFFF');
 
 
-         // Destroy the colorpicker instance to prevent issues if the modal is shown again
-         // This is important if the picker appends elements outside the modal container.
+         // Destroy the colorpicker instance to prevent issues
          const $modalColorPickerElement = $('#modal_create_temp_color').closest('.colorpicker-element');
          if ($modalColorPickerElement.data('colorpicker')) {
              $modalColorPickerElement.colorpicker('destroy');
-             // console.log('Modal colorpicker destroyed.'); // Debugging
+             console.log('Modal colorpicker destroyed.');
          }
-          // console.log('Modal hidden handler finished.'); // Debugging
+          console.log('Create Modal hidden handler finished.');
     });
 
     // Handle modal submit button click
     $('#modal-create-submit').click(function() {
-        // console.log('Modal submit button clicked.'); // Debugging
-        // The hidden input for colors (`product_colors_input_modal_create`)
-        // should already be updated by add/remove button clicks via updateHiddenColorInput.
-        // We just need to submit the form.
+        console.log('Modal submit button clicked.');
         $('#modal-create-product-form').submit();
     });
 
 
     // --- Preview Updates on Form Input Change ---
 
-    // Add input/change listeners for edit form fields that affect the preview
-    $('#edit_name, #edit_price, #edit_original_price, #edit_category').on('input change', updateEditPreview);
-    // Add change listener for edit form image file input
-    $('#edit_image').on('change', updateEditPreview);
+    // Add input/change listeners for CREATE TAB form fields
+    $('#create_name, #create_price, #create_original_price, #create_category').on('input change', updateCreatePreview);
+    $('#create_image').on('change', updateCreatePreview); // Image file input
 
-     // Note: Preview is also updated when colors are added/removed (handled in add/remove click handlers)
+    // Add input/change listeners for EDIT TAB form fields
+    $('#edit_name, #edit_price, #edit_original_price, #edit_category').on('input change', updateEditPreview);
+    $('#edit_image').on('change', updateEditPreview); // Image file input
+
+     // Note: Preview is also updated when colors are added/removed (handled in add/remove click handlers for both create and edit tabs)
+
 
     // --- Initial Load ---
-    // handleTabContentInitialized is called by the 'shown.bs.tab' listener which is triggered
-    // by the initial `tab('show')` call. This covers the first load.
-
+    // The initial call to `tab('show')` above will trigger the 'shown.bs.tab' event,
+    // which in turn calls `handleTabContentInitialized` for the correct initial tab.
 
 });
 </script>
