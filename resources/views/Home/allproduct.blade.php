@@ -233,59 +233,7 @@
 
 @section('styles')
     {{-- Tambahkan style khusus jika perlu --}}
-    <style>
-        .product-image-container {
-            height: 224px;
-            /* Sesuaikan tinggi gambar */
-        }
-
-        .product-image {
-            max-width: 90%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .line-clamp-2 {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            height: 2.5em;
-            /* Sesuaikan based on line-height */
-            line-height: 1.25em;
-        }
-
-        /* Style untuk pagination (Tailwind default) */
-        .pagination {}
-
-        /* Container */
-        .pagination>nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pagination span[aria-current="page"] span {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-
-        .pagination a:hover {
-            background-color: #ebf8ff;
-        }
-
-        /* light blue */
-        .pagination span[aria-disabled="true"] span {
-            color: #a0aec0;
-            cursor: not-allowed;
-        }
-
-        .pagination a,
-        .pagination span {
-            /* Styling for links and spans */
-        }
-    </style>
+    <style src="{{ asset('\css\allproduct.css') }}"></style>
 @endsection
 
 @section('scripts')
