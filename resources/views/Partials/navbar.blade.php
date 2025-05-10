@@ -26,17 +26,13 @@
 
             <!-- Hamburger Menu Button (Mobile - Left) -->
             <div class="md:hidden">
-                <div class="hamburger">
-                    <svg id="openHamburger" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                <button id="hamburger-button" class="text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
-                    <svg id="closeHamburger" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 hidden" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                </div>
+                </button>
             </div>
 
             <!-- Logo (centered on mobile & static on desktop) -->
@@ -111,7 +107,7 @@
 
 
     <!-- Mobile Navigation Menu (Hidden by default) -->
-    <div class="mobile-navbar-menu hidden bg-white absolute w-full z-50 shadow-lg py-3">
+    <div id="mobile-menu" class="mobile-navbar-menu hidden bg-white absolute w-full z-50 shadow-lg py-3">
         <div class="container mx-auto px-4">
             <div class="flex flex-col space-y-3">
                 <a href="{{ route('welcome') }}"
@@ -172,380 +168,204 @@
     </div>
 </div>
 
-
-@section('styles')
-    <style>
-        /* General Responsive Styles */
-        .container {
-            max-width: 1200px;
-        }
-
-        /* Navbar Hamburger Menu */
-        .navbar {
-            transition: all 0.3s ease;
-        }
-
-        .navbar-menu {
-            transition: all 0.3s ease;
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 30px;
-            height: 20px;
-            cursor: pointer;
-            z-index: 20;
-        }
-
-        .hamburger span {
-            background: #3b82f6;
-            /* Blue-500 color */
-            height: 3px;
-            width: 100%;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        .mobile-navbar-menu {
-            transition: all 0.3s ease;
-            max-height: 0;
-            overflow: hidden;
-        }
-
-        .mobile-navbar-menu.active {
-            max-height: 500px;
-        }
-
-        /* Banner Styles */
-        .banner-image {
-            width: 100%;
-            object-fit: cover;
-            max-height: 400px;
-        }
-
-        @media (max-width: 768px) {
-            .banner-image {
-                max-height: 300px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .banner-image {
-                max-height: 200px;
-            }
-        }
-
-        /* Wave Section */
-        .wave-section {
-            position: relative;
-            height: 100px;
-            margin-top: -1px;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .wave-svg {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform: translateY(1px);
-        }
-
-        @media (max-width: 768px) {
-            .wave-section {
-                height: 80px;
-            }
-        }
-
-        /* Product Card */
-        .product-image-container {
-            height: 240px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .product-image {
-            max-width: 90%;
-            max-height: 220px;
-            object-fit: contain;
-        }
-
-        @media (max-width: 640px) {
-            .product-image-container {
-                height: 200px;
-            }
-
-            .product-image {
-                max-height: 180px;
-            }
-        }
-
-        /* Search Bar */
-        .search-form {
-            width: 100%;
-        }
-
-        @media (max-width: 768px) {
-            .search-form input {
-                font-size: 0.875rem;
-                padding: 0.75rem 1rem;
-            }
-
-            .search-form button {
-                padding: 0.75rem;
-            }
-        }
-
-        /* Mobile Navbar */
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-                position: absolute;
-                right: 15px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
-            .navbar-menu {
-                display: none;
-            }
-
-            .mobile-navbar-menu {
-                top: 100%;
-                border-bottom-left-radius: 15px;
-                border-bottom-right-radius: 15px;
-            }
-        }
-    </style>
-@endsection
-
 @section('scripts')
     <script>
-        // Fungsi utama untuk inisialisasi hamburger menu
-function initHamburgerMenu() {
-    const hamburger = document.querySelector('.hamburger');
-    const mobileNavbarMenu = document.querySelector('.mobile-navbar-menu');
-    const openHamburger = document.getElementById('openHamburger');
-    const closeHamburger = document.getElementById('closeHamburger');
+        // Hamburger menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerButton = document.getElementById('hamburger-button');
+            const mobileMenu = document.getElementById('mobile-menu');
 
-    if (!hamburger || !mobileNavbarMenu || !openHamburger || !closeHamburger) return;
+            if (hamburgerButton && mobileMenu) {
+                hamburgerButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    mobileMenu.classList.toggle('active');
 
-    // Hapus event listener lama jika ada
-    hamburger.removeEventListener('click', toggleHamburgerMenu);
-    
-    // Tambahkan event listener baru
-    hamburger.addEventListener('click', toggleHamburgerMenu);
+                    // Toggle hamburger icon between menu and X
+                    const isOpen = !mobileMenu.classList.contains('hidden');
+                    const svg = hamburgerButton.querySelector('svg');
 
-    // Fungsi toggle
-    function toggleHamburgerMenu(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const isActive = mobileNavbarMenu.classList.toggle('hidden');
-        openHamburger.classList.toggle('hidden', isActive);
-        closeHamburger.classList.toggle('hidden', !isActive);
-    }
-
-    // Tutup menu saat klik di luar
-    document.addEventListener('click', function(e) {
-        if (!hamburger.contains(e.target) && !mobileNavbarMenu.contains(e.target)) {
-            mobileNavbarMenu.classList.add('hidden');
-            openHamburger.classList.remove('hidden');
-            closeHamburger.classList.add('hidden');
-        }
-    });
-
-    // Tutup menu saat klik link di menu
-    mobileNavbarMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function() {
-            mobileNavbarMenu.classList.add('hidden');
-            closeHamburger.classList.remove('hidden');
-            openHamburger.classList.add('hidden');
-        });
-    });
-}
-
-// Panggil pertama kali saat DOM siap
-document.addEventListener('DOMContentLoaded', initHamburgerMenu);
-
-// Jika menggunakan Turbolinks
-document.addEventListener('turbolinks:load', initHamburgerMenu);
-
-// Jika menggunakan Livewire
-document.addEventListener('livewire:load', initHamburgerMenu);
-
-        // Banner Slider Functionality
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.slider-dot');
-        let currentSlide = 0;
-        let slideInterval;
-
-        function showSlide(index) {
-            slides.forEach(slide => {
-                slide.style.display = 'none';
-                slide.classList.remove('active');
-            });
-            dots.forEach(dot => {
-                dot.classList.remove('active');
-                dot.classList.remove('bg-blue-500');
-                dot.classList.add('bg-gray-300');
-            });
-
-            slides[index].style.display = 'block';
-            slides[index].classList.add('active');
-            dots[index].classList.add('active');
-            dots[index].classList.remove('bg-gray-300');
-            dots[index].classList.add('bg-blue-500');
-            currentSlide = index;
-        }
-
-        function startSlideShow() {
-            slideInterval = setInterval(function() {
-                let nextSlide = (currentSlide + 1) % slides.length;
-                showSlide(nextSlide);
-            }, 5000);
-        }
-
-        if (slides.length > 0 && dots.length > 0) {
-            dots.forEach(dot => {
-                dot.addEventListener('click', function() {
-                    let slideIndex = parseInt(this.getAttribute('data-slide'));
-                    showSlide(slideIndex);
-                    clearInterval(slideInterval);
-                    startSlideShow();
+                    if (isOpen) {
+                        svg.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        `;
+                    } else {
+                        svg.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        `;
+                    }
                 });
-            });
 
-            showSlide(0);
-            startSlideShow();
-        }
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    const isClickInside = hamburgerButton.contains(event.target) ||
+                        mobileMenu.contains(event.target);
 
-        // Add to Cart AJAX Functionality
-        document.querySelectorAll('[data-cart-action="add"]').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
+                    if (!isClickInside && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenu.classList.remove('active');
+                        const svg = hamburgerButton.querySelector('svg');
+                        svg.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        `;
+                    }
+                });
+            }
 
-                const form = this.closest('form');
-                const productId = this.getAttribute('data-product-id');
+            // Banner Slider Functionality
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.slider-dot');
+            let currentSlide = 0;
+            let slideInterval;
 
-                // Check if user is logged in before proceeding
-                const isLoggedIn = document.body.classList.contains('user-logged-in') ||
-                    document.querySelector('meta[name="user-logged-in"]') !== null;
+            function showSlide(index) {
+                slides.forEach(slide => {
+                    slide.style.display = 'none';
+                    slide.classList.remove('active');
+                });
+                dots.forEach(dot => {
+                    dot.classList.remove('active');
+                    dot.classList.remove('bg-blue-500');
+                    dot.classList.add('bg-gray-300');
+                });
 
-                if (!isLoggedIn) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Login Diperlukan',
-                        text: 'Silakan login untuk menambahkan produk ke keranjang.',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                    }).then(() => {
-                        window.location.href =
-                            `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                slides[index].style.display = 'block';
+                slides[index].classList.add('active');
+                dots[index].classList.add('active');
+                dots[index].classList.remove('bg-gray-300');
+                dots[index].classList.add('bg-blue-500');
+                currentSlide = index;
+            }
+
+            function startSlideShow() {
+                slideInterval = setInterval(function() {
+                    let nextSlide = (currentSlide + 1) % slides.length;
+                    showSlide(nextSlide);
+                }, 5000);
+            }
+
+            if (slides.length > 0 && dots.length > 0) {
+                dots.forEach(dot => {
+                    dot.addEventListener('click', function() {
+                        let slideIndex = parseInt(this.getAttribute('data-slide'));
+                        showSlide(slideIndex);
+                        clearInterval(slideInterval);
+                        startSlideShow();
                     });
-                    return;
-                }
+                });
 
-                const formData = new FormData(form);
+                showSlide(0);
+                startSlideShow();
+            }
 
-                // Add CSRF token
-                const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                if (!csrfToken) {
-                    console.error('CSRF token not found');
-                    return;
-                }
+            // Add to Cart AJAX Functionality
+            document.querySelectorAll('[data-cart-action="add"]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
 
-                fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                        credentials: 'same-origin'
-                    })
-                    .then(response => {
-                        if (response.status === 401) {
-                            throw new Error('User not authenticated');
-                        }
-                        if (!response.ok) {
-                            return response.json().then(data => {
-                                throw new Error(data.message ||
-                                    'Network response was not ok');
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
+                    const form = this.closest('form');
+                    const productId = this.getAttribute('data-product-id');
+
+                    // Check if user is logged in before proceeding
+                    const isLoggedIn = document.body.classList.contains('user-logged-in') ||
+                        document.querySelector('meta[name="user-logged-in"]') !== null;
+
+                    if (!isLoggedIn) {
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: data.message ||
-                                'Produk berhasil ditambahkan ke keranjang!',
+                            icon: 'warning',
+                            title: 'Login Diperlukan',
+                            text: 'Silakan login untuk menambahkan produk ke keranjang.',
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 3000,
                             timerProgressBar: true,
+                        }).then(() => {
+                            window.location.href =
+                                `/login?redirect=${encodeURIComponent(window.location.href)}`;
                         });
+                        return;
+                    }
 
-                        const cartCount = document.getElementById('cart-count');
-                        if (cartCount && data.cartCount !== undefined) {
-                            cartCount.textContent = data.cartCount;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Fetch Error:', error);
-                        if (error.message === 'User not authenticated') {
+                    const formData = new FormData(form);
+
+                    // Add CSRF token
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    if (!csrfToken) {
+                        console.error('CSRF token not found');
+                        return;
+                    }
+
+                    fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(response => {
+                            if (response.status === 401) {
+                                throw new Error('User not authenticated');
+                            }
+                            if (!response.ok) {
+                                return response.json().then(data => {
+                                    throw new Error(data.message ||
+                                        'Network response was not ok');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
                             Swal.fire({
-                                icon: 'warning',
-                                title: 'Login Diperlukan',
-                                text: 'Silakan login untuk menambahkan produk ke keranjang.',
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true,
-                            }).then(() => {
-                                window.location.href =
-                                    `/login?redirect=${encodeURIComponent(window.location.href)}`;
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal!',
-                                text: error.message ||
-                                    'Terjadi kesalahan saat menambahkan produk ke keranjang.',
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message ||
+                                    'Produk berhasil ditambahkan ke keranjang!',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
                                 timer: 2000,
                                 timerProgressBar: true,
                             });
-                        }
-                    });
+
+                            const cartCount = document.getElementById('cart-count');
+                            if (cartCount && data.cartCount !== undefined) {
+                                cartCount.textContent = data.cartCount;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                            if (error.message === 'User not authenticated') {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Login Diperlukan',
+                                    text: 'Silakan login untuk menambahkan produk ke keranjang.',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                }).then(() => {
+                                    window.location.href =
+                                        `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: error.message ||
+                                        'Terjadi kesalahan saat menambahkan produk ke keranjang.',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                });
+                            }
+                        });
+                });
             });
         });
     </script>
