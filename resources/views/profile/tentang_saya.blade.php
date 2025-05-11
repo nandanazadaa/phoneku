@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="relative">
-    <div class="bg-blue-500 h-[500px] md:h-[550px] lg:h-[400px]">
+    <div class="bg-blue-500 h-[500px] sm:h-[450px] md:h-[550px] lg:h-[400px] xl:h-[350px]">
         <!-- Kosongkan konten header jika tidak ada teks -->
     </div>
 
@@ -18,19 +18,19 @@
     </div>
 
     <!-- Banner Image -->
-    <div class="absolute top-[5%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
-        <div class="relative w-full h-full" style="overflow: hidden;">
+    <div class="absolute top-[5%] left-1/2 transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none">
+        <div class="relative w-full h-full overflow-hidden">
             <img src="{{ asset('img/banner4.png') }}" alt="Smartphones"
-                class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
+                class="object-contain w-full h-auto max-h-[300px] sm:max-h-[250px] md:max-h-[350px] lg:max-h-[400px] xl:max-h-[500px]">
         </div>
     </div>
 </div>
 
 <!-- Main Content - User Profile -->
 <div class="container mx-auto px-4 py-8 -mt-48 relative z-10">
-    <div class="flex flex-wrap">
+    <div class="flex flex-wrap lg:flex-nowrap">
         <!-- Left Sidebar -->
-        <div class="w-full md:w-1/4 mb-6 md:mb-0 md:pr-4">
+        <div class="w-full md:w-1/3 lg:w-1/4 mb-6 md:mb-0 md:pr-4">
             <div class="bg-white rounded-xl p-4 shadow-md mb-6">
                 <div class="flex flex-col items-center mb-4">
                     <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
@@ -66,7 +66,7 @@
         </div>
 
         <!-- Right Content -->
-        <div class="w-full md:w-3/4">
+        <div class="w-full md:w-2/3 lg:w-3/4">
             @if (session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     {{ session('success') }}
@@ -165,7 +165,9 @@
                                     <select name="birth_month"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">
                                         <option value="">Bulan</option>
-                                        @foreach (['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] as $key => $month)
+                                        @foreach ([
+                                            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                                            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] as $key => $month)
                                             <option value="{{ $key + 1 }}" {{ old('birth_month', $user->profile->birth_month ?? '') == $key + 1 ? 'selected' : '' }}>{{ $month }}</option>
                                         @endforeach
                                     </select>
@@ -226,37 +228,27 @@
 @endsection
 
 @section('styles')
-    <style>
-        /* Memastikan wave SVG tidak menyebabkan spasi tak terduga */
-        .wave-container > svg {
-            display: block;
-        }
-        
-        /* Memastikan gambar tidak keluar dari container */
-        .overflow-hidden {
-            overflow: hidden;
-        }
+<style>
+    .wave-container > svg {
+        display: block;
+    }
 
-        /* Desain responsif untuk berbagai level zoom */
-        @media screen and (max-width: 640px) {
-            .h-[500px] {
-                height: 400px;
-            }
-            
-            .max-h-[300px] {
-                max-height: 250px;
-            }
+    @media screen and (max-width: 640px) {
+        .h-[500px] {
+            height: 400px;
         }
+        .max-h-[300px] {
+            max-height: 250px;
+        }
+    }
 
-        /* Untuk browser dengan zoom yang berbeda */
-        @media screen and (min-width: 1500px) {
-            .lg\:h-[600px] {
-                height: 700px;
-            }
-            
-            .lg\:max-h-[400px] {
-                max-height: 500px;
-            }
+    @media screen and (min-width: 1500px) {
+        .lg\:h-[600px] {
+            height: 700px;
         }
-    </style>
+        .lg\:max-h-[400px] {
+            max-height: 500px;
+        }
+    }
+</style>
 @endsection

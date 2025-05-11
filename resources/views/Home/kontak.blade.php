@@ -19,7 +19,7 @@
                     <div class="flex flex-col">
                         <div>
                             <h6 class="text-lg sm:text-xl">Hubungi Kami</h6>
-                            <h2 class="font-bold text-2xl sm:text-4xl md:text-[48px] leading-tight">
+                            <h2 class="font-bold text-2xl sm:text-4xl md:text-[40px] leading-tight">
                                 Kami selalu senang membantu Anda dan menjawab pertanyaan Anda
                             </h2>
                             <p class="mt-6 text-base sm:text-lg">
