@@ -11,8 +11,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    // Existing methods (login, register, logout for regular users)
-    
     /**
      * Handle login request for regular users
      */
@@ -40,8 +38,8 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
+        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            $request->session()->regenerate(); // Regenerate session ID on login for security
 
             // Redirect ke URL yang tersimpan di session jika ada
             if ($request->has('redirect')) {
@@ -85,7 +83,8 @@ class AuthController extends Controller
             'role' => 'customer', // Default role
         ]);
 
-        Auth::login($user);
+        Auth::guard('web')->login($user);
+        $request->session()->regenerate(); // Regenerate session ID on login for security
 
         // Redirect ke URL yang tersimpan di session jika ada
         if ($request->has('redirect')) {
@@ -101,13 +100,24 @@ class AuthController extends Controller
 
     /**
      * Handle logout request for regular users
+     * PERBAIKAN ADA DI FUNGSI INI
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        // Hanya logout guard 'web'
+        Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // --- PERBAIKAN ---
+        // HAPUS ATAU KOMENTARI BARIS DI BAWAH INI
+        // Memanggil invalidate() akan menghancurkan SEMUA data sesi,
+        // termasuk status login guard 'admin' jika mereka berbagi session driver.
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
+        // --- AKHIR PERBAIKAN ---
+
+        // Jika Anda masih ingin regenerate CSRF token (biasanya tidak perlu jika tidak invalidate)
+        // Anda bisa mengaktifkan baris di bawah ini jika diperlukan, tapi coba tanpa ini dulu.
+        // $request->session()->regenerateToken();
 
         return redirect()->route('welcome');
     }
@@ -153,7 +163,7 @@ class AuthController extends Controller
 
     if (!$user) {
         return redirect()->back()
-            ->withErrors(['auth' => 'Invalid credentials or you don\'t have admin privileges'])
+            ->withErrors(['auth' => 'Invalid credentials'])
             ->withInput($request->except('password'));
     }
 
@@ -176,13 +186,13 @@ class AuthController extends Controller
      */
     public function showAdminRegistrationForm()
     {
-        // Only allow existing admins to view this page
-        // if (!Auth::check() || Auth::user()->role !== 'admin') {
+        // Optional: Restrict access to existing admins
+        // if (!Auth::guard('admin')->check()) {
         //     return redirect()->route('admin.login')
         //         ->withErrors(['auth' => 'You must be logged in as an admin to access this page']);
         // }
-        
-        return view('auth.admin_registrasi');
+
+        return view('auth.admin_registrasi'); // Pastikan view ini ada
     }
 
     /**
@@ -221,9 +231,10 @@ class AuthController extends Controller
 {
     Auth::guard('admin')->logout();
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+        // Tidak memanggil invalidate() agar tidak mengganggu sesi guard lain (misal 'web')
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
 
-    return redirect()->route('admin.login');
-}
+        return redirect()->route('admin.login');
+    }
 }

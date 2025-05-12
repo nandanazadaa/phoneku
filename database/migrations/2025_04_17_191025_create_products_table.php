@@ -15,12 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price', 12, 2);
-            $table->decimal('original_price', 12, 2)->nullable();
-            $table->string('image')->nullable();
-            $table->enum('category', ['handphone','accessory'])->default('handphone');
+            $table->decimal('price', 10, 2);
+            $table->decimal('original_price', 10, 2)->nullable();
+            $table->enum('category', ['handphone', 'accessory']);
             $table->boolean('is_featured')->default(false);
-            $table->integer('stock')->default(0);
+            $table->integer('stock');
+            // PERBAIKAN: Menggunakan string untuk 1 gambar utama
+            $table->string('image')->nullable();
+            // Jika Anda benar-benar butuh multi-image, Anda perlu model terpisah (ProductImage)
+            // dan relasi hasMany, serta menyesuaikan Controller & View
             $table->timestamps();
         });
     }
