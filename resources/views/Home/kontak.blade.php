@@ -11,24 +11,12 @@
                 <h1 class="text-3xl sm:text-4xl md:text-[48px] text-white font-bold text-center">Kontak</h1>
             </div>
         </div>
-<<<<<<< HEAD
-    
-    <!-- kontak Content -->
-    <div class="bg-white">
-        <div class="container mx-auto px-32 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">  
-                <div class="flex flex-row">
-                    <!-- isi kiri -->
-                    <div>
-                        <!-- sambutan -->
-=======
 
         <div class="bg-white">
             <div class="container mx-auto px-4 sm:px-8 md:px-16 lg:px-32 py-16">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <!-- Kanan -->
                     <div class="flex flex-col">
->>>>>>> 4a8f7f0a39fa875d76848d5d96eceef884e6f339
                         <div>
                             <h6 class="text-lg sm:text-xl">Hubungi Kami</h6>
                             <h2 class="font-bold text-2xl sm:text-4xl md:text-[40px] leading-tight">
@@ -107,32 +95,6 @@
                     </div>
                 </div>
 
-<<<<<<< HEAD
-                <!-- isi kanan -->
-                <div class=" bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl px-24 py-16 flex flex-col text-white overflow-hidden shadow-lg">
-                    <div>
-                        <h4 class="font-bold text-[24px]">Hubungi Kami</h4>
-                        <p class="mt-6"> Tim kami akan dengan senang hati merespons setiap pertanyaan atau kebutuhan Anda secepat mungkin.</p>
-                    </div>
-                    <div>
-                        <input type="text" placeholder="Nama Lengkap" class="w-full mt-12 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
-                    </div>
-                    <div>
-                        <input type="email" placeholder="Email" class="w-full mt-2 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
-                    </div>
-                    <div>
-                        <input type="text" placeholder="Subjek" class="w-full mt-2 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
-                    </div>
-                    <div>
-                        <input type="text" placeholder="Pesan" class="w-full mt-2 pb-20 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
-                    </div>
-
-                    <div>
-                        <button class="bg-white text-gray-800 font-medium mt-8 px-6 py-3 rounded-full hover:bg-gray-100">
-                            > Kirim Pesan
-                        </button>
-                    </div>
-=======
                 <!-- Google Map -->
                 <div class="mt-16 w-full h-64 sm:h-96 md:h-[500px] rounded-xl overflow-hidden shadow-lg">
                     <iframe
@@ -140,7 +102,6 @@
                         class="w-full h-full border-0" allowfullscreen="" loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
->>>>>>> 4a8f7f0a39fa875d76848d5d96eceef884e6f339
                 </div>
             </div>
         </div>
