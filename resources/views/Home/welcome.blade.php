@@ -333,7 +333,7 @@
                 currentSlide = index;
             }
 
-            function startSlideShow() {
+            function startSlideShow() asas{
                 slideInterval = setInterval(function() {
                     let nextSlide = (currentSlide + 1) % slides.length;
                     showSlide(nextSlide);
