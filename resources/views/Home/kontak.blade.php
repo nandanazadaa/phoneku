@@ -22,7 +22,7 @@
         <div class="container mx-auto px-32 py-16">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">  
                 <div class="flex flex-row">
-                    <!-- isi kanan -->
+                    <!-- isi kiri -->
                     <div>
                         <!-- sambutan -->
                         <div>
@@ -71,7 +71,7 @@
                     </div>
                 </div>
 
-                <!-- isi kiri -->
+                <!-- isi kanan -->
                 <div class=" bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl px-24 py-16 flex flex-col text-white overflow-hidden shadow-lg">
                     <div>
                         <h4 class="font-bold text-[24px]">Hubungi Kami</h4>
