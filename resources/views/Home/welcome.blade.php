@@ -11,13 +11,13 @@
                 <div class="slide-container">
                     <div class="slides">
                         <div class="slide active">
-                            <img src="img/banner1.png" alt="PhoneKu Banner 1" class="banner-image">
+                            <img src="img/banner1.png" alt="PhoneKu Banner 1" class="w-full h-auto object-cover">
                         </div>
                         <div class="slide">
-                            <img src="img/banner2.png" alt="PhoneKu Banner 2" class="banner-image">
+                            <img src="img/banner2.png" alt="PhoneKu Banner 2" class="w-full h-auto object-cover">
                         </div>
                         <div class="slide">
-                            <img src="img/banner3.png" alt="PhoneKu Banner 3" class="banner-image">
+                            <img src="img/banner3.png" alt="PhoneKu Banner 3" class="w-full h-auto object-cover">
                         </div>
                     </div>
                 </div>
@@ -42,11 +42,11 @@
     </div>
 
     <!-- Handphone Section -->
-    <div class="container mx-auto px-4 pt-16 pb-8">
+    <div class="container mx-auto px-4 pt-16 pb-8 border-t border-gray-200">
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
-                <p class="text-sm text-gray-600">Produk kami</p>
                 <h2 class="text-2xl font-bold">Handphone</h2>
+                <p class="text-sm text-gray-600">Produk kami yang tersedia</p>
             </div>
 
             <div class="w-full md:w-auto max-w-md">
@@ -68,20 +68,20 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @forelse($phones as $product)
                 <!-- Product Card -->
-                <div class="bg-blue-500 rounded-xl overflow-hidden">
-                    <div class="product-image-container bg-blue w-full h-64 flex items-center justify-center">
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
+                    <div class="product-image-container bg-gray-100 w-full h-56 flex items-center justify-center flex-shrink-0 p-4 relative group">
                         @if ($product->image)
                             <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                class="product-image max-h-56 object-contain px-4">
+                                class="product-image max-h-full object-contain transition duration-500 ease-in-out transform group-hover:scale-105">
                         @else
-                            <div class="flex items-center justify-center h-full w-full bg-blue-400">
-                                <i class="fa fa-image text-white text-5xl"></i>
+                            <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
+                                <i class="fa fa-image text-5xl"></i>
                             </div>
                         @endif
                     </div>
-                    <div class="p-4 text-white">
-                        <h3 class="font-medium">{{ $product->name }}</h3>
-                        <p class="text-2xl font-bold mt-1">{{ $product->formatted_price }}</p>
+                    <div class="p-4 text-blue-600 flex flex-col flex-grow">
+                        <h3 class="font-semibold text-base text-gray-800 flex-grow mb-2">{{ $product->name }}</h3>
+                        <p class="text-xl font-bold text-blue-600 mt-1">{{ $product->formatted_price }}</p>
                         @if ($product->has_discount)
                             <p class="text-white/70 line-through">{{ $product->formatted_original_price }}</p>
                         @endif
@@ -90,15 +90,18 @@
                                 <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
                                     @csrf
                                     <button type="submit" data-cart-action="add" data-product-id="{{ $product->id }}"
-                                        class="bg-white text-blue-500 rounded py-2 px-4 text-sm w-full text-center">+Keranjang</button>
+                                        class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                        <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                    </button>
                                 </form>
                                 <a href="{{ route('product.show', $product) }}"
-                                    class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">Beli</a>
                             @else
                                 <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                    class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
+                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                        <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                 <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                    class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                                    class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">Beli</a>
                             @endauth
                         </div>
                     </div>
@@ -122,27 +125,27 @@
     <!-- Accessories Section -->
     <div class="container mx-auto px-4 py-8 border-t border-gray-200">
         <div class="mb-6">
-            <p class="text-sm text-gray-600">Produk kami</p>
             <h2 class="text-2xl font-bold">Aksesoris</h2>
+                <p class="text-sm text-gray-600">Produk kami yang tersedia</p>
         </div>
 
         <!-- Products Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @forelse($accessories as $product)
                 <!-- Product Card -->
-                <div class="bg-blue-500 rounded-xl overflow-hidden">
-                    <div class="bg-blue w-full h-64 flex items-center justify-center">
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
+                    <div class="product-image-container bg-gray-100 w-full h-56 flex items-center justify-center flex-shrink-0 p-4 relative group">
                         @if ($product->image)
                             <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                class="max-h-64 max-w-full object-contain">
+                                class="product-image max-h-full object-contain transition duration-500 ease-in-out transform group-hover:scale-105">
                         @else
-                            <div class="bg-blue-400 flex items-center justify-center h-64 w-full">
-                                <i class="fa fa-image text-white text-5xl"></i>
+                            <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
+                                <i class="fa fa-image text-5xl"></i>
                             </div>
                         @endif
                     </div>
-                    <div class="p-4 text-white">
-                        <h3 class="font-medium">{{ $product->name }}</h3>
+                    <div class="p-4 text-blue-600 flex flex-col flex-grow">
+                        <h3 class="font-semibold text-base text-gray-800 flex-grow mb-2">{{ $product->name }}</h3>
                         <p class="text-2xl font-bold mt-1">{{ $product->formatted_price }}</p>
                         @if ($product->has_discount)
                             <p class="text-white/70 line-through">{{ $product->formatted_original_price }}</p>
@@ -152,15 +155,18 @@
                                 <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
                                     @csrf
                                     <button type="submit" data-cart-action="add" data-product-id="{{ $product->id }}"
-                                        class="bg-white text-blue-500 rounded py-2 px-4 text-sm w-full text-center">+Keranjang</button>
+                                        class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                        <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                    </button>
                                 </form>
                                 <a href="{{ route('product.show', $product) }}"
-                                    class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">Beli</a>
                             @else
                                 <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                    class="bg-white text-blue-500 rounded py-2 px-4 text-sm flex-1 text-center no-underline">+Keranjang</a>
+                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                        <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                 <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                    class="bg-blue-600 text-white rounded py-2 px-4 text-sm flex-1 text-center no-underline">Beli</a>
+                                    class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">Beli</a>
                             @endauth
                         </div>
                     </div>

@@ -122,7 +122,7 @@
                     class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
                     {{-- Link ke halaman detail produk --}}
                     <a href="{{ route('product.show', $product) }}"
-                        class="block product-image-container bg-gray-100 w-full h-56 flex items-center justify-center flex-shrink-0 p-4 relative group">
+                        class="product-image-container bg-gray-100 w-full h-56 flex items-center justify-center flex-shrink-0 p-4 relative group">
                         @if ($product->image)
                             <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
                                 class="product-image max-h-full object-contain transition duration-500 ease-in-out transform group-hover:scale-105">
