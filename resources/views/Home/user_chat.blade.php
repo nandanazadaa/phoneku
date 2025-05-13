@@ -10,8 +10,8 @@
     <!-- CSS Files -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/user_chat.css') }}">
 
-    <style src="{{ asset('\css\user_chat.css') }}"></style>
 </head>
 
 <body>
@@ -111,7 +111,7 @@
                 if (!message) return;
 
                 $.ajax({
-                    url: '{{ route('chat.send') }}', // Use the new route for customers
+                    url: '{{ route('chat.send') }}',
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
@@ -131,7 +131,7 @@
             // Function to load previous messages
             function loadMessages() {
                 $.ajax({
-                    url: '{{ route('chat.messages', ['receiverId' => $support->id]) }}', // Use the new route
+                    url: '{{ route('chat.messages', ['receiverId' => $support->id]) }}',
                     method: 'GET',
                     success: function(response) {
                         $('#chat-messages').empty();
@@ -141,8 +141,7 @@
                         } else {
                             response.forEach(function(msg) {
                                 const messageClass = msg.is_sent ? 'sent' : 'received';
-                                appendMessage(msg.message, messageClass, new Date(msg
-                                    .created_at));
+                                appendMessage(msg.message, messageClass, new Date(msg.created_at));
                             });
                         }
                         scrollToBottom();

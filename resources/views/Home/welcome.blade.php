@@ -11,13 +11,13 @@
                 <div class="slide-container">
                     <div class="slides">
                         <div class="slide active">
-                            <img src="img/banner1.png" alt="PhoneKu Banner 1" class="banner-image">
+                            <img src="img/banner1.png" alt="PhoneKu Banner 1" class="w-full h-auto object-cover">
                         </div>
                         <div class="slide">
-                            <img src="img/banner2.png" alt="PhoneKu Banner 2" class="banner-image">
+                            <img src="img/banner2.png" alt="PhoneKu Banner 2" class="w-full h-auto object-cover">
                         </div>
                         <div class="slide">
-                            <img src="img/banner3.png" alt="PhoneKu Banner 3" class="banner-image">
+                            <img src="img/banner3.png" alt="PhoneKu Banner 3" class="w-full h-auto object-cover">
                         </div>
                     </div>
                 </div>
