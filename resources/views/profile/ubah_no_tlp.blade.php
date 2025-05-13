@@ -80,7 +80,7 @@
                 <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100">
                     <h3 class="text-2xl font-semibold text-gray-700 mb-2">Atur Nomer Telepon</h3>
                     <p class="text-gray-500 mb-6">Masukkan nomer Anda untuk memperbarui nomer telepon.
-                        <span class="text-yellow-600 font-semibold"> ⚠️ Pastikan nomor telepon dapat menerima pesan pesan.</span>
+                        <span class="text-yellow-600 font-semibold"> ⚠️ Pastikan nomor telepon dapat menerima pesan.</span>
                     </p>
                     <form action="{{ route('kirim_otp') }}" method="POST">
                     @csrf

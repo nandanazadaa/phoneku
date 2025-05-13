@@ -19,7 +19,6 @@
             </div>
         @endauth
     </div>
-
     <!-- Main Navigation -->
     <div class="container mx-auto px-4 pb-4">
         <div class="relative bg-white rounded-xl py-4 px-6 flex items-center justify-between">
@@ -35,15 +34,22 @@
                 </button>
             </div>
 
-            <!-- Logo (centered on mobile & static on desktop) -->
-            <div class="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
+            <!-- Logo -->
+            <div class="flex-1 flex justify-center md:hidden">
                 <a href="{{ route('welcome') }}">
                     <img src="{{ asset('img/logo2.png') }}" alt="PhoneKu Logo" class="h-10">
                 </a>
             </div>
 
-            <!-- Navigation Links (Desktop only) -->
-            <div class="hidden md:flex space-x-8 ml-auto items-center">
+            <!-- Desktop logo -->
+            <div class="hidden md:flex flex-shrink-0">
+                <a href="{{ route('welcome') }}">
+                    <img src="{{ asset('img/logo2.png') }}" alt="PhoneKu Logo" class="h-10">
+                </a>
+            </div>
+
+            <!-- Navigation Links (Centered on desktop) -->
+            <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 space-x-8 items-center">
                 <a href="{{ route('welcome') }}"
                     class="{{ Route::currentRouteName() == 'welcome' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
                     Beranda
@@ -64,8 +70,10 @@
                     class="{{ Route::currentRouteName() == 'kontak' ? 'text-blue-500 font-medium border-b-2 border-blue-500 pb-1' : 'text-gray-600 hover:text-blue-500' }}">
                     Kontak
                 </a>
+            </div>
 
-                <!-- Icons -->
+            <!-- Icons (Right aligned) -->
+            <div class="hidden md:flex items-center space-x-4">
                 @auth
                     <a href="{{ route('cart') }}"
                         class="{{ Route::currentRouteName() == 'cart' ? 'text-blue-500 font-medium' : 'text-gray-600 hover:text-blue-500' }} relative">
@@ -104,6 +112,7 @@
             </div>
         </div>
     </div>
+
 
 
     <!-- Mobile Navigation Menu (Hidden by default) -->
