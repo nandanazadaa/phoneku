@@ -78,6 +78,16 @@
                                 <i class="fa fa-image text-5xl"></i>
                             </div>
                         @endif
+                        @if ($product->original_price && $product->original_price > $product->price)
+                            @php
+                                $discountPercentage = round(
+                                    (($product->original_price - $product->price) / $product->original_price) * 100,
+                                );
+                            @endphp
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                {{ $discountPercentage }}% OFF
+                            </span>
+                        @endif
                     </div>
                     <div class="p-4 text-blue-600 flex flex-col flex-grow">
                         <h3 class="font-semibold text-base text-gray-800 flex-grow mb-2">{{ $product->name }}</h3>
@@ -85,6 +95,11 @@
                         @if ($product->has_discount)
                             <p class="text-white/70 line-through">{{ $product->formatted_original_price }}</p>
                         @endif
+                        @if ($product->original_price && $product->original_price > $product->price)
+                                <p class="text-gray-500 line-through text-sm">
+                                    {{ $product->formatted_original_price ?? 'Rp ' . number_format($product->original_price, 0, ',', '.') }}
+                                </p>
+                            @endif
                         <div class="flex mt-4 space-x-2">
                             @auth
                                 <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
