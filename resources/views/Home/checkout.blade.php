@@ -10,14 +10,12 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-6 mt-5">Checkout</h1>
 
         {{-- Tampilkan pesan jika keranjang kosong atau tidak ada item valid untuk checkout --}}
-        @if($cartItems->isEmpty())
              <div class="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
                  <p class="text-gray-500 text-xl mb-4">Tidak ada item di keranjang Anda yang bisa dicheckout.</p>
                  <a href="{{ route('allproduct') }}" class="mt-6 inline-block bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition font-medium">
                      Mulai Belanja
                  </a>
              </div>
-        @else
             {{-- Tampilkan konten checkout jika ada item valid --}}
             <div class="flex flex-col lg:flex-row gap-6">
                 <!-- Left Column: Address & Product -->
@@ -59,35 +57,31 @@
                          </div>
                          <div class="p-4 space-y-6">
                             {{-- *** LOOPING ITEM CART YANG VALID UNTUK CHECKOUT (DATA DINAMIS) *** --}}
-                            @foreach($cartItems as $item)
+                            
                                 <!-- Item Produk -->
-                                <div class="flex flex-col md:flex-row items-start {{ !$loop->first ? 'pt-6 border-t border-gray-100' : '' }}">
+                                <div class="flex flex-col md:flex-row items-start {}">
                                     <div class="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
                                          {{-- Gunakan asset('storage/') untuk gambar produk --}}
-                                        <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : 'https://via.placeholder.com/100x100' }}"
-                                             alt="{{ $item->product->name }}" class="w-24 h-auto object-contain rounded-lg"> {{-- Ukuran gambar disesuaikan --}}
+                                        <img src="{{ 'https://via.placeholder.com/100x100' }}"
+                                             alt="{}" class="w-24 h-auto object-contain rounded-lg"> {{-- Ukuran gambar disesuaikan --}}
                                     </div>
                                     <div class="flex-grow">
-                                        <h3 class="text-lg font-semibold mb-2 text-gray-800">{{ $item->product->name }}</h3> {{-- Nama produk --}}
+                                        <h3 class="text-lg font-semibold mb-2 text-gray-800">Nama Produk</h3> 
                                         {{-- Detail produk lain (warna/varian) jika ada --}}
-                                        {{-- <div class="text-sm text-gray-600 mb-2">Warna: {{ $item->product->color ?? 'N/A' }}</div> --}}
+                                        {{-- <div class="text-sm text-gray-600 mb-2">Warna</div>
                                         {{-- Kuantitas item --}}
-                                         <div class="text-sm text-gray-600 mb-2">Kuantitas: {{ $item->quantity }}</div>
+                                         <div class="text-sm text-gray-600 mb-2">Kuantitas</div>
                                         {{-- Ringkasan Fitur (opsional, sesuai kode lama Anda) --}}
                                          {{-- Jika deskripsi bisa diparse menjadi fitur --}}
                                          {{-- <div class="text-gray-700 text-xs">
-                                              @if($item->product->description)
-                                                 // Perlu logic untuk parse deskripsi menjadi daftar fitur
-                                                 // Atau simpan fitur di kolom/relasi terpisah
-                                              @endif
                                          </div> --}}
                                     </div>
                                     <div class="flex-shrink-0 text-right mt-4 md:mt-0 md:ml-auto"> {{-- ML Auto untuk dorong ke kanan di md+ --}}
                                         {{-- Harga Subtotal per item (Harga Satuan * Kuantitas) --}}
-                                        <div class="font-bold text-lg text-gray-800">Rp{{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}</div>
+                                        <div class="font-bold text-lg text-gray-800">Rp</div>
                                     </div>
                                 </div>
-                            @endforeach
+                            
                             {{-- *** END LOOPING ITEM CART *** --}}
                          </div>
                     </div>
@@ -244,18 +238,18 @@
                             <div class="space-y-2 mb-4 text-gray-700">
                                 <div class="flex justify-between">
                                     {{-- *** GUNAKAN VARIABEL DARI CONTROLLER *** --}}
-                                    <span>Total Harga ({{ $cartItems->count() }} Barang)</span> {{-- Hitung jumlah item dinamis dari collection $cartItems --}}
-                                    <span>Rp{{ number_format($subtotal, 0, ',', '.') }}</span> {{-- Gunakan variabel subtotal dari controller --}}
+                                    <span>Total Harga </span> 
+                                    <span>Rp</span> {{-- Gunakan variabel subtotal dari controller --}}
                                 </div>
                                 <div class="flex justify-between">
                                     <span>Total Ongkos Kirim</span>
                                     {{-- *** GUNAKAN VARIABEL DARI CONTROLLER *** --}}
-                                    <span>Rp{{ number_format($shippingCost, 0, ',', '.') }}</span> {{-- Gunakan variabel shippingCost dari controller --}}
+                                    <span>Rp</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span>Biaya Jasa Aplikasi</span>
                                      {{-- *** GUNAKAN VARIABEL DARI CONTROLLER *** --}}
-                                    <span>Rp{{ number_format($serviceFee, 0, ',', '.') }}</span> {{-- Gunakan variabel serviceFee dari controller --}}
+                                    <span>Rp</span>
                                 </div>
                             </div>
 
@@ -269,7 +263,7 @@
                             <div class="flex justify-between font-bold text-xl pt-4 border-t border-gray-200 text-gray-800">
                                 <span>Total Tagihan</span>
                                 {{-- *** GUNAKAN VARIABEL DARI CONTROLLER *** --}}
-                                <span id="total-amount">Rp{{ number_format($totalAmount, 0, ',', '.') }}</span> {{-- Gunakan variabel totalAmount dari controller --}}
+                                <span id="total-amount">Rp</span> 
                             </div>
 
                             {{-- Tombol Bayar Sekarang --}}
@@ -286,7 +280,6 @@
                     </div> {{-- Akhir Ringkasan & Pembayaran Column --}}
                 </div> {{-- Akhir Right Column --}}
             </div> {{-- Akhir Flex lg:flex-row --}}
-        @endif {{-- Akhir if $cartItems->isEmpty() --}}
     </main> {{-- Akhir Main Content --}}
 
     <!-- Voucher Modal -->

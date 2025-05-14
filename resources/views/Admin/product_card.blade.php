@@ -1372,6 +1372,7 @@
 </div>
 @endsection
 
+
 @push('scripts')
 {{-- Bootstrap Colorpicker JS --}}
 {{-- Pastikan URL ini benar-benar dapat diakses dan filenya ada --}}
