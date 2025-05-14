@@ -28,7 +28,7 @@
                         <p class="mt-4">Berdiri sejak 2025, kami telah melayani ribuan pelanggan yang mencari produk berkualitas dan pelayanan terbaik.</p>
                     </div>
                     <div class="flex justify-center md:justify-start">
-                        <img src="/img/aboutus.png" alt="Team Working" class="w-full md:w-[70%]">
+                        <img src="/img/dokumentasi.png" alt="Team Working" class="w-full md:w-[70%]">
                     </div>
                 </div>
                 
