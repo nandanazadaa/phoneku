@@ -50,7 +50,7 @@ class AuthController extends Controller
                 return redirect()->to($redirect);
             }
 
-            return redirect()->intended(route('welcome'));
+            return redirect()->intended(route('profile/logout'));
         }
 
         return redirect()->back()
@@ -95,7 +95,7 @@ class AuthController extends Controller
             return redirect()->to($redirect);
         }
 
-        return redirect()->route('welcome');
+        return redirect()->route('profile/logout');
     }
 
     /**
@@ -119,7 +119,7 @@ class AuthController extends Controller
         // Anda bisa mengaktifkan baris di bawah ini jika diperlukan, tapi coba tanpa ini dulu.
         // $request->session()->regenerateToken();
 
-        return redirect()->route('welcome');
+        return redirect()->route('logout');
     }
 
     /********************************************
