@@ -16,6 +16,8 @@ class Profile extends Model
         'username',
         'recipient_name',
         'address',
+        'latitude',
+        'longitude',
         'label',
         'phone',
         'gender',
