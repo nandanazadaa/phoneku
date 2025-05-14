@@ -34,10 +34,18 @@
             <div class="w-full md:w-1/4 mb-6 md:mb-0 md:pr-4 mt-20">
                 <div class="bg-white rounded-xl p-4 shadow-md mb-6">
                     <div class="flex flex-col items-center mb-4">
-                        <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
-                            <img src="/img/profile_kosong.png" alt="User Profile" class="w-full h-full object-cover">
-                        </div>
-                        <h2 class="text-xl font-bold mb-1 text-gray-800">Belum Masuk</h2>
+                        @if(Auth::check() && isset($user))
+                            <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
+                                <img src="{{ $user->profile && $user->profile->profile_picture ? asset('storage/' . $user->profile->profile_picture) : asset('img/profile.png') }}"
+                                    alt="User Profile" class="w-full h-full object-cover">
+                            </div>
+                            <h2 class="text-xl font-bold mb-1 text-gray-800">{{ $user->name }}</h2>
+                        @else
+                            <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
+                                <img src="{{ asset('img/profile.png') }}" alt="User Profile" class="w-full h-full object-cover">
+                            </div>
+                            <h2 class="text-xl font-bold mb-1 text-gray-800">Belum Masuk</h2>
+                        @endif
                     </div>
                 </div>
 
@@ -71,7 +79,7 @@
                     <p class="text-gray-500 mb-6">Silahkan Masuk ke Akun Terlebih Dahulu atau Daftar!</p>
 
                     <div class="flex justify-center gap-6">
-                        <a href="/login" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">
+                        <a href="{{ route('login') }}" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">
                             Masuk
                         </a>
                         <a href="/registrasi" class="px-20 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-full transition duration-300">

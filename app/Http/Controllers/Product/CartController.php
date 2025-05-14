@@ -12,71 +12,121 @@ use Illuminate\Support\Facades\Log;
 class CartController extends Controller
 {
     public function addToCart(Request $request, $productId)
-{
-    try {
-        Log::info('Attempting to add product to cart', ['productId' => $productId, 'userId' => Auth::id()]);
+    {
+        try {
+            Log::info('Attempting to add product to cart', ['productId' => $productId, 'userId' => Auth::id()]);
 
-        $product = Product::findOrFail($productId);
+            $product = Product::findOrFail($productId);
+            $user = Auth::user();
+
+            if (!$user) {
+                Log::warning('User not authenticated', ['productId' => $productId]);
+                return response()->json(['success' => false, 'message' => 'User not authenticated'], 401);
+            }
+
+            // Validate quantity
+            $quantity = (int) $request->input('quantity', 1);
+            if ($quantity <= 0) {
+                return response()->json(['success' => false, 'message' => 'Kuantitas tidak valid'], 400);
+            }
+
+            if ($quantity > $product->stock) {
+                return response()->json(['success' => false, 'message' => 'Kuantitas melebihi stok yang tersedia'], 400);
+            }
+
+            // Get selected color if provided
+            $selectedColor = $request->input('color');
+
+            $cart = Cart::where('user_id', $user->id)
+                       ->where('product_id', $product->id)
+                       ->where('color', $selectedColor)
+                       ->first();
+
+            if ($cart) {
+                // Update existing cart item
+                $newQuantity = $cart->quantity + $quantity;
+                if ($newQuantity > $product->stock) {
+                    // Instead of error, adjust to maximum possible
+                    $maxAddable = $product->stock - $cart->quantity;
+                    if ($maxAddable <= 0) {
+                        return response()->json([
+                            'success' => false, 
+                            'message' => 'Produk sudah mencapai batas maksimal di keranjang Anda'
+                        ], 400);
+                    }
+                    $cart->quantity = $product->stock;
+                    $cart->save();
+                    return response()->json([
+                        'success' => true,
+                        'message' => "Berhasil menambahkan maksimal {$maxAddable} items ke keranjang",
+                        'cartCount' => Cart::where('user_id', $user->id)->sum('quantity')
+                    ], 200);
+                }
+                $cart->quantity = $newQuantity;
+            } else {
+                // Create new cart item
+                $cart = new Cart([
+                    'user_id' => $user->id,
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'color' => $selectedColor
+                ]);
+            }
+
+            if (!$cart->save()) {
+                Log::error('Failed to save cart', ['cartId' => $cart->id ?? 'new']);
+                throw new \Exception('Failed to save cart');
+            }
+
+            $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
+
+            Log::info('Product added to cart successfully', ['cartId' => $cart->id, 'cartCount' => $cartCount]);
+
+            // Jika ada parameter redirect_checkout, redirect ke checkout
+            if ($request->has('redirect_checkout')) {
+                return redirect()->route('checkout');
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil ditambahkan ke keranjang!',
+                'cartCount' => $cartCount
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error adding product to cart', [
+                'error' => $e->getMessage(),
+                'productId' => $productId,
+                'userId' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+
+    public function index()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login', ['redirect' => url()->current()]);
+        }
+        
         $user = Auth::user();
+        
+        $cartItems = Cart::where('user_id', $user->id)
+            ->with('product')
+            ->get();
 
-        if (!$user) {
-            Log::warning('User not authenticated', ['productId' => $productId]);
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
+        $subtotal = $cartItems->sum(function ($item) {
+            return $item->product->price * $item->quantity;
+        });
 
-        $cart = Cart::firstOrCreate(
-            ['user_id' => $user->id, 'product_id' => $product->id],
-            ['quantity' => 0]
-        );
-
-        $cart->quantity += 1;
-        if (!$cart->save()) {
-            Log::error('Failed to save cart', ['cartId' => $cart->id]);
-            throw new \Exception('Failed to save cart');
-        }
-
-        $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
-
-        Log::info('Product added to cart successfully', ['cartId' => $cart->id, 'cartCount' => $cartCount]);
-
-        return response()->json([
-            'message' => 'Produk berhasil ditambahkan ke keranjang!',
-            'cartCount' => $cartCount
-        ], 200);
-    } catch (\Exception $e) {
-        Log::error('Error adding product to cart', [
-            'error' => $e->getMessage(),
-            'productId' => $productId,
-            'userId' => Auth::id(),
-            'trace' => $e->getTraceAsString()
+        return view('Home.cart', [
+            'cartItems' => $cartItems,
+            'subtotal' => $subtotal,
         ]);
-        return response()->json([
-            'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
-        ], 500);
     }
-}
-
-public function index()
-{
-    if (!Auth::check()) {
-        return redirect()->route('login', ['redirect' => url()->current()]);
-    }
-    
-    $user = Auth::user();
-    
-    $cartItems = Cart::where('user_id', $user->id)
-        ->with('product')
-        ->get();
-
-    $subtotal = $cartItems->sum(function ($item) {
-        return $item->product->price * $item->quantity;
-    });
-
-    return view('Home.cart', [
-        'cartItems' => $cartItems,
-        'subtotal' => $subtotal,
-    ]);
-}
 
     /**
      * Update item quantity in the cart.
@@ -86,13 +136,10 @@ public function index()
         $cartItem = Cart::findOrFail($id);
         
         // Make sure this cart item belongs to the current user
-        if ($cartItem->user_id != Auth::user()->id_user) {
+        if ($cartItem->user_id != Auth::user()->id) {
             return redirect()->route('cart')->with('error', 'Anda tidak memiliki akses.');
         }
         
-        $cartItem->quantity = $request->quantity;
-        $cartItem->save();
-
         $product = $cartItem->product;
         // Cek jika produk sudah tidak ada
         if (!$product) {
@@ -131,7 +178,6 @@ public function index()
         return redirect()->route('cart'); // Redirect tanpa pesan
     }
 
-
     /**
      * Remove item from cart.
      */
@@ -140,12 +186,10 @@ public function index()
         $cartItem = Cart::findOrFail($id);
         
         // Make sure this cart item belongs to the current user
-        if ($cartItem->user_id != Auth::user()->id_user) {
+        if ($cartItem->user_id != Auth::user()->id) {
             return redirect()->route('cart')->with('error', 'Anda tidak memiliki akses.');
         }
         
-        $cartItem->delete();
-
         $cartItem->delete();
         return redirect()->route('cart')->with('success', 'Produk berhasil dihapus dari keranjang!');
     }
@@ -166,7 +210,7 @@ public function index()
                             $query->where('stock', '>', 0); // Hanya item dengan stok > 0
                         })
                         ->with(['product' => function($query) {
-                            $query->select('id', 'name', 'price', 'image', 'stock', 'description'); // Ambil kolom yang diperlukan
+                            $query->select('id', 'name', 'price', 'image', 'stock', 'description', 'color'); // Tambah kolom color
                         }])
                         ->get();
 

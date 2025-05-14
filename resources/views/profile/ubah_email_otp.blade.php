@@ -57,7 +57,7 @@
                         <span>Keamanan & Privasi</span>
                     </a>
                     
-                    <a href="{{ route('logout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                    <a href="{{ route('profile.logout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                         <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>
                         <span>Keluar Akun</span>
                     </a>

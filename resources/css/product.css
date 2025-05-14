@@ -1,4 +1,3 @@
-
 /* Image Slider */
 .product-image {
     position: absolute;
@@ -37,6 +36,31 @@
 
 .dot {
     cursor: pointer;
+}
+
+/* Color Selection */
+.color-option {
+    transition: all 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.05);
+}
+
+.color-option.selected {
+    transform: scale(1.1);
+}
+
+.color-option div {
+    transition: all 0.2s ease;
+}
+
+.color-option:hover div {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.color-option.selected div {
+    box-shadow: 0 0 0 3px #3b82f6;
 }
 
 /* Quantity Counter */

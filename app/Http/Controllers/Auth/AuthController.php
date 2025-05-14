@@ -50,7 +50,7 @@ class AuthController extends Controller
                 return redirect()->to($redirect);
             }
 
-            return redirect()->intended(route('profile/logout'));
+            return redirect()->intended(route('profile.logout'));
         }
 
         return redirect()->back()
@@ -95,31 +95,19 @@ class AuthController extends Controller
             return redirect()->to($redirect);
         }
 
-        return redirect()->route('profile/logout');
+        return redirect()->route('profile.logout');
     }
 
     /**
      * Handle logout request for regular users
-     * PERBAIKAN ADA DI FUNGSI INI
      */
     public function logout(Request $request)
     {
         // Hanya logout guard 'web'
         Auth::guard('web')->logout();
-
-        // --- PERBAIKAN ---
-        // HAPUS ATAU KOMENTARI BARIS DI BAWAH INI
-        // Memanggil invalidate() akan menghancurkan SEMUA data sesi,
-        // termasuk status login guard 'admin' jika mereka berbagi session driver.
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
-        // --- AKHIR PERBAIKAN ---
-
-        // Jika Anda masih ingin regenerate CSRF token (biasanya tidak perlu jika tidak invalidate)
-        // Anda bisa mengaktifkan baris di bawah ini jika diperlukan, tapi coba tanpa ini dulu.
-        // $request->session()->regenerateToken();
-
-        return redirect()->route('logout');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('profile.logout');
     }
 
     /********************************************

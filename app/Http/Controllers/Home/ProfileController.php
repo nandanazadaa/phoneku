@@ -280,6 +280,9 @@ class ProfileController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'username' => 'nullable|string|max:255|unique:profiles,username,' . $profileId . ',profile_id',
+            'recipient_name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'label' => 'nullable|string|max:50',
             // 'phone' => 'nullable|string|max:20',
             'gender' => 'nullable|in:male,female',
             'birth_day' => 'nullable|integer|min:1|max:31',
@@ -300,6 +303,9 @@ class ProfileController extends Controller
         // Prepare profile data
         $profileData = [
             'username' => $request->username,
+            'recipient_name' => $request->recipient_name,
+            'address' => $request->address,
+            'label' => $request->label,
             // 'phone' => $request->phone,
             'gender' => $request->gender,
             'birth_day' => $request->birth_day,

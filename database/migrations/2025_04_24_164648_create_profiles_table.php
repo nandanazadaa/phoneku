@@ -13,6 +13,9 @@ class CreateProfilesTable extends Migration
             $table->unsignedBigInteger('user_id'); // <-- Tambahkan kolom user_id
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('username')->nullable();
+            $table->string('recipient_name')->nullable();
+            $table->string('address')->nullable();
+            $table->string('label')->nullable();
             $table->string('phone')->nullable();
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->integer('birth_day')->nullable();
