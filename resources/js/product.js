@@ -1,4 +1,29 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Color Selection ---
+    const colorOptions = document.querySelectorAll('.color-option');
+    const selectedColorInput = document.getElementById('selected-color');
+    let selectedColor = null;
+
+    colorOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected state from all options
+            colorOptions.forEach(opt => {
+                opt.classList.remove('selected');
+                opt.style.transform = 'scale(1)';
+            });
+            
+            // Add selected state to clicked option
+            this.classList.add('selected');
+            this.style.transform = 'scale(1.1)';
+            
+            // Update selected color
+            selectedColor = this.dataset.color;
+            selectedColorInput.value = selectedColor;
+            
+            console.log('Selected color:', selectedColor);
+        });
+    });
+
     // --- Image Slider ---
     const images = document.querySelectorAll('.product-image');
     const dots = document.querySelectorAll('.dot');
@@ -6,8 +31,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const rightArrow = document.querySelector('.slider-arrow.right');
     let currentImageIndex = 0;
     const totalImages = images.length;
-
-    
 
     function showImage(index) {
         if (totalImages === 0) return;
@@ -43,9 +66,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const minusBtnDetail = document.querySelector('.minus-btn');
     const plusBtnDetail = document.querySelector('.plus-btn');
     const totalPriceDisplay = document.getElementById('total-price-display');
-    // Parse product price safely, default to 0
-    const productPrice = parseFloat("{{ is_numeric($product->price) ? $product->price : 0 }}");
-    const stock = parseInt("{{ $product->stock }}") || 0;
+    // Get product data from window object
+    const productPrice = window.productData ? window.productData.price : 0;
+    const stock = window.productData ? window.productData.stock : 0;
 
     function formatRupiah(number) {
         if (isNaN(number)) return 'Rp 0';
@@ -91,40 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     if (quantityInputDetail) {
         quantityInputDetail.addEventListener('input', updateDetailTotalPrice);
-        quantityInputDetail.addEventListener('change',
-            updateDetailTotalPrice); // Ensure update on blur/manual change
+        quantityInputDetail.addEventListener('change', updateDetailTotalPrice);
     }
     updateDetailTotalPrice(); // Initial update
-
-    // --- Testimonial "See More" ---
-    // (Kode JS Testimoni dari file asli Anda bisa ditaruh di sini)
-    const seeMoreBtn = document.getElementById('see-more-btn');
-    const testimonialMore = document.querySelector('.testimonial-more');
-    if (seeMoreBtn && testimonialMore) {
-        seeMoreBtn.addEventListener('click', () => {
-            testimonialMore.classList.remove('hidden');
-            seeMoreBtn.classList.add('hidden');
-            // Re-init lightbox for new images if needed
-            initLightbox(testimonialMore.querySelectorAll('.proof-image'));
-        });
-    }
-
-    // --- Image Lightbox ---
-    // (Kode JS Lightbox dari file asli Anda bisa ditaruh di sini)
-    const lightbox = document.createElement('div'); // ... (rest of lightbox code) ...
-    // Initialize lightbox
-    function initLightbox(imageElements) {
-        imageElements.forEach(img => {
-            img.style.cursor = 'pointer'; // Add pointer cursor
-            img.removeEventListener('click', openLightboxHandler); // Remove old listeners
-            img.addEventListener('click', openLightboxHandler);
-        });
-    }
-
-    function openLightboxHandler() {
-        openLightbox(this.src);
-    } // Define handler
-    initLightbox(document.querySelectorAll('.proof-image')); // Init for all proof images
 
     // --- AJAX Add to Cart & Buy Now Logic ---
     const productActionForm = document.getElementById('product-action-form');
@@ -133,25 +125,31 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!productActionForm) return;
 
         const formData = new FormData(productActionForm);
-        const actionUrl = button.getAttribute('formaction') || productActionForm
-            .action; // Get action from button or form
+        const actionUrl = button.getAttribute('formaction') || productActionForm.action;
         const originalButtonContent = button.innerHTML;
         button.disabled = true;
         button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...';
+
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            return;
+        }
 
         fetch(actionUrl, {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                    'content'),
+                'X-CSRF-TOKEN': csrfToken,
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
             }
         })
             .then(response => {
                 if (response.status === 401) {
-                    window.location.href = "{{ route('login', ['redirect' => url()->current()]) }}";
+                    // Redirect to login if needed
+                    window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
                     throw new Error('Unauthorized');
                 }
                 if (!response.ok && response.status !== 400) {
@@ -164,14 +162,14 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 if (data.success) {
                     // Update cart count
-                    const cartCountElement = document.getElementById('cart-count'); // Adjust selector
+                    const cartCountElement = document.getElementById('cart-count');
                     if (cartCountElement && data.cartCount !== undefined) {
                         cartCountElement.textContent = data.cartCount;
                         cartCountElement.classList.toggle('hidden', data.cartCount <= 0);
                     }
 
                     if (redirectCheckout) {
-                        window.location.href = "{{ route('checkout') }}";
+                        window.location.href = "/checkout";
                     } else {
                         Swal.fire({
                             icon: 'success',
@@ -214,4 +212,33 @@ document.addEventListener('DOMContentLoaded', function () {
         submitProductAction(btn, true);
     }));
 
+    // --- Testimonial "See More" ---
+    // (Kode JS Testimoni dari file asli Anda bisa ditaruh di sini)
+    const seeMoreBtn = document.getElementById('see-more-btn');
+    const testimonialMore = document.querySelector('.testimonial-more');
+    if (seeMoreBtn && testimonialMore) {
+        seeMoreBtn.addEventListener('click', () => {
+            testimonialMore.classList.remove('hidden');
+            seeMoreBtn.classList.add('hidden');
+            // Re-init lightbox for new images if needed
+            initLightbox(testimonialMore.querySelectorAll('.proof-image'));
+        });
+    }
+
+    // --- Image Lightbox ---
+    // (Kode JS Lightbox dari file asli Anda bisa ditaruh di sini)
+    const lightbox = document.createElement('div'); // ... (rest of lightbox code) ...
+    // Initialize lightbox
+    function initLightbox(imageElements) {
+        imageElements.forEach(img => {
+            img.style.cursor = 'pointer'; // Add pointer cursor
+            img.removeEventListener('click', openLightboxHandler); // Remove old listeners
+            img.addEventListener('click', openLightboxHandler);
+        });
+    }
+
+    function openLightboxHandler() {
+        openLightbox(this.src);
+    } // Define handler
+    initLightbox(document.querySelectorAll('.proof-image')); // Init for all proof images
 });

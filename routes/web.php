@@ -10,6 +10,7 @@ use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\CartController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Home\ProfileController;
+use App\Http\Controllers\Home\CheckoutController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -73,9 +74,7 @@ Route::middleware(['auth:web'])->group(function () {
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
 
-    Route::get('/checkout', function () {
-        return view('Home/checkout');
-    })->name('checkout');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
     Route::get('/riwayatpembelian', function () {
         return view('profile/riwayat_pembelian');
@@ -89,14 +88,22 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
     
     // Logout
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+   
 
 });
 
-// Post-logout routes (Optional)
-// Route::get('/profileout', function () { return view('profile/setelah_keluar'); })->name('profileout');
-// Route::get('/setelah_logout', function () { return view('profile/setelah_logout'); })->name('setelah_logout');
+// Route untuk menampilkan halaman konfirmasi logout
+Route::get('/logout', function () {
+    return view('profile.logout');
+})->name('profile.logout');
 
+// User logout (POST)
+Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
+
+// Route untuk menampilkan halaman setelah keluar
+Route::get('/setelah_keluar', function () {
+    return view('profile.setelah_keluar');
+})->name('profileout');
 
 // Admin routes
 Route::prefix('admin')->name('admin.')->group(function () {

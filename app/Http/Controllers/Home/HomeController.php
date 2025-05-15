@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Home;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Cart;
 
 
 class HomeController extends Controller
@@ -52,9 +54,17 @@ class HomeController extends Controller
     {
         $relatedProducts = Product::where('category', $product->category)
             ->where('id', '!=', $product->id)
-            ->take(4)
+            ->limit(4)
             ->get();
             
-        return view('home.product', compact('product', 'relatedProducts'));
+        // Get current cart quantity for this product (if user is logged in)
+        $cartQuantity = 0;
+        if (Auth::guard('web')->check()) {
+            $cartQuantity = Cart::where('user_id', Auth::guard('web')->id())
+                ->where('product_id', $product->id)
+                ->sum('quantity');
+        }
+
+        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity'));
     }
 }

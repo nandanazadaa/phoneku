@@ -57,8 +57,7 @@
                     <i class="fas fa-shield-alt w-5 mr-3 text-center"></i>
                     <span>Keamanan & Privasi</span>
                 </a>
-                <a href="{{ route('logout') }}"
-                    class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                <a href="{{ route('profile.logout') }}" class="flex items-center py-3 px-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
                     <i class="fas fa-sign-out-alt w-5 mr-3 text-center"></i>
                     <span>Keluar Akun</span>
                 </a>
@@ -125,8 +124,38 @@
                                </div>
                                 <input type="tel" id="phone" name="phone" value="{{ $user->profile->phone ?? ''}}"
                                     placeholder="Belum ditambahkan"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700" readonly>
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">
                                 @error('phone')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Alamat -->
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-600 mb-1">Alamat</label>
+                                <textarea id="address" name="address" rows="3"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">{{ $user->profile->address ?? '' }}</textarea>
+                                @error('address')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Recipient Name -->  
+                            <div>
+                                <label for="recipient_name" class="block text-sm font-medium text-gray-600 mb-1">Nama Penerima</label>
+                                <input type="text" id="recipient_name" name="recipient_name" value="{{ $user->profile->recipient_name ?? $user->name }}"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">
+                                @error('recipient_name')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            
+                            <!-- Label Alamat -->
+                            <div>
+                                <label for="label" class="block text-sm font-medium text-gray-600 mb-1">Label Alamat</label>
+                                <input type="text" id="label" name="label" value="{{ $user->profile->label ?? 'Rumah' }}"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700">
+                                @error('label')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>

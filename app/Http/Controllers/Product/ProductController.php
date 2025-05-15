@@ -50,54 +50,61 @@ class ProductController extends Controller
             'category' => 'required|in:handphone,accessory',
             'is_featured' => 'boolean',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:png|max:2048',
+            'color' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
     
-        $data = $request->except('image');
+        $data = $request->except(['image', 'image2', 'image3']);
         
         // Set is_featured to false if not provided
         if (!isset($data['is_featured'])) {
             $data['is_featured'] = false;
         }
         
-        // Handle image upload with improved error handling
-        if ($request->hasFile('image')) {
-            try {
-                $image = $request->file('image');
-                
-                // Check if the file is valid
-                if (!$image->isValid()) {
+        // Handle image uploads
+        $imageFields = ['image', 'image2', 'image3'];
+        
+        foreach ($imageFields as $field) {
+            if ($request->hasFile($field)) {
+                try {
+                    $image = $request->file($field);
+                    
+                    // Check if the file is valid
+                    if (!$image->isValid()) {
+                        return redirect()->back()
+                            ->with('error', "File {$field} tidak valid.")
+                            ->withInput();
+                    }
+                    
+                    $imageName = Str::slug($request->name) . '-' . $field . '-' . time() . '.' . $image->getClientOriginalExtension();
+                    
+                    // Store with explicit public disk
+                    $path = $image->storeAs('products', $imageName, 'public');
+                    
+                    // For debugging
+                    if (!$path) {
+                        return redirect()->back()
+                            ->with('error', "Gagal menyimpan {$field} ke storage.")
+                            ->withInput();
+                    }
+                    
+                    // Set the image path correctly
+                    $data[$field] = $path;
+                    
+                } catch (\Exception $e) {
                     return redirect()->back()
-                        ->with('error', 'Uploaded file is not valid.')
+                        ->with('error', "Error upload {$field}: " . $e->getMessage())
                         ->withInput();
                 }
-                
-                $imageName = Str::slug($request->name) . '-' . time() . '.' . $image->getClientOriginalExtension();
-                
-                // Store with explicit public disk
-                $path = $image->storeAs('products', $imageName, 'public');
-                
-                // For debugging
-                if (!$path) {
-                    return redirect()->back()
-                        ->with('error', 'Failed to save image to storage.')
-                        ->withInput();
-                }
-                
-                // Set the image path correctly
-                $data['image'] = $path;
-                
-            } catch (\Exception $e) {
-                return redirect()->back()
-                    ->with('error', 'Error uploading image: ' . $e->getMessage())
-                    ->withInput();
             }
         }
     
         Product::create($data);
     
         return redirect()->route('admin.products', ['tab' => 'list'])
-            ->with('success', 'Product created successfully.');
+            ->with('success', 'Produk berhasil dibuat.');
     }
 
     /**
@@ -115,33 +122,40 @@ class ProductController extends Controller
             'category' => 'required|in:handphone,accessory',
             'is_featured' => 'boolean',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'color' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'image2', 'image3']);
         
         // Set is_featured to false if not provided
         if (!isset($data['is_featured'])) {
             $data['is_featured'] = false;
         }
         
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($product->image) {
-                Storage::delete('public/' . $product->image);
+        // Handle image uploads
+        $imageFields = ['image', 'image2', 'image3'];
+        
+        foreach ($imageFields as $field) {
+            if ($request->hasFile($field)) {
+                // Delete old image if exists
+                if ($product->$field) {
+                    Storage::disk('public')->delete($product->$field);
+                }
+                
+                $image = $request->file($field);
+                $imageName = Str::slug($request->name) . '-' . $field . '-' . time() . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('products', $imageName, 'public');
+                $data[$field] = $path;
             }
-            
-            $image = $request->file('image');
-            $imageName = Str::slug($request->name) . '-' . time() . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('public/products', $imageName);
-            $data['image'] = 'products/' . $imageName;
         }
 
         $product->update($data);
 
         return redirect()->route('admin.products', ['tab' => 'list'])
-            ->with('success', 'Product updated successfully.');
+            ->with('success', 'Produk berhasil diupdate.');
     }
 
     /**
@@ -151,15 +165,18 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         
-        // Delete product image if exists
-        if ($product->image) {
-            Storage::delete('public/' . $product->image);
+        // Delete product images if exist
+        $imageFields = ['image', 'image2', 'image3'];
+        foreach ($imageFields as $field) {
+            if ($product->$field) {
+                Storage::disk('public')->delete($product->$field);
+            }
         }
         
         $product->delete();
 
         return redirect()->route('admin.products', ['tab' => 'list'])
-            ->with('success', 'Product deleted successfully.');
+            ->with('success', 'Produk berhasil dihapus.');
     }
 
     /**
@@ -173,6 +190,7 @@ class ProductController extends Controller
             'price' => $request->price ?? 0,
             'original_price' => $request->original_price ?? null,
             'category' => $request->category ?? 'handphone',
+            'color' => $request->color ?? '',
         ]);
 
         // For proper display in the template
