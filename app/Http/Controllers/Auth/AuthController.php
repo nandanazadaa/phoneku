@@ -39,7 +39,7 @@ class AuthController extends Controller
         $remember = $request->has('remember');
 
         if (Auth::guard('web')->attempt($credentials, $remember)) {
-            $request->session()->regenerate(); // Regenerate session ID on login for security
+            // $request->session()->regenerate(); // HAPUS supaya tidak menendang session admin
 
             // Redirect ke URL yang tersimpan di session jika ada
             if ($request->has('redirect')) {
@@ -50,7 +50,7 @@ class AuthController extends Controller
                 return redirect()->to($redirect);
             }
 
-            return redirect()->intended(route('profile.logout'));
+            return redirect()->intended(route('welcome'));
         }
 
         return redirect()->back()
@@ -84,7 +84,7 @@ class AuthController extends Controller
         ]);
 
         Auth::guard('web')->login($user);
-        $request->session()->regenerate(); // Regenerate session ID on login for security
+        // $request->session()->regenerate(); // HAPUS supaya tidak menendang session admin
 
         // Redirect ke URL yang tersimpan di session jika ada
         if ($request->has('redirect')) {
@@ -95,7 +95,7 @@ class AuthController extends Controller
             return redirect()->to($redirect);
         }
 
-        return redirect()->route('profile.logout');
+        return redirect()->route('welcome');
     }
 
     /**
@@ -105,9 +105,9 @@ class AuthController extends Controller
     {
         // Hanya logout guard 'web'
         Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect()->route('profile.logout');
+        // $request->session()->invalidate(); // HAPUS supaya tidak menendang session admin
+        // $request->session()->regenerateToken(); // HAPUS supaya tidak menendang session admin
+        return redirect()->route('profileout');
     }
 
     /********************************************
@@ -132,42 +132,42 @@ class AuthController extends Controller
      * Handle admin login request
      */
     public function adminLogin(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()
-            ->withErrors($validator)
-            ->withInput($request->except('password'));
-    }
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput($request->except('password'));
+        }
 
-    // Check if the user exists and has role 'admin'
-    $user = User::where('email', $request->email)
-                ->where('role', 'admin')
-                ->first();
+        // Check if the user exists and has role 'admin'
+        $user = User::where('email', $request->email)
+                    ->where('role', 'admin')
+                    ->first();
 
-    if (!$user) {
+        if (!$user) {
+            return redirect()->back()
+                ->withErrors(['auth' => 'Invalid credentials'])
+                ->withInput($request->except('password'));
+        }
+
+        $credentials = $request->only('email', 'password');
+        $remember = $request->has('remember');
+
+        // Use the 'admin' guard to attempt login
+        if (Auth::guard('admin')->attempt($credentials, $remember)) {
+            // $request->session()->regenerate(); // HAPUS supaya tidak menendang session user
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
         return redirect()->back()
             ->withErrors(['auth' => 'Invalid credentials'])
             ->withInput($request->except('password'));
     }
-
-    $credentials = $request->only('email', 'password');
-    $remember = $request->has('remember');
-
-    // Use the 'admin' guard to attempt login
-    if (Auth::guard('admin')->attempt($credentials, $remember)) {
-        $request->session()->regenerate();
-        return redirect()->intended(route('admin.dashboard'));
-    }
-
-    return redirect()->back()
-        ->withErrors(['auth' => 'Invalid credentials'])
-        ->withInput($request->except('password'));
-}
 
     /**
      * Show admin registration form
@@ -216,13 +216,10 @@ class AuthController extends Controller
      * Handle admin logout request
      */
     public function adminLogout(Request $request)
-{
-    Auth::guard('admin')->logout();
-
-        // Tidak memanggil invalidate() agar tidak mengganggu sesi guard lain (misal 'web')
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
-
+    {
+        Auth::guard('admin')->logout();
+        // $request->session()->invalidate(); // HAPUS supaya tidak menendang session user
+        // $request->session()->regenerateToken(); // HAPUS supaya tidak menendang session user
         return redirect()->route('admin.login');
     }
 }

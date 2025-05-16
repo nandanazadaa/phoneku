@@ -98,7 +98,7 @@ Route::get('/logout', function () {
 })->name('profile.logout');
 
 // User logout (POST)
-Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Route untuk menampilkan halaman setelah keluar
 Route::get('/setelah_keluar', function () {
