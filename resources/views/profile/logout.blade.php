@@ -76,7 +76,8 @@
                     <h3 class="text-2xl font-semibold text-gray-700 mb-2">Keluar Akun</h3>
                     <p class="text-gray-500 mb-6">Anda Yakin Ingin Keluar Dari Akun Anda?</p>
                     <div class="flex justify-center">
-                        <form class="inline" action="{{ route('profileout') }}" method="GET">
+                        <form class="inline" action="{{ route('logout') }}" method="POST">
+                            @csrf
                             <button 
                                 class="bg-red-500 hover:bg-red-600 text-white py-2 px-12 rounded-full text-sm font-medium transition-all duration-200">
                                 Keluar
