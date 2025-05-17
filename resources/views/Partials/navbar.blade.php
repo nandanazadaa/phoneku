@@ -377,5 +377,13 @@
                 });
             });
         });
+        function scrollSlider(id, direction) {
+            const container = document.getElementById(id);
+            const scrollAmount = 300; // px per click
+            container.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
     </script>
 @endsection
