@@ -115,109 +115,118 @@
         </div>
 
         <!-- Products Grid (DINAMIS) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @forelse($products as $product)
-                <!-- Product Card -->
-                <div
-                    class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
-                    {{-- Link ke halaman detail produk --}}
-                    <a href="{{ route('product.show', $product) }}"
-                        class="product-image-container bg-gray-100 w-full h-56 flex items-center justify-center flex-shrink-0 p-4 relative group">
-                        @if ($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                class="product-image max-h-full object-contain transition duration-500 ease-in-out transform group-hover:scale-105">
-                        @else
-                            {{-- Placeholder jika tidak ada gambar --}}
-                            <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
-                                <i class="fa fa-image text-5xl"></i>
-                            </div>
-                        @endif
-                        {{-- Discount Badge (Example) --}}
-                        @if ($product->original_price && $product->original_price > $product->price)
-                            @php
-                                $discountPercentage = round(
-                                    (($product->original_price - $product->price) / $product->original_price) * 100,
-                                );
-                            @endphp
-                            <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                                {{ $discountPercentage }}% OFF
-                            </span>
-                        @endif
-                    </a>
-                    <div class="p-4 text-gray-800 flex flex-col flex-grow">
-                        {{-- Nama Produk (link ke detail) --}}
-                        <h3 class="font-semibold text-base flex-grow mb-2">
-                            <a href="{{ route('product.show', $product) }}" class="hover:text-blue-600 line-clamp-2"
-                                title="{{ $product->name }}">{{ $product->name }}</a>
-                        </h3>
+        <div class="relative">
+            <!-- Tombol Navigasi Slider -->
+            <button onclick="scrollSlider('product-slider', -1)"
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button onclick="scrollSlider('product-slider', 1)"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
+                <i class="fas fa-chevron-right"></i>
+            </button>
 
-                        {{-- Harga --}}
-                        <div class="mt-auto"> {{-- Push price and buttons to bottom --}}
-                            <p class="text-xl font-bold text-blue-600 mt-1">
-                                {{ $product->formatted_price ?? 'Rp ' . number_format($product->price, 0, ',', '.') }}</p>
-                            {{-- Harga Asli (jika ada diskon) --}}
-                            @if ($product->original_price && $product->original_price > $product->price)
-                                <p class="text-gray-500 line-through text-sm">
-                                    {{ $product->formatted_original_price ?? 'Rp ' . number_format($product->original_price, 0, ',', '.') }}
-                                </p>
-                            @endif
-
-                            {{-- Tombol Aksi --}}
-                            <div class="flex mt-4 space-x-2">
-                                {{-- Cek stok --}}
-                                @if ($product->stock > 0)
-                                    @auth('web')
-                                        {{-- Pastikan cek guard web --}}
-                                        {{-- Tombol Tambah ke Keranjang (jika login) --}}
-                                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
-                                            @csrf
-                                            <button type="submit" data-cart-action="add" data-product-id="{{ $product->id }}"
-                                                class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
-                                                <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                            </button>
-                                        </form>
-                                        {{-- Tombol Beli (link ke detail) --}}
-                                        <a href="{{ route('product.show', $product) }}" title="Lihat Detail"
-                                            class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                            <i class="fas fa-eye mr-1"></i> Detail
-                                        </a>
-                                    @else
-                                        {{-- Tombol jika belum login (mengarahkan ke login) --}}
-                                        <a href="{{ route('login', ['redirect' => route('allproduct', request()->query())]) }}"
-                                            title="Login untuk tambah ke keranjang"
-                                            class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-200 transition duration-200">
-                                            <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                        </a>
-                                        <a href="{{ route('product.show', $product) }}" title="Lihat Detail"
-                                            class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                            <i class="fas fa-eye mr-1"></i> Detail
-                                        </a>
-                                    @endauth
+            <!-- Slider Container -->
+            <div id="product-slider" class="overflow-x-auto hide-scrollbar scroll-smooth px-6">
+                <div class="flex gap-6 w-max">
+                    @forelse($products as $product)
+                        <!-- Product Card -->
+                        <div
+                            class="w-72 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
+                            {{-- Link ke halaman detail produk --}}
+                            <a href="{{ route('product.show', $product) }}"
+                                class="product-image-container bg-gray-100 w-full h-56 flex items-center justify-center flex-shrink-0 p-4 relative group">
+                                @if ($product->image)
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                        class="product-image max-h-full object-contain transition duration-500 ease-in-out transform group-hover:scale-105">
                                 @else
-                                    <span
-                                        class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
-                                        Habis</span>
+                                    <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
+                                        <i class="fa fa-image text-5xl"></i>
+                                    </div>
                                 @endif
+
+                                @if ($product->original_price && $product->original_price > $product->price)
+                                    @php
+                                        $discountPercentage = round(
+                                            (($product->original_price - $product->price) / $product->original_price) *
+                                                100,
+                                        );
+                                    @endphp
+                                    <span
+                                        class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                        {{ $discountPercentage }}% OFF
+                                    </span>
+                                @endif
+                            </a>
+
+                            <div class="p-4 text-gray-800 flex flex-col flex-grow">
+                                <h3 class="font-semibold text-base flex-grow mb-2">
+                                    <a href="{{ route('product.show', $product) }}"
+                                        class="hover:text-blue-600 line-clamp-2"
+                                        title="{{ $product->name }}">{{ $product->name }}</a>
+                                </h3>
+
+                                <div class="mt-auto">
+                                    <p class="text-xl font-bold text-blue-600 mt-1">
+                                        {{ $product->formatted_price ?? 'Rp ' . number_format($product->price, 0, ',', '.') }}
+                                    </p>
+                                    @if ($product->original_price && $product->original_price > $product->price)
+                                        <p class="text-gray-500 line-through text-sm">
+                                            {{ $product->formatted_original_price ?? 'Rp ' . number_format($product->original_price, 0, ',', '.') }}
+                                        </p>
+                                    @endif
+
+                                    <div class="flex mt-4 space-x-2">
+                                        @if ($product->stock > 0)
+                                            @auth('web')
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST"
+                                                    class="flex-1">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                                        <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                                    </button>
+                                                </form>
+                                                <a href="{{ route('product.show', $product) }}"
+                                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                    <i class="fas fa-eye mr-1"></i> Detail
+                                                </a>
+                                            @else
+                                                <a href="{{ route('login', ['redirect' => route('allproduct', request()->query())]) }}"
+                                                    class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-200 transition duration-200">
+                                                    <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                                </a>
+                                                <a href="{{ route('product.show', $product) }}"
+                                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                    <i class="fas fa-eye mr-1"></i> Detail
+                                                </a>
+                                            @endauth
+                                        @else
+                                            <span
+                                                class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
+                                                Habis</span>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @empty
+                        <div class="text-center py-16 w-full">
+                            <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600 text-xl font-semibold">Oops! Produk tidak ditemukan.</p>
+                            @if (request()->hasAny(['category', 'brand', 'price_range', 'search']))
+                                <p class="text-gray-500 mt-2">Coba ubah filter atau kata kunci pencarian Anda.</p>
+                                <a href="{{ route('allproduct') }}"
+                                    class="mt-4 inline-block text-blue-600 hover:underline font-medium">
+                                    <i class="fas fa-sync-alt mr-1"></i> Reset Filter
+                                </a>
+                            @else
+                                <p class="text-gray-500 mt-2">Saat ini belum ada produk yang tersedia.</p>
+                            @endif
+                        </div>
+                    @endforelse
                 </div>
-            @empty
-                {{-- Pesan jika tidak ada produk --}}
-                <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center py-16 bg-gray-50 rounded-lg">
-                    <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
-                    <p class="text-gray-600 text-xl font-semibold">Oops! Produk tidak ditemukan.</p>
-                    @if (request()->hasAny(['category', 'brand', 'price_range', 'search']))
-                        <p class="text-gray-500 mt-2">Coba ubah filter atau kata kunci pencarian Anda.</p>
-                        <a href="{{ route('allproduct') }}"
-                            class="mt-4 inline-block text-blue-600 hover:underline font-medium">
-                            <i class="fas fa-sync-alt mr-1"></i> Reset Filter
-                        </a>
-                    @else
-                        <p class="text-gray-500 mt-2">Saat ini belum ada produk yang tersedia.</p>
-                    @endif
-                </div>
-            @endforelse
+            </div>
         </div>
         <!-- AKHIR Products Grid -->
 
@@ -290,7 +299,7 @@
                         const originalButtonText = this.innerHTML; // Simpan teks tombol asli
                         this.disabled = true; // Disable tombol
                         this.innerHTML =
-                        '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...'; // Loading state
+                            '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...'; // Loading state
 
                         fetch(form.action, {
                                 method: 'POST',
@@ -375,5 +384,14 @@
                 });
             });
         });
+
+        function scrollSlider(id, direction) {
+            const slider = document.getElementById(id);
+            const scrollAmount = 300 * direction;
+            slider.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
     </script>
 @endsection
