@@ -11,6 +11,8 @@ use App\Http\Controllers\Product\CartController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\Home\CheckoutController;
+use App\Http\Controllers\Home\ContactController;
+
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -25,6 +27,7 @@ Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allprod
 Route::get('/kontak', function () {
     return view('home.kontak');
 })->name('kontak');
+Route::post('/kontak/kirim', [ContactController::class, 'kirim'])->name('kontak.kirim');
 
 
 // Authentication routes (guest only)
