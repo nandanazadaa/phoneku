@@ -12,7 +12,7 @@ class User extends Authenticatable
 
     public function profile()
     {
-        return $this->hasOne(\App\Models\Profile::class, 'user_id', 'id');
+        return $this->hasOne(Profile::class); // Adjust Profile to your actual profile model name
     }
     /**
      * The primary key for the model.

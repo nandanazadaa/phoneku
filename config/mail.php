@@ -108,6 +108,8 @@ return [
     |
     */
 
+    'mail_to_admin' => env('MAIL_TO_ADMIN'),
+
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),

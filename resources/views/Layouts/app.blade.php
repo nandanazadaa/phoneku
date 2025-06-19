@@ -1,4 +1,7 @@
 <!-- layouts/app.blade.php -->
+<?php
+use Illuminate\Support\Facades\Auth;
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth
-        <meta name="user-logged-in" content="true">
+        <meta name="logged-in" content="true">
         <meta name="user-id" content="{{ Auth::id() }}">
     @endauth
     <title>PhoneKu - @yield('title', 'Marketplace Handphone & Aksesoris')</title>

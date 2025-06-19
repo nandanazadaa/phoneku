@@ -5,12 +5,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\UserController;
-use App\Http\Controllers\Dashboard\ChatController; // Pastikan ChatController diimport
+use App\Http\Controllers\Dashboard\ChatController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\CartController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\Home\CheckoutController;
+use App\Http\Controllers\Home\ContactController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
@@ -25,7 +26,7 @@ Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allprod
 Route::get('/kontak', function () {
     return view('home.kontak');
 })->name('kontak');
-
+Route::post('/kontak/kirim', [ContactController::class, 'kirim'])->name('kontak.kirim');
 
 // Authentication routes (guest only)
 Route::middleware(['guest:web'])->group(function () {
@@ -39,7 +40,7 @@ Route::middleware(['guest:web'])->group(function () {
     Route::post('/registrasi', [AuthController::class, 'register'])->name('registrasi.post');
     Route::get('/lupa_password', function () {
         return view('Auth/lupapassword');
-    })->name('lupa_password'); // Pastikan view ini ada
+    })->name('lupa_password');
 });
 
 // Authenticated routes
@@ -50,55 +51,48 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/riwayatbeli', [ProfileController::class, 'riwayat'])->name('riwayatbeli');
     Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
 
-    // Profile - ubah email 
+    // Profile - ubah email
     Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
     Route::get('/ubah_email_otp', [ProfileController::class, 'ubahEmailOTP'])->name('ubah_email_otp');
-
-    // Form ubah email - kirim OTP ke email lama
     Route::post('/kirim_otp_email_lama', [ProfileController::class, 'kirimOtpEmailLama'])->name('kirim_otp_email_lama');
-    // Verifikasi OTP dan ubah email
-    Route::post('/verifikasi_otp_ubah_email', [ProfileController::class, 'verifikasiOtpUbahEmail'])->name('verifikasi_otp_ubah_email');    
+    Route::post('/verifikasi_otp_ubah_email', [ProfileController::class, 'verifikasiOtpUbahEmail'])->name('verifikasi_otp_ubah_email');
 
-    // Profile - ubah nomer telepon 
+    // Profile - ubah nomer telepon
     Route::get('/ubah_no_tlp', [ProfileController::class, 'tambahNoTelepon'])->name('ubah_no_tlp');
     Route::get('/ubah_no_tlp_otp', [ProfileController::class, 'tambahNoTeleponOTP'])->name('ubah_no_tlp_otp');
-
-    // Form tambah/ubah nomer telepon - kirim OTP ke email lama
     Route::post('/kirim_otp', [ProfileController::class, 'kirimOtpAturNotlp'])->name('kirim_otp');
-    // Verifikasi OTP dan tambah/ubah nomer telepon
     Route::post('/verifikasi_otp', [ProfileController::class, 'verifikasiOtpAturNoTlp'])->name('verifikasi_otp');
-    
+
     // Cart and checkout
     Route::post('/cart/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
-
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/buy-now/{productId}', [CheckoutController::class, 'buyNow'])->name('buy.now');
+
 
     Route::get('/riwayatpembelian', function () {
         return view('profile/riwayat_pembelian');
     })->name('riwayatpembelian');
 
-    
     Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support');
-    
-    // Add routes for customers to send and fetch messages
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
-    
-    // Logout
-   
 
+    // Logout
+    Route::get('/logout', function () {
+        return view('profile.logout');
+    })->name('profile.logout.confirm');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('profile.logout');
 });
 
-// Route untuk menampilkan halaman konfirmasi logout
-Route::get('/logout', function () {
-    return view('profile.logout');
-})->name('profile.logout');
+// Post-checkout routes
+Route::get('/thank-you', function () {
+    return view('checkout.success');
+})->name('thank-you');
 
-// User logout (POST)
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Route untuk menampilkan halaman setelah keluar
 Route::get('/setelah_keluar', function () {
@@ -111,26 +105,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'adminLogin'])->name('login.post');
     Route::middleware(['guest:admin'])->group(function () {
-        
         Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
         Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
     });
-    
+
     // Admin protected routes
-    Route::middleware(['auth:admin'])->group(function() {
+    Route::middleware(['auth:admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
         Route::get('/products', [ProductController::class, 'index'])->name('products');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-        Route::post('/products/preview', [ProductController::class, 'preview']); 
+        Route::post('/products/preview', [ProductController::class, 'preview']);
         Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 
         // Admin chat routes
-        Route::get('/chat', [ChatController::class, 'index'])->name('chat'); // Pastikan ChatController ada
+        Route::get('/chat', [ChatController::class, 'index'])->name('chat');
         Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
         Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
 
@@ -139,7 +132,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-// Pusher authentication (Jika menggunakan Websockets)
+// Pusher authentication
 Route::post('/pusher/auth', function (Request $request) {
     $pusher = new Pusher\Pusher(
         env('PUSHER_APP_KEY'),

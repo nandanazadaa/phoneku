@@ -70,28 +70,51 @@
                     <div
                         class="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl px-6 sm:px-12 md:px-24 py-12 flex flex-col text-white overflow-hidden shadow-lg">
                         <div>
+                             @if (session('success'))
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            {{-- UNTUK MENAMPILKAN ERROR JIKA ADA INPUT YANG SALAH --}}
+                            @if ($errors->any())
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                    <strong class="font-bold">Oops! Terjadi kesalahan:</strong>
+                                    <ul class="list-disc list-inside mt-2">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                             <h4 class="font-bold text-xl sm:text-2xl">Hubungi Kami</h4>
                             <p class="mt-4 sm:mt-6 text-sm sm:text-base">
                                 Tim kami akan dengan senang hati merespons setiap pertanyaan atau kebutuhan Anda secepat
                                 mungkin.
                             </p>
                         </div>
+                       <form action="{{ route('kontak.kirim') }}" method="POST">
+                        @csrf
                         <div class="mt-10 space-y-4">
-                            <input type="text" placeholder="Nama Lengkap"
-                                class="w-full px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
-                            <input type="email" placeholder="Email"
-                                class="w-full px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
-                            <input type="text" placeholder="Subjek"
-                                class="w-full px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none">
-                            <textarea placeholder="Pesan"
-                                class="w-full h-32 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none resize-none"></textarea>
+                            <input type="text" name="nama_lengkap" placeholder="Nama Lengkap" required
+                                class="w-full px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none" value="{{ old('nama_lengkap') }}">
+                            
+                            <input type="email" name="email" placeholder="Email" required
+                                class="w-full px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none" value="{{ old('email') }}">
+                            
+                            <input type="text" name="subjek" placeholder="Subjek" required
+                                class="w-full px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none" value="{{ old('subjek') }}">
+                            
+                            <textarea name="pesan" placeholder="Pesan" required
+                                class="w-full h-32 px-0 py-3 bg-transparent border-b border-white/50 placeholder-white focus:outline-none resize-none">{{ old('pesan') }}</textarea>
                         </div>
                         <div>
-                            <button
+                            <button type="submit"
                                 class="bg-white text-gray-800 font-medium mt-8 px-6 py-3 rounded-full hover:bg-gray-100 w-full sm:w-auto">
                                 Kirim Pesan
                             </button>
                         </div>
+                        </form>
                     </div>
                 </div>
 

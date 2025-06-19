@@ -120,3 +120,23 @@
 .alert-fade-out {
     animation: fadeOut 0.5s forwards;
 }
+.cart-item {
+    transition: box-shadow 0.2s;
+}
+.cart-item:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type='number'] {
+    appearance: textfield;
+}
+@media (max-width: 768px) {
+    .cart-item img {
+        width: 64px;
+        height: 64px;
+    }
+}

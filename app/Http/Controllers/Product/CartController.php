@@ -11,99 +11,49 @@ use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
-    public function addToCart(Request $request, $productId)
+public function addToCart(Request $request, $productId)
     {
-        try {
-            Log::info('Attempting to add product to cart', ['productId' => $productId, 'userId' => Auth::id()]);
-
-            $product = Product::findOrFail($productId);
-            $user = Auth::user();
-
-            if (!$user) {
-                Log::warning('User not authenticated', ['productId' => $productId]);
-                return response()->json(['success' => false, 'message' => 'User not authenticated'], 401);
-            }
-
-            // Validate quantity
-            $quantity = (int) $request->input('quantity', 1);
-            if ($quantity <= 0) {
-                return response()->json(['success' => false, 'message' => 'Kuantitas tidak valid'], 400);
-            }
-
-            if ($quantity > $product->stock) {
-                return response()->json(['success' => false, 'message' => 'Kuantitas melebihi stok yang tersedia'], 400);
-            }
-
-            // Get selected color if provided
-            $selectedColor = $request->input('color');
-
-            $cart = Cart::where('user_id', $user->id)
-                       ->where('product_id', $product->id)
-                       ->where('color', $selectedColor)
-                       ->first();
-
-            if ($cart) {
-                // Update existing cart item
-                $newQuantity = $cart->quantity + $quantity;
-                if ($newQuantity > $product->stock) {
-                    // Instead of error, adjust to maximum possible
-                    $maxAddable = $product->stock - $cart->quantity;
-                    if ($maxAddable <= 0) {
-                        return response()->json([
-                            'success' => false, 
-                            'message' => 'Produk sudah mencapai batas maksimal di keranjang Anda'
-                        ], 400);
-                    }
-                    $cart->quantity = $product->stock;
-                    $cart->save();
-                    return response()->json([
-                        'success' => true,
-                        'message' => "Berhasil menambahkan maksimal {$maxAddable} items ke keranjang",
-                        'cartCount' => Cart::where('user_id', $user->id)->sum('quantity')
-                    ], 200);
-                }
-                $cart->quantity = $newQuantity;
-            } else {
-                // Create new cart item
-                $cart = new Cart([
-                    'user_id' => $user->id,
-                    'product_id' => $product->id,
-                    'quantity' => $quantity,
-                    'color' => $selectedColor
-                ]);
-            }
-
-            if (!$cart->save()) {
-                Log::error('Failed to save cart', ['cartId' => $cart->id ?? 'new']);
-                throw new \Exception('Failed to save cart');
-            }
-
-            $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
-
-            Log::info('Product added to cart successfully', ['cartId' => $cart->id, 'cartCount' => $cartCount]);
-
-            // Jika ada parameter redirect_checkout, redirect ke checkout
-            if ($request->has('redirect_checkout')) {
-                return redirect()->route('checkout');
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Produk berhasil ditambahkan ke keranjang!',
-                'cartCount' => $cartCount
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error('Error adding product to cart', [
-                'error' => $e->getMessage(),
-                'productId' => $productId,
-                'userId' => Auth::id(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
-            ], 500);
+        $user = Auth::guard('web')->user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Anda harus login terlebih dahulu.'], 401);
         }
+
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $product = Product::findOrFail($productId);
+        $quantity = $request->quantity;
+
+        // Check stock
+        $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity');
+        $availableQuantity = $product->stock - $currentCartQuantity;
+
+        if ($quantity > $availableQuantity) {
+            return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi.'], 400);
+        }
+
+        // Check if item exists in cart
+        $cartItem = Cart::where('user_id', $user->id)->where('product_id', $productId)->first();
+
+        if ($cartItem) {
+            $cartItem->update(['quantity' => $cartItem->quantity + $quantity]);
+        } else {
+            Cart::create([
+                'user_id' => $user->id,
+                'product_id' => $productId,
+                'quantity' => $quantity,
+            ]);
+        }
+
+        $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
+
+        // Check for redirect_checkout parameter
+        if ($request->has('redirect_checkout') && $request->redirect_checkout == '1') {
+            return response()->json(['success' => true, 'message' => 'Produk ditambahkan, mengarahkan ke checkout.', 'cartCount' => $cartCount, 'redirect' => route('checkout.index')]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Produk berhasil ditambahkan ke keranjang.', 'cartCount' => $cartCount]);
     }
 
     public function index()

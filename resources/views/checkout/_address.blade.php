@@ -1,14 +1,62 @@
-<div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm flex flex-col md:flex-row items-start md:items-center p-4 gap-4">
-    <div class="text-blue-500 text-2xl md:text-3xl">
-        <i class="fas fa-map-marker-alt"></i>
+<div class="bg-white p-4 md:p-6 rounded-lg shadow">
+    <h2 class="text-lg md:text-xl font-semibold mb-4">Alamat Pengiriman</h2>
+    <div id="address-section" class="flex items-start justify-between">
+        @if ($user && $user->profile)
+            <div class="space-y-2">
+                <p class="flex items-center text-sm">
+                    <span class="text-gray-400 mr-2">📍</span>
+                    <span class="font-medium">{{ $user->profile->label ?? 'Rumah' }}</span> | 
+                    <span class="ml-1">{{ $user->profile->recipient_name ?? $user->username }}</span>
+                </p>
+                <p class="text-sm text-gray-600">
+                    {{ $user->profile->address ?? 'Alamat belum diatur' }}<br>
+                    Telepon: {{ $user->profile->phone ?? '' }}
+                </p>
+            </div>
+            <button id="gantiButton" class="btn btn-primary mt-0 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" data-toggle="modal" data-target="#modalAddress">Ganti</button>
+        @else
+            <p class="text-sm">Alamat belum diatur. Silakan <a href="{{ route('profile.index') }}" class="text-blue-500 underline">lengkapi profil</a>.</p>
+            <button class="btn btn-primary mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" data-toggle="modal" data-target="#modalAddress" disabled>Ganti</button>
+        @endif
     </div>
-    <div class="flex-1">
-        <div class="flex flex-wrap items-center gap-2 mb-1">
-            <span class="font-semibold text-gray-800 text-base md:text-lg">{{ $user->profile->recipient_name ?? $user->name }}</span>
-            <span class="text-gray-500 text-xs md:text-sm">({{ $user->profile->label ?? 'Alamat Utama' }})</span>
-        </div>
-        <div class="text-gray-700 text-sm md:text-base">{{ $user->profile->address ?? '-' }}</div>
-        <div class="text-gray-700 text-xs md:text-sm mt-1">Telp: {{ $user->profile->phone ?? '-' }}</div>
-    </div>
-    <button type="button" class="px-4 py-2 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition font-medium mt-3 md:mt-0" onclick="document.getElementById('addressModal').style.display='block'">Ubah</button>
-</div> 
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Perbarui alamat setelah form disimpan
+        const updatedProfile = @json(session('updated_profile'));
+        if (updatedProfile) {
+            const addressSection = document.getElementById('address-section');
+            if (addressSection) {
+                addressSection.innerHTML = `
+                    <div class="space-y-2">
+                        <p class="flex items-center text-sm">
+                            <span class="text-gray-400 mr-2">📍</span>
+                            <span class="font-medium">${updatedProfile.label || 'Rumah'}</span> | 
+                            <span class="ml-1">${updatedProfile.recipient_name || '{{ $user->username }}'}</span>
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            ${updatedProfile.address || 'Alamat belum diatur'}<br>
+                            Telepon: ${updatedProfile.phone || ''}
+                        </p>
+                    </div>
+                    <button id="gantiButton" class="btn btn-primary mt-0 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" data-toggle="modal" data-target="#modalAddress">Ganti</button>
+                `;
+            }
+        }
+
+        // Re-bind event listener to gantiButton after update
+        const gantiButton = document.getElementById('gantiButton');
+        if (gantiButton && !gantiButton.dataset.eventBound) {
+            gantiButton.addEventListener('click', function() {
+                document.getElementById('modalAddress').classList.remove('hidden');
+                setTimeout(() => {
+                    if (typeof leafletMap !== 'undefined' && leafletMap) {
+                        leafletMap.invalidateSize();
+                    }
+                }, 200);
+            });
+            gantiButton.dataset.eventBound = 'true';
+        }
+    });
+</script>

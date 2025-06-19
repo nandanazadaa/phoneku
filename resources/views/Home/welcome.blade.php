@@ -83,60 +83,63 @@
             <div id="handphone-slider" class="overflow-x-auto hide-scrollbar scroll-smooth py-4 px-8">
                 <div class="flex space-x-4 min-w-max">
                     @forelse($phones as $product)
-                    <!-- Product Card -->
-                    <div
-                        class="w-64 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
-                        <div class="bg-gray-100 w-full h-56 flex items-center justify-center p-4 relative group">
-                            @if ($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                    class="max-h-full object-contain transition transform group-hover:scale-105">
-                            @else
-                                <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
-                                    <i class="fa fa-image text-5xl"></i>
-                                </div>
-                            @endif
-                            @if ($product->original_price && $product->original_price > $product->price)
-                                @php
-                                    $discountPercentage = round(
-                                        (($product->original_price - $product->price) / $product->original_price) * 100,
-                                    );
-                                @endphp
-                                <span
-                                    class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                                    {{ $discountPercentage }}% OFF
-                                </span>
-                            @endif
-                        </div>
-                        <div class="p-4 flex flex-col flex-grow">
-                            <h3 class="font-semibold text-base text-gray-800 mb-2">{{ $product->name }}</h3>
-                            <p class="text-blue-600 font-bold text-lg">{{ $product->formatted_price }}</p>
-                            @if ($product->original_price && $product->original_price > $product->price)
-                                <p class="text-gray-500 line-through text-sm">
-                                    {{ $product->formatted_original_price }}
-                                </p>
-                            @endif
-                            <div class="flex mt-4 space-x-2">
-                                @auth
-                                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
-                                        @csrf
-                                        <button type="submit"
-                                            class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full hover:bg-blue-200">
-                                            <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                        </button>
-                                    </form>
-                                    <a href="{{ route('product.show', $product) }}"
-                                        class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center hover:bg-blue-600">Beli</a>
+                        <!-- Product Card -->
+                        <div
+                            class="w-64 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
+                            <div class="bg-gray-100 w-full h-56 flex items-center justify-center p-4 relative group">
+                                @if ($product->image)
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                        class="max-h-full object-contain transition transform group-hover:scale-105">
                                 @else
-                                    <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full hover:bg-blue-200">
-                                        <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                    </a>
-                                    <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm text-center hover:bg-blue-600">Beli</a>
-                                @endauth
+                                    <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
+                                        <i class="fa fa-image text-5xl"></i>
+                                    </div>
+                                @endif
+                                @if ($product->original_price && $product->original_price > $product->price)
+                                    @php
+                                        $discountPercentage = round(
+                                            (($product->original_price - $product->price) / $product->original_price) *
+                                                100,
+                                        );
+                                    @endphp
+                                    <span
+                                        class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                        {{ $discountPercentage }}% OFF
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="p-4 flex flex-col flex-grow">
+                                <h3 class="font-semibold text-base text-gray-800 mb-2">{{ $product->name }}</h3>
+                                <p class="text-blue-600 font-bold text-lg">{{ $product->formatted_price }}</p>
+                                @if ($product->original_price && $product->original_price > $product->price)
+                                    <p class="text-gray-500 line-through text-sm">
+                                        {{ $product->formatted_original_price }}
+                                    </p>
+                                @endif
+                                <div class="flex mt-4 space-x-2">
+                                    @auth
+                                        <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit"
+                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200">
+                                            <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                            </button>
+                                        </form>
+                                        <a href="{{ route('product.show', $product) }}"
+                                            class="bg-blue-500 text-white rounded-lg py-2 px-8 text-sm text-center hover:bg-blue-600"><i
+                                                class="fas fa-shopping-bag mr-1"></i>Beli</a>
+                                    @else
+                                        <a href="{{ route('login', ['redirect' => url()->current()]) }}"
+                                            class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200">
+                                            <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                        </a>
+                                        <a href="{{ route('login', ['redirect' => url()->current()]) }}"
+                                            class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm text-center hover:bg-blue-600"><i
+                                                class="fas fa-shopping-bag mr-1"></i>Beli</a>
+                                    @endauth
+                                </div>
                             </div>
                         </div>
-                    </div>
                     @empty
                         <div class="text-center w-full py-8">
                             <p class="text-gray-500">Tidak ada produk handphone tersedia saat ini.</p>
@@ -196,13 +199,15 @@
                                     </button>
                                 </form>
                                 <a href="{{ route('product.show', $product) }}"
-                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">Beli</a>
+                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200"><i
+                                        class="fas fa-shopping-bag mr-1"></i>Beli</a>
                             @else
                                 <a href="{{ route('login', ['redirect' => url()->current()]) }}"
                                     class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
                                     <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                     <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">Beli</a>
+                                        class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200"><i
+                                            class="fas fa-shopping-bag mr-1"></i>Beli</a>
                                 @endauth
                         </div>
                     </div>
@@ -421,4 +426,5 @@
         });
     </script>
 @endsection
+
 

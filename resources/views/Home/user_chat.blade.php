@@ -15,7 +15,7 @@
 
 <body>
     <div class="header">
-        <h2>Chat</h2>
+        <h2>Chat Customers</h2>
         <p class="mb-0">We're here to help you</p>
     </div>
 

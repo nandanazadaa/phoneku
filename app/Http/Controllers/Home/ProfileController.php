@@ -246,15 +246,12 @@ class ProfileController extends Controller
             'otp' => 'required|numeric',
         ]);
 
-        // Check if the OTP matches 
         if ($request->otp == Session::get('otp_tlp')) {
-            // Update phone number
             if ($user->profile) {
                 $user->profile->phone = Session::get('phone');
                 $user->profile->save();
             }
 
-            // Clear OTP session
             Session::forget('otp');
             Session::forget('phone');
 
@@ -263,115 +260,55 @@ class ProfileController extends Controller
         return back()->with('error', 'Kode OTP salah.');
     }
 
-    public function update(Request $request)
-    {
-        // Get authenticated user
-        $user = Auth::user();
-        
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'User not authenticated.');
-        }
-
-        // Debug info
-        $debugData = [
-            'request_all' => $request->all(),
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'profile_exists' => $user->profile ? 'yes' : 'no'
-        ];
-        
-        // Get user's profile
-        $profile = DB::table('profiles')->where('user_id', $user->id)->first();
-        $profileId = $profile ? $profile->profile_id : null;
-        
-        if ($profile) {
-            $debugData['existing_profile'] = [
-                'profile_id' => $profile->profile_id,
-                'phone' => $profile->phone,
-                'address' => $profile->address
-            ];
-        }
-
-        // Validate the request
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'username' => 'nullable|string|max:255|unique:profiles,username,' . $profileId . ',profile_id',
-            'recipient_name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'label' => 'nullable|string|max:50',
-            'phone' => 'nullable|string|max:20',
-            'gender' => 'nullable|in:male,female',
-            'birth_day' => 'nullable|integer|min:1|max:31',
-            'birth_month' => 'nullable|integer|min:1|max:12',
-            'birth_year' => 'nullable|integer|min:1900|max:' . date('Y'),
-            'profile_picture' => 'nullable|image|mimes:png,jpg,jpeg|max:1024', // Max 1MB
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('debug_info', array_merge($debugData, ['validation_failed' => $validator->errors()->toArray()]));
-        }
-
-        // Update user data directly in the database
-        DB::table('users')->where('id', $user->id)->update([
-            'name' => $request->name
-        ]);
-
-        // Prepare profile data
-        $profileData = [
-            'username' => $request->username,
-            'recipient_name' => $request->recipient_name,
-            'address' => $request->address,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'label' => $request->label,
-            'phone' => $request->phone,
-            'gender' => $request->gender,
-            'birth_day' => $request->birth_day,
-            'birth_month' => $request->birth_month,
-            'birth_year' => $request->birth_year,
-        ];
-        
-        $debugData['profile_data_to_save'] = $profileData;
-
-        // Handle profile picture upload
-        if ($request->hasFile('profile_picture')) {
-            // Delete old profile picture if exists
-            if ($profile && isset($profile->profile_picture)) {
-                Storage::delete('public/' . $profile->profile_picture);
-            }
-            // Store new profile picture
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $profileData['profile_picture'] = $path;
-        }
-
-        // Update or create profile using DB
-        if ($profile) {
-            DB::table('profiles')->where('profile_id', $profile->profile_id)->update($profileData);
-            $debugData['action'] = 'updated';
-        } else {
-            $profileData['user_id'] = $user->id;
-            DB::table('profiles')->insert($profileData);
-            $debugData['action'] = 'created';
-        }
-        
-        // Check if profile was successfully updated
-        $updatedProfile = DB::table('profiles')->where('user_id', $user->id)->first();
-        if ($updatedProfile) {
-            $debugData['updated_profile'] = [
-                'phone' => $updatedProfile->phone,
-                'address' => $updatedProfile->address
-            ];
-        }
-        
-        // Refresh user & profile
-        $user->refresh();
-        return redirect()->route('checkout')
-            ->with('success', 'Profile updated successfully.')
-            ->with('debug_info', $debugData);
+public function update(Request $request)
+{
+    $user = Auth::user();
+    
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'User not authenticated.');
     }
+
+    $debugData = [
+        'request_all' => $request->all(),
+        'phone' => $request->phone,
+        'address' => $request->address,
+        'profile_exists' => $user->profile ? 'yes' : 'no'
+    ];
+    
+    // Validate the request
+    $validator = Validator::make($request->all(), [
+        'label' => 'required|string|max:50',
+        'recipient_name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+        'address' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput()
+            ->with('debug_info', array_merge($debugData, ['validation_failed' => $validator->errors()->toArray()]));
+    }
+
+    // Update or create profile
+    $profileData = [
+        'label' => $request->label,
+        'recipient_name' => $request->recipient_name,
+        'phone' => $request->phone,
+        'address' => $request->address,
+    ];
+
+    $profile = $user->profile()->updateOrCreate([], $profileData);
+    $debugData['profile_data_to_save'] = $profileData;
+    $debugData['action'] = $profile->wasRecentlyCreated ? 'created' : 'updated';
+    $debugData['updated_profile'] = $profile->toArray();
+
+    // Kirim data terbaru ke view
+    Session::flash('updated_profile', $profile->toArray());
+
+    return redirect()->route('checkout')
+        ->with('success', 'Alamat berhasil diperbarui.')
+        ->with('debug_info', $debugData)
+        ->with('modal_closed', true); // Indikator untuk menutup modal
+}
 }

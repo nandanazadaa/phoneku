@@ -1,3 +1,7 @@
+<?php
+use Illuminate\Support\Facades\Route;
+?>
+
 <!-- Top Navigation -->
 <div class="bg-blue-500 relative">
     <div class="container mx-auto px-4 py-2 flex justify-end text-white space-x-4 text-sm">
@@ -9,7 +13,7 @@
 
         @auth
             <div class="flex items-center">
-                <form method="POST" action="{{ route('logout') }}" class="inline">
+                <form method="POST" action="{{ route('profile.logout') }}" class="inline">
                     @csrf
                     <button type="submit" class="hover:underline flex items-center">
                         <i class="fas fa-sign-out-alt mr-1"></i>
@@ -155,7 +159,7 @@
                         <i class="fas fa-user-circle mr-2"></i>Profil
                     </a>
                     <div class="py-2 text-center">
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                        <form method="POST" action="{{ route('profile.logout') }}" class="inline">
                             @csrf
                             <button type="submit"
                                 class="text-gray-600 hover:text-blue-500 w-full flex items-center justify-center">
