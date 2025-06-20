@@ -102,7 +102,7 @@
                         <label for="pwubah" class="block text-sm font-medium text-gray-700 mb-1">Hapus Akun</label>
                         <p class="block text-sm font-medium text-gray-400 mb-2">Akun Anda Akan Dihapus Secara Permanen</p>
 
-                        <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus akun? Ini tidak bisa dibatalkan!')">
+                        <form action="{{ route('profile.logout') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus akun? Ini tidak bisa dibatalkan!')">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

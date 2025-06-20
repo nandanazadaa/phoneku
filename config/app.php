@@ -125,9 +125,8 @@ return [
 
     'aliases' => [
         'Midtrans' => \Midtrans\Snap::class,
+        'Str' => Illuminate\Support\Str::class, 
+        'Auth' => Illuminate\Support\Facades\Auth::class,
     ],
-
-
-
 
 ];

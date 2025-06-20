@@ -92,11 +92,11 @@ use Illuminate\Support\Facades\Route;
                             'profile',
                             'riwayatbeli',
                             'profilekeamanan',
-                            'logout',
                             'ubah_email',
                             'ubah_email_otp',
                             'ubah_no_tlp',
                             'ubah_no_tlp_otp',
+                            'profile.logout.confirm',
                         ];
                         $isProfileActive = in_array(Route::currentRouteName(), $activeRoutes);
                     @endphp

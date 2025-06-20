@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="relative">
-    <div class="bg-blue-500 h-[300px] sm:h-[350px] md:h-[400px] lg:h-[400px]">
+    <div class="bg-blue-500 min-h-[400px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[400px] xl:min-h-[350px] relative">
         <!-- Kosongkan konten header jika tidak ada teks -->
     </div>
 
@@ -19,9 +19,9 @@
 
     <!-- Banner Image -->
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4/5 max-w-3xl z-0 pointer-events-none">
-        <div class="relative w-full h-full overflow-hidden">
+        <div class="relative w-full h-full" style="overflow: hidden;">
             <img src="{{ asset('img/banner4.png') }}" alt="Smartphones"
-                class="object-contain w-full h-auto max-h-[180px] sm:max-h-[250px] md:max-h-[300px] lg:max-h-[350px] xl:max-h-[400px]">
+                class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
         </div>
     </div>
 </div>
@@ -30,13 +30,13 @@
 <div class="container mx-auto px-4 py-8 -mt-48 relative z-10">
     <div class="flex flex-wrap lg:flex-nowrap">
         <!-- Sidebar -->
-        <div class="w-full lg:w-1/3 mb-6 lg:mb-0 md:pr-4">
+        <div class="w-full md:w-1/3 lg:w-1/4 mb-6 md:mb-0 md:pr-4">
             <div class="bg-white rounded-xl p-4 shadow-md mb-6">
                 <div class="flex flex-col items-center mb-4">
                     <div class="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-gray-200 shadow-sm">
                         <img src="{{ asset('img/profile.png') }}" alt="User Profile" class="w-full h-full object-cover">
                     </div>
-                    <h2 class="text-lg sm:text-xl font-bold text-gray-800">Belum Masuk</h2>
+                    <h2 class="text-xl font-bold mb-1 text-gray-800">Belum Masuk</h2>
                 </div>
             </div>
 
