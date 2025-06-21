@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Config; // Tambahkan baris ini
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -260,55 +261,84 @@ class ProfileController extends Controller
         return back()->with('error', 'Kode OTP salah.');
     }
 
-public function update(Request $request)
-{
-    $user = Auth::user();
-    
-    if (!$user) {
-        return redirect()->route('login')->with('error', 'User not authenticated.');
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'User not authenticated.');
+        }
+
+        $debugData = [
+            'request_all' => $request->all(),
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'profile_exists' => $user->profile ? 'yes' : 'no'
+        ];
+        
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'label' => 'required|string|max:50',
+            'recipient_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('debug_info', array_merge($debugData, ['validation_failed' => $validator->errors()->toArray()]));
+        }
+
+        // Update or create profile
+        $profileData = [
+            'label' => $request->label,
+            'recipient_name' => $request->recipient_name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ];
+
+        $profile = $user->profile()->updateOrCreate([], $profileData);
+        $debugData['profile_data_to_save'] = $profileData;
+        $debugData['action'] = $profile->wasRecentlyCreated ? 'created' : 'updated';
+        $debugData['updated_profile'] = $profile->toArray();
+
+        // Kirim data terbaru ke view
+        Session::flash('updated_profile', $profile->toArray());
+
+        return redirect()->route('checkout')
+            ->with('success', 'Alamat berhasil diperbarui.')
+            ->with('debug_info', $debugData)
+            ->with('modal_closed', true); // Indikator untuk menutup modal
     }
 
-    $debugData = [
-        'request_all' => $request->all(),
-        'phone' => $request->phone,
-        'address' => $request->address,
-        'profile_exists' => $user->profile ? 'yes' : 'no'
-    ];
-    
-    // Validate the request
-    $validator = Validator::make($request->all(), [
-        'label' => 'required|string|max:50',
-        'recipient_name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
-        'address' => 'required|string|max:255',
-    ]);
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()
-            ->withErrors($validator)
-            ->withInput()
-            ->with('debug_info', array_merge($debugData, ['validation_failed' => $validator->errors()->toArray()]));
+        $user = auth()->user();
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return back()->withErrors(['old_password' => 'Password lama salah.']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('status', 'Password berhasil diperbarui.');
     }
 
-    // Update or create profile
-    $profileData = [
-        'label' => $request->label,
-        'recipient_name' => $request->recipient_name,
-        'phone' => $request->phone,
-        'address' => $request->address,
-    ];
+    public function destroy(Request $request)
+    {
+        // logika hapus akun
+        $user = $request->user();
+        Auth::logout();
+        $user->delete();
 
-    $profile = $user->profile()->updateOrCreate([], $profileData);
-    $debugData['profile_data_to_save'] = $profileData;
-    $debugData['action'] = $profile->wasRecentlyCreated ? 'created' : 'updated';
-    $debugData['updated_profile'] = $profile->toArray();
-
-    // Kirim data terbaru ke view
-    Session::flash('updated_profile', $profile->toArray());
-
-    return redirect()->route('checkout')
-        ->with('success', 'Alamat berhasil diperbarui.')
-        ->with('debug_info', $debugData)
-        ->with('modal_closed', true); // Indikator untuk menutup modal
-}
+        return redirect('/')->with('success', 'Akun berhasil dihapus.');
+    }
 }

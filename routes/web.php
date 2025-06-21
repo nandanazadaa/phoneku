@@ -28,6 +28,11 @@ Route::get('/kontak', function () {
 })->name('kontak');
 Route::post('/kontak/kirim', [ContactController::class, 'kirim'])->name('kontak.kirim');
 
+// Route lupa password dipisah karena agar saat login masih bisa masuk ke pagi
+Route::get('/lupa_password', function () {
+    return view('Auth/lupapassword');
+})->name('lupa_password');
+
 // Authentication routes (guest only)
 Route::middleware(['guest:web'])->group(function () {
     Route::get('/login', function () {
@@ -38,9 +43,6 @@ Route::middleware(['guest:web'])->group(function () {
         return view('Auth/registrasi');
     })->name('registrasi');
     Route::post('/registrasi', [AuthController::class, 'register'])->name('registrasi.post');
-    Route::get('/lupa_password', function () {
-        return view('Auth/lupapassword');
-    })->name('lupa_password');
 });
 
 // Authenticated routes
@@ -50,6 +52,8 @@ Route::middleware(['auth:web'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/riwayatbeli', [ProfileController::class, 'riwayat'])->name('riwayatbeli');
     Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Profile - ubah email
     Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
@@ -69,8 +73,8 @@ Route::middleware(['auth:web'])->group(function () {
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
-Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::post('/buy-now/{productId}', [CheckoutController::class, 'buyNow'])->name('buy.now');
+    Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/buy-now/{productId}', [CheckoutController::class, 'buyNow'])->name('buy.now');
 
 
     Route::get('/riwayatpembelian', function () {
