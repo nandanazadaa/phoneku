@@ -140,6 +140,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
         });
 
+        // Admin testimoni (moderasi)
+        Route::get('/testimoni', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimoni');
+        Route::post('/testimoni/{id}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimoni.approve');
+        Route::post('/testimoni/{id}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->name('testimoni.reject');
+
         // Admin logout
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
     });

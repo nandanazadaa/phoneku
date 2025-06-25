@@ -61,6 +61,12 @@
                         <p>Management Users</p>
                     </a>
                 </li>
+                <li class="nav-item {{ request()->routeIs('admin.testimoni') ? 'active' : '' }}">
+                    <a href="{{ route('admin.testimoni') }}" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-star"></i>
+                        <p>Manage Testimoni</p>
+                    </a>
+                </li>
                 <li class="nav-section">
                     <span class="sidebar-mini-icon">
                         <i class="fa fa-ellipsis-h"></i>
