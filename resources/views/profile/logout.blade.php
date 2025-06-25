@@ -3,6 +3,12 @@
 @section('title', 'Keluar Akun - PhoneKu')
 
 @section('content')
+@php
+    $user = Auth::user();
+    if ($user && !$user->relationLoaded('profile')) {
+        $user->load('profile');
+    }
+@endphp
 <div class="relative">
     <div class="bg-blue-500 min-h-[400px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[400px] xl:min-h-[350px] relative">
         <!-- Kosongkan konten header jika tidak ada teks -->

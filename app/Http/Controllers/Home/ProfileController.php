@@ -261,53 +261,66 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-        
         if (!$user) {
             return redirect()->route('login')->with('error', 'User not authenticated.');
         }
 
         $debugData = [
             'request_all' => $request->all(),
-            'phone' => $request->phone,
-            'address' => $request->address,
             'profile_exists' => $user->profile ? 'yes' : 'no'
         ];
-        
-        // Validate the request
+
+        // Validasi semua field yang ada di form
         $validator = Validator::make($request->all(), [
-            'label' => 'required|string|max:50',
-            'recipient_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
+            'username' => 'nullable|string|max:50',
+            'name' => 'required|string|max:255',
+            'label' => 'nullable|string|max:50',
+            'recipient_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'gender' => 'nullable|in:male,female',
+            'birth_day' => 'nullable|integer|min:1|max:31',
+            'birth_month' => 'nullable|integer|min:1|max:12',
+            'birth_year' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
-                ->withInput()
-                ->with('debug_info', array_merge($debugData, ['validation_failed' => $validator->errors()->toArray()]));
+                ->withInput();
         }
 
-        // Update or create profile
+        // Update nama user jika berubah
+        if ($user->name !== $request->name) {
+            $user->name = $request->name;
+            $user->save();
+        }
+
+        // Handle upload foto profil
+        $profilePicturePath = $user->profile->profile_picture ?? null;
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $profilePicturePath = $file->store('profile_pictures', 'public');
+        }
+
+        // Data profile yang akan disimpan
         $profileData = [
+            'username' => $request->username,
             'label' => $request->label,
             'recipient_name' => $request->recipient_name,
             'phone' => $request->phone,
             'address' => $request->address,
+            'gender' => $request->gender,
+            'birth_day' => $request->birth_day,
+            'birth_month' => $request->birth_month,
+            'birth_year' => $request->birth_year,
+            'profile_picture' => $profilePicturePath,
         ];
 
-        $profile = $user->profile()->updateOrCreate([], $profileData);
-        $debugData['profile_data_to_save'] = $profileData;
-        $debugData['action'] = $profile->wasRecentlyCreated ? 'created' : 'updated';
-        $debugData['updated_profile'] = $profile->toArray();
+        $user->profile()->updateOrCreate([], $profileData);
 
-        // Kirim data terbaru ke view
-        Session::flash('updated_profile', $profile->toArray());
-
-        return redirect()->route('checkout')
-            ->with('success', 'Alamat berhasil diperbarui.')
-            ->with('debug_info', $debugData)
-            ->with('modal_closed', true); // Indikator untuk menutup modal
+        return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function updatePassword(Request $request)

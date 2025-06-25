@@ -15,6 +15,7 @@ class Product extends Model
         'price',
         'original_price',
         'category',
+        'brand', // pastikan brand bisa diisi massal
         'is_featured',
         'stock',
         'image',

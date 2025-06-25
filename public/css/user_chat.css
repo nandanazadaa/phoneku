@@ -6,7 +6,7 @@ body {
 }
 
 .header {
-    background: linear-gradient(to right, #5867DD, #1e3c72);
+    background: white;
     color: white;
     padding: 20px 30px;
 }
@@ -40,7 +40,7 @@ body {
 
 .chat-header {
     padding: 15px;
-    background-color: #5867DD;
+    background-color: #3b82f6; /* #5867DD */
     color: white;
     font-weight: bold;
     display: flex;
@@ -105,7 +105,7 @@ body {
 }
 
 .btn-send {
-    background-color: #5867DD;
+    background-color: #3b82f6; /* 5867DD */
     color: white;
     border-radius: 50%;
     width: 45px;
@@ -125,7 +125,7 @@ body {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: #28a745;
+    background-color: #45ff71;
     margin-right: 5px;
     display: inline-block;
 }

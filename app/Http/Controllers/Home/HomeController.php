@@ -30,20 +30,44 @@ class HomeController extends Controller
     {
         $category = $request->input('category');
         $search = $request->input('search');
-        
+        $brand = $request->input('brand');
+        $priceRange = $request->input('price_range');
+
         $query = Product::query();
-        
+
         if ($category) {
             $query->where('category', $category);
         }
-        
+
         if ($search) {
-            $query->where('name', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
+            });
         }
-        
+
+        if ($brand) {
+            // Bandingkan slug dari kolom brand dengan slug dari filter
+            $query->whereRaw('LOWER(REPLACE(REPLACE(brand, " ", "-"), ".", "")) = ?', [strtolower($brand)]);
+        }
+
+        if ($priceRange) {
+            $range = explode('-', $priceRange);
+            if (count($range) == 2) {
+                $min = (int) $range[0];
+                $max = $range[1] !== '' ? (int) $range[1] : null;
+                if ($min && $max) {
+                    $query->whereBetween('price', [$min, $max]);
+                } elseif ($min && !$max) {
+                    $query->where('price', '>=', $min);
+                } elseif (!$min && $max) {
+                    $query->where('price', '<=', $max);
+                }
+            }
+        }
+
         $products = $query->latest()->paginate(12);
-        
+
         return view('home.allproduct', compact('products'));
     }
 
