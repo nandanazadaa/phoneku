@@ -92,6 +92,9 @@ Route::middleware(['auth:web'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('profile.logout');
 });
 
+// Testimonial user
+Route::post('/testimonial', [\App\Http\Controllers\Home\TestimonialController::class, 'store'])->name('testimonial.store');
+
 // Post-checkout routes
 Route::get('/thank-you', function () {
     return view('checkout.success');
@@ -130,6 +133,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/chat', [ChatController::class, 'index'])->name('chat');
         Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
         Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+
+        // Admin testimonial
+        Route::middleware(['auth:web', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+            Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class);
+            Route::post('testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
+        });
 
         // Admin logout
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');

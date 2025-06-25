@@ -120,8 +120,9 @@
                                     @auth
                                         <form action="{{ route('cart.add', $product->id) }}" method="POST">
                                             @csrf
+                                            <input type="hidden" name="quantity" value="1">
                                             <button type="submit"
-                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200">
+                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200 transition-colors">
                                             <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                             </button>
                                         </form>
