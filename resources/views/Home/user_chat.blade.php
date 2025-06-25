@@ -1,3 +1,9 @@
+@extends('layouts.app')
+
+@section('title', 'Tim - PhoneKu')
+
+@section('content')
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Support Chat</title>
     <!-- CSS Files -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/user_chat.css') }}">
 
@@ -15,8 +21,8 @@
 
 <body>
     <div class="header">
-        <h2>Chat Customers</h2>
-        <p class="mb-0">We're here to help you</p>
+        <!-- <h2>Chat Customers</h2>
+        <p class="mb-0">We're here to help you</p> -->
     </div>
 
     <div class="container-fluid content-wrapper">
@@ -24,10 +30,10 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title">Chat with Admin</div>
+                        <!-- <div class="card-title">Chat with Admin</div> -->
 
                         <!-- Alert messages -->
-                        <div class="alert alert-success alert-dismissible fade show d-none" role="alert"
+                        <!-- <div class="alert alert-success alert-dismissible fade show d-none" role="alert"
                             id="success-alert">
                             <span id="success-message"></span>
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -41,14 +47,14 @@
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>
-                        </div>
+                        </div> -->
 
                         <!-- Chat interface -->
                         <div class="chat-container">
                             <div class="chat-area">
                                 <div class="chat-header">
                                     <div class="status-indicator"></div>
-                                    <strong>Customer Support</strong> <small>(Online)</small>
+                                    <strong>Customer Support</strong> <!-- <small>(Online)</small> -->
                                 </div>
                                 <div class="chat-messages" id="chat-messages">
                                     <div class="message received">
@@ -187,5 +193,5 @@
         });
     </script>
 </body>
-
 </html>
+@endsection
