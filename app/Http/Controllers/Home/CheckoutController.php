@@ -166,4 +166,29 @@ class CheckoutController extends Controller
 
         return redirect()->route('checkout');
     }
+
+    public function midtransCallback(Request $request)
+    {
+        try {
+            $notif = new \Midtrans\Notification();
+            $order = Order::where('order_code', $notif->order_id)->first();
+            if (!$order) {
+                return response()->json(['error' => 'Order not found'], 404);
+            }
+
+            if (in_array($notif->transaction_status, ['settlement', 'capture'])) {
+                $order->payment_status = 'completed';
+            } elseif ($notif->transaction_status == 'pending') {
+                $order->payment_status = 'pending';
+            } elseif (in_array($notif->transaction_status, ['expire', 'cancel', 'deny'])) {
+                $order->payment_status = 'failed';
+            }
+            $order->save();
+            Log::info('Midtrans callback processed for order: ' . $order->order_code . ' status: ' . $order->payment_status);
+            return response()->json(['status' => 'ok']);
+        } catch (\Exception $e) {
+            Log::error('Midtrans callback error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
