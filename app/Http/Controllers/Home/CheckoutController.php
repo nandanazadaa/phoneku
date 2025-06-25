@@ -17,10 +17,21 @@ class CheckoutController extends Controller
 {
     public function __construct()
     {
-        Config::$serverKey = config('midtrans.serverKey');
-        Config::$isProduction = config('midtrans.isProduction');
+        $serverKey = config('midtrans.serverKey');
+        $clientKey = config('midtrans.clientKey');
+        $isProduction = config('midtrans.isProduction');
+        $is3ds = config('midtrans.3ds');
+
+        // Validate keys
+        if (empty($serverKey) || empty($clientKey)) {
+            throw new \Exception('Midtrans server or client key is not configured. Please check your .env file.');
+        }
+        Log::info('Midtrans Config - Server Key: ' . $serverKey . ', Client Key: ' . $clientKey . ', Is Production: ' . var_export($isProduction, true));
+
+        Config::$serverKey = $serverKey;
+        Config::$isProduction = $isProduction ?? false;
         Config::$isSanitized = true;
-        Config::$is3ds = config('midtrans.3ds');
+        Config::$is3ds = $is3ds ?? true;
     }
 
     public function index()
@@ -42,30 +53,46 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Anda harus login terlebih dahulu.'], 401);
         }
 
-        Log::info('Request data:', $request->all()); // Log data yang diterima
+        Log::info('Request data:', $request->all());
 
         try {
             $request->validate([
-                'product_id' => 'required|exists:products,id',
-                'quantity' => 'required|integer|min:1',
+                'products' => 'required|array|min:1',
+                'products.*.product_id' => 'required|exists:products,id',
+                'products.*.quantity' => 'required|integer|min:1',
                 'shipping_cost' => 'nullable|integer',
                 'service_fee' => 'nullable|integer',
             ]);
 
-            $product = Product::findOrFail($request->product_id);
-            $quantity = $request->quantity;
-            $subtotal = $product->price * $quantity;
             $shippingCost = $request->shipping_cost ?? 20000;
             $serviceFee = $request->service_fee ?? 5000;
+            $subtotal = 0;
+            $itemDetails = [];
+            $orderItems = [];
+
+            foreach ($request->products as $prod) {
+                $product = \App\Models\Product::findOrFail($prod['product_id']);
+                $quantity = $prod['quantity'];
+                $subtotal += $product->price * $quantity;
+                $itemDetails[] = [
+                    'id' => $product->id,
+                    'price' => $product->price,
+                    'quantity' => $quantity,
+                    'name' => $product->name,
+                ];
+                $orderItems[] = [
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'price' => $product->price,
+                ];
+            }
             $total = $subtotal + $shippingCost + $serviceFee;
 
-            // Periksa stok
             $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $product->id)->sum('quantity');
             if ($quantity > ($product->stock - $currentCartQuantity)) {
                 return response()->json(['error' => 'Stok tidak mencukupi untuk jumlah yang diminta.'], 400);
             }
 
-            // Buat order
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_code' => 'ORD-' . time(),
@@ -79,14 +106,10 @@ class CheckoutController extends Controller
                 'payment_status' => 'pending',
             ]);
 
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'quantity' => $quantity,
-                'price' => $product->price,
-            ]);
+            foreach ($orderItems as $item) {
+                \App\Models\OrderItem::create(array_merge($item, ['order_id' => $order->id]));
+            }
 
-            // Parameter untuk Midtrans
             $params = [
                 'transaction_details' => [
                     'order_id' => $order->order_code,
@@ -97,22 +120,16 @@ class CheckoutController extends Controller
                     'email' => $user->email,
                     'phone' => $user->profile->phone ?? '',
                 ],
-                'item_details' => [
-                    [
-                        'id' => $product->id,
-                        'price' => $product->price,
-                        'quantity' => $quantity,
-                        'name' => $product->name,
-                    ],
-                ],
+                'item_details' => $itemDetails,
             ];
 
+            Log::info('Midtrans Params:', $params);
             $snapToken = Snap::getSnapToken($params);
             return response()->json(['snap_token' => $snapToken, 'order_id' => $order->order_code]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['error' => $e->validator->errors()->first(), 'errors' => $e->validator->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Midtrans Error: ' . $e->getMessage());
+            \Log::error('Midtrans Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()], 500);
         }
     }
@@ -131,7 +148,6 @@ class CheckoutController extends Controller
         $product = Product::findOrFail($productId);
         $quantity = $request->quantity;
 
-        // Check stock availability
         $currentCartQuantity = $user ? Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity') : 0;
         $availableQuantity = $product->stock - $currentCartQuantity;
 
@@ -139,7 +155,6 @@ class CheckoutController extends Controller
             return redirect()->back()->withErrors(['quantity' => 'Stok tidak mencukupi untuk jumlah yang diminta.']);
         }
 
-        // Clear existing cart items to ensure only this product is checked out
         if ($user) {
             Cart::where('user_id', $user->id)->delete();
             Cart::create([

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="relative">
-    <div class="bg-blue-500 h-[500px] md:h-[550px] lg:h-[400px]">
+    <div class="bg-blue-500 min-h-[400px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[400px] xl:min-h-[350px] relative">
         <!-- Kosongkan konten header jika tidak ada teks -->
     </div>
 
@@ -18,14 +18,13 @@
     </div>
 
     <!-- Banner Image -->
-    <div class="absolute top-[5%] left-[calc(50%+1cm)] transform -translate-x-1/2 w-full max-w-3xl mx-auto z-0 pointer-events-none" style="max-height: 70%;">
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4/5 max-w-3xl z-0 pointer-events-none">
         <div class="relative w-full h-full" style="overflow: hidden;">
             <img src="{{ asset('img/banner4.png') }}" alt="Smartphones"
                 class="object-contain w-full h-auto max-h-[300px] md:max-h-[350px] lg:max-h-[400px]">
         </div>
     </div>
 </div>
-
     <!-- Main Content - User Profile -->
     <!-- Adjusted negative margin-top to match increased header height -->
     <div class="container mx-auto px-4 py-8 -mt-48 relative z-10">

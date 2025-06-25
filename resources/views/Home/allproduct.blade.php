@@ -54,15 +54,16 @@
                 <div class="relative w-full">
                     {{-- Anda bisa mengambil daftar brand unik dari produk yang ada --}}
                     @php
-                        // $brands = App\Models\Product::distinct()->pluck('brand')->filter()->sort(); // Contoh ambil brand dari DB
-                        $brands = ['Samsung', 'Xiaomi', 'Oppo', 'Apple', 'Realme', 'Vivo']; // Contoh statis
+                        // Daftar brand HP populer (statis, bisa diganti sesuai kebutuhan)
+                        $brands = [
+                            'Samsung', 'Xiaomi', 'Oppo', 'Apple', 'Realme', 'Vivo', 'Asus', 'Infinix', 'Nokia', 'Huawei', 'Sony', 'Lenovo', 'Advan', 'Evercoss', 'OnePlus', 'Google', 'Motorola', 'Meizu', 'Honor', 'Sharp', 'Polytron'
+                        ];
                     @endphp
                     <select name="brand" onchange="document.getElementById('filter-form').submit()"
                         class="appearance-none bg-white border border-gray-300 text-gray-700 p-2 pl-4 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200">
                         <option value="">Semua Brand</option>
                         @foreach ($brands as $brand)
-                            <option value="{{ Str::slug($brand) }}"
-                                {{ request('brand') == Str::slug($brand) ? 'selected' : '' }}>{{ $brand }}</option>
+                            <option value="{{ Str::slug($brand) }}" {{ request('brand') == Str::slug($brand) ? 'selected' : '' }}>{{ $brand }}</option>
                         @endforeach
                     </select>
                     <i
@@ -318,7 +319,7 @@
                                     throw new Error('Unauthorized');
                                 }
                                 if (!response.ok && response.status !== 400 && response
-                                    .status !== 401) { // Handle non-validation errors
+                                    status !== 401) { // Handle non-validation errors
                                     throw new Error('Network response was not ok: ' + response
                                         .statusText);
                                 }

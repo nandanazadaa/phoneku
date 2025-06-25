@@ -51,7 +51,7 @@
     }
     .chat-header {
         padding: 15px;
-        background-color: #5867DD;
+        background-color: #3b82f6; /* #5867DD */
         color: white;
         font-weight: bold;
         display: flex;
@@ -107,7 +107,7 @@
         outline: none;
     }
     .btn-send {
-        background-color: #5867DD;
+        background-color: #3b82f6; /* #5867DD */
         color: white;
         border-radius: 50%;
         width: 45px;
