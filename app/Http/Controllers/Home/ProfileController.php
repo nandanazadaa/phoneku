@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Order; // TAMBAHKAN INI
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
@@ -36,15 +38,10 @@ class ProfileController extends Controller
 
     public function riwayat()
     {
-        // Get authenticated user
         $user = Auth::user();
-        
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'User not authenticated.');
-        }
-        
-        // Pass the user to the view
-        return view('profile.riwayat_pembelian', compact('user'));
+        $orders = Order::where('user_id', $user->id)->with('orderItems.product')->get();
+
+        return view('profile.riwayat_pembelian', compact('orders', 'user'));
     }
 
     public function privasiKeamanan()
@@ -354,4 +351,5 @@ class ProfileController extends Controller
 
         return redirect('/')->with('success', 'Akun berhasil dihapus.');
     }
+
 }
