@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
+use App\Models\Testimonial;
 
 
 class HomeController extends Controller
@@ -56,15 +57,15 @@ class HomeController extends Controller
             ->where('id', '!=', $product->id)
             ->limit(4)
             ->get();
-            
-        // Get current cart quantity for this product (if user is logged in)
         $cartQuantity = 0;
         if (Auth::guard('web')->check()) {
             $cartQuantity = Cart::where('user_id', Auth::guard('web')->id())
                 ->where('product_id', $product->id)
                 ->sum('quantity');
         }
-
-        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity'));
+        $testimonials = \App\Models\Testimonial::where('is_approved', true)
+            ->where('product_id', $product->id)
+            ->latest()->take(6)->get();
+        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials'));
     }
 }

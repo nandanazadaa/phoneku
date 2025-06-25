@@ -45,6 +45,78 @@
         Route::post('/registrasi', [AuthController::class, 'register'])->name('registrasi.post');
     });
 
+
+// Authenticated routes
+Route::middleware(['auth:web'])->group(function () {
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/riwayatbeli', [ProfileController::class, 'riwayat'])->name('riwayatbeli');
+    Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Profile - ubah email
+    Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');
+    Route::get('/ubah_email_otp', [ProfileController::class, 'ubahEmailOTP'])->name('ubah_email_otp');
+    Route::post('/kirim_otp_email_lama', [ProfileController::class, 'kirimOtpEmailLama'])->name('kirim_otp_email_lama');
+    Route::post('/verifikasi_otp_ubah_email', [ProfileController::class, 'verifikasiOtpUbahEmail'])->name('verifikasi_otp_ubah_email');
+
+    // Profile - ubah nomer telepon
+    Route::get('/ubah_no_tlp', [ProfileController::class, 'tambahNoTelepon'])->name('ubah_no_tlp');
+    Route::get('/ubah_no_tlp_otp', [ProfileController::class, 'tambahNoTeleponOTP'])->name('ubah_no_tlp_otp');
+    Route::post('/kirim_otp', [ProfileController::class, 'kirimOtpAturNotlp'])->name('kirim_otp');
+    Route::post('/verifikasi_otp', [ProfileController::class, 'verifikasiOtpAturNoTlp'])->name('verifikasi_otp');
+
+    // Cart and checkout
+    Route::post('/cart/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/buy-now/{productId}', [CheckoutController::class, 'buyNow'])->name('buy.now');
+
+
+    Route::get('/riwayatpembelian', function () {
+        return view('profile/riwayat_pembelian');
+    })->name('riwayatpembelian');
+
+    Route::get('/customer_support', [ChatController::class, 'customerChat'])->name('customer_support');
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
+
+    // Logout
+    Route::get('/logout', function () {
+        return view('profile.logout');
+    })->name('profile.logout.confirm');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('profile.logout');
+});
+
+// Testimonial user
+Route::post('/testimonial', [\App\Http\Controllers\Home\TestimonialController::class, 'store'])->name('testimonial.store');
+
+// Post-checkout routes
+Route::get('/thank-you', function () {
+    return view('checkout.success');
+})->name('thank-you');
+
+
+// Route untuk menampilkan halaman setelah keluar
+Route::get('/setelah_keluar', function () {
+    return view('profile.setelah_keluar');
+})->name('profileout');
+
+// Admin routes
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Admin login (no auth middleware)
+    Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'adminLogin'])->name('login.post');
+    Route::middleware(['guest:admin'])->group(function () {
+        Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
+        Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
+    });
+
     // Authenticated routes
     Route::middleware(['auth:web'])->group(function () {
         // Profile routes
@@ -85,12 +157,14 @@
         Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
         Route::get('/chat/messages/{receiverId}', [ChatController::class, 'fetchMessages'])->name('chat.messages');
 
-        // Logout
-        Route::get('/logout', function () {
-            return view('profile.logout');
-        })->name('profile.logout.confirm');
-        Route::post('/logout', [AuthController::class, 'logout'])->name('profile.logout');
-    });
+        // Admin testimonial
+        Route::middleware(['auth:web', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+            Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class);
+            Route::post('testimonials/{testimonial}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimonials.approve');
+        });
+
+        // Admin logout
+        Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
 
     // Post-checkout routes
     Route::get('/thank-you', function () {
@@ -146,3 +220,5 @@
         );
         return $pusher->socket_auth($request->channel_name, $request->socket_id);
     })->middleware('auth:web,admin');
+});
+});

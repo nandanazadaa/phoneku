@@ -53,8 +53,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        product_id: productId,
-                        quantity: quantity,
+                        products: products,
                         shipping_cost: {{ $shippingCost }},
                         service_fee: {{ $serviceFee }}
                     })
@@ -69,7 +68,6 @@
                 })
                 .then(data => {
                     if (data.snap_token) {
-                        console.log('Snap token received:', data.snap_token);
                         snap.pay(data.snap_token, {
                             onSuccess: function(result) {
                                 alert('Pembayaran berhasil! Order ID: ' + result.order_id);

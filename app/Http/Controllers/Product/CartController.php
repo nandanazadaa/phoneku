@@ -10,31 +10,50 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
-{
-public function addToCart(Request $request, $productId)
+{    public function addToCart(Request $request, $productId)
     {
         $user = Auth::guard('web')->user();
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Anda harus login terlebih dahulu.'], 401);
+            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
         }
 
         $request->validate([
             'quantity' => 'required|integer|min:1',
+            'color' => 'nullable|string',
         ]);
 
         $product = Product::findOrFail($productId);
         $quantity = $request->quantity;
+        $color = $request->input('color');
+
+        // Validate color if product has color options
+        if ($color && $product->color) {
+            $colorOptions = array_map('trim', explode(',', $product->color));
+            if (!in_array($color, $colorOptions)) {
+                return redirect()->back()->with('error', 'Warna tidak valid.');
+            }
+        }
 
         // Check stock
-        $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity');
+        $currentCartQuantity = Cart::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->where(function($q) use ($color) {
+                if ($color) $q->where('color', $color);
+            })
+            ->sum('quantity');
         $availableQuantity = $product->stock - $currentCartQuantity;
 
         if ($quantity > $availableQuantity) {
-            return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi.'], 400);
+            return redirect()->back()->with('error', 'Stok tidak mencukupi.');
         }
 
-        // Check if item exists in cart
-        $cartItem = Cart::where('user_id', $user->id)->where('product_id', $productId)->first();
+        // Check if item exists in cart (per color)
+        $cartItem = Cart::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->where(function($q) use ($color) {
+                if ($color) $q->where('color', $color);
+            })
+            ->first();
 
         if ($cartItem) {
             $cartItem->update(['quantity' => $cartItem->quantity + $quantity]);
@@ -43,17 +62,11 @@ public function addToCart(Request $request, $productId)
                 'user_id' => $user->id,
                 'product_id' => $productId,
                 'quantity' => $quantity,
+                'color' => $color,
             ]);
         }
 
-        $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
-
-        // Check for redirect_checkout parameter
-        if ($request->has('redirect_checkout') && $request->redirect_checkout == '1') {
-            return response()->json(['success' => true, 'message' => 'Produk ditambahkan, mengarahkan ke checkout.', 'cartCount' => $cartCount, 'redirect' => route('checkout.index')]);
-        }
-
-        return response()->json(['success' => true, 'message' => 'Produk berhasil ditambahkan ke keranjang.', 'cartCount' => $cartCount]);
+        return redirect()->route('cart')->with('success', 'Produk berhasil ditambahkan ke keranjang.');
     }
 
     public function index()
