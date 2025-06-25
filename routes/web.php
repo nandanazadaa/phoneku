@@ -73,6 +73,7 @@ Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('chec
 Route::post('/buy-now/{productId}', [CheckoutController::class, 'buyNow'])->name('buy.now');
 
 
+
     Route::get('/riwayatpembelian', function () {
         return view('profile/riwayat_pembelian');
     })->name('riwayatpembelian');
