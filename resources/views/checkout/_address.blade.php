@@ -15,7 +15,7 @@
             </div>
             <button id="gantiButton" class="btn btn-primary mt-0 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" data-toggle="modal" data-target="#modalAddress">Ganti</button>
         @else
-            <p class="text-sm">Alamat belum diatur. Silakan <a href="{{ route('profile.index') }}" class="text-blue-500 underline">lengkapi profil</a>.</p>
+            <p class="text-sm">Alamat belum diatur. Silakan <a href="{{ route('profile') }}" class="text-blue-500 underline">lengkapi profil</a>.</p>
             <button class="btn btn-primary mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" data-toggle="modal" data-target="#modalAddress" disabled>Ganti</button>
         @endif
     </div>

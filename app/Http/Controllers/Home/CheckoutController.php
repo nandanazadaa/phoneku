@@ -17,10 +17,21 @@ class CheckoutController extends Controller
 {
     public function __construct()
     {
-        Config::$serverKey = config('midtrans.serverKey');
-        Config::$isProduction = config('midtrans.isProduction');
+        $serverKey = config('midtrans.serverKey');
+        $clientKey = config('midtrans.clientKey');
+        $isProduction = config('midtrans.isProduction');
+        $is3ds = config('midtrans.3ds');
+
+        // Validate keys
+        if (empty($serverKey) || empty($clientKey)) {
+            throw new \Exception('Midtrans server or client key is not configured. Please check your .env file.');
+        }
+        Log::info('Midtrans Config - Server Key: ' . $serverKey . ', Client Key: ' . $clientKey . ', Is Production: ' . var_export($isProduction, true));
+
+        Config::$serverKey = $serverKey;
+        Config::$isProduction = $isProduction ?? false;
         Config::$isSanitized = true;
-        Config::$is3ds = config('midtrans.3ds');
+        Config::$is3ds = $is3ds ?? true;
     }
 
     public function index()
@@ -42,7 +53,7 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Anda harus login terlebih dahulu.'], 401);
         }
 
-        Log::info('Request data:', $request->all()); // Log data yang diterima
+        Log::info('Request data:', $request->all());
 
         try {
             $request->validate([
@@ -59,13 +70,11 @@ class CheckoutController extends Controller
             $serviceFee = $request->service_fee ?? 5000;
             $total = $subtotal + $shippingCost + $serviceFee;
 
-            // Periksa stok
             $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $product->id)->sum('quantity');
             if ($quantity > ($product->stock - $currentCartQuantity)) {
                 return response()->json(['error' => 'Stok tidak mencukupi untuk jumlah yang diminta.'], 400);
             }
 
-            // Buat order
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_code' => 'ORD-' . time(),
@@ -86,7 +95,6 @@ class CheckoutController extends Controller
                 'price' => $product->price,
             ]);
 
-            // Parameter untuk Midtrans
             $params = [
                 'transaction_details' => [
                     'order_id' => $order->order_code,
@@ -107,6 +115,7 @@ class CheckoutController extends Controller
                 ],
             ];
 
+            Log::info('Midtrans Params:', $params);
             $snapToken = Snap::getSnapToken($params);
             return response()->json(['snap_token' => $snapToken, 'order_id' => $order->order_code]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -131,7 +140,6 @@ class CheckoutController extends Controller
         $product = Product::findOrFail($productId);
         $quantity = $request->quantity;
 
-        // Check stock availability
         $currentCartQuantity = $user ? Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity') : 0;
         $availableQuantity = $product->stock - $currentCartQuantity;
 
@@ -139,7 +147,6 @@ class CheckoutController extends Controller
             return redirect()->back()->withErrors(['quantity' => 'Stok tidak mencukupi untuk jumlah yang diminta.']);
         }
 
-        // Clear existing cart items to ensure only this product is checked out
         if ($user) {
             Cart::where('user_id', $user->id)->delete();
             Cart::create([

@@ -35,6 +35,7 @@
                     return;
                 }
 
+                // Ensure product_id and quantity are available
                 const productId = cartItems[0]?.product_id || null;
                 const quantity = cartItems[0]?.quantity || null;
 
@@ -72,7 +73,7 @@
                         snap.pay(data.snap_token, {
                             onSuccess: function(result) {
                                 alert('Pembayaran berhasil! Order ID: ' + result.order_id);
-                                window.location.href = '/thank-you?order_id=' + result.order_id; // Arahkan ke halaman thank-you
+                                window.location.href = '/thank-you?order_id=' + result.order_id;
                             },
                             onPending: function(result) {
                                 alert('Pembayaran tertunda. Order ID: ' + result.order_id);
