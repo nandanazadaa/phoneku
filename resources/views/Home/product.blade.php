@@ -52,14 +52,15 @@
                         <span class="text-xs text-gray-500 font-semibold uppercase mr-2">WARNA</span>
                         <div class="flex items-center gap-2" id="color-options">
                             @php
-                                $colors = $product->color_options ? (is_array($product->color_options) ? $product->color_options : explode(',', $product->color_options)) : [$product->color];
-                                $selectedColor = old('color', $product->color ?? (isset($colors[0]) ? trim($colors[0]) : ''));
+                                $colors = $product->color_options ? (is_array($product->color_options) ? $product->color_options : explode(',', $product->color_options)) : (isset($product->color) ? explode(',', $product->color) : []);
+                                $colors = array_filter(array_map('trim', $colors));
+                                $selectedColor = old('color', $product->color ?? (isset($colors[0]) ? $colors[0] : ''));
                             @endphp
                             @foreach($colors as $color)
-                                <label class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center cursor-pointer relative">
-                                    <input type="radio" name="color" value="{{ trim($color) }}" class="sr-only color-radio" {{ $selectedColor == trim($color) ? 'checked' : '' }}>
-                                    <span class="block w-4 h-4 rounded-full" style="background: {{ trim($color) }};"></span>
-                                    @if($selectedColor == trim($color))
+                                <label class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer relative" style="border-color: {{ $selectedColor == $color ? '#3b82f6' : '#d1d5db' }};">
+                                    <input type="radio" name="color" value="{{ $color }}" class="sr-only color-radio" {{ $selectedColor == $color ? 'checked' : '' }}>
+                                    <span class="block w-4 h-4 rounded-full" style="background: {{ $color }};"></span>
+                                    @if($selectedColor == $color)
                                         <span class="absolute inset-0 border-2 border-blue-500 rounded-full pointer-events-none"></span>
                                     @endif
                                 </label>
@@ -81,12 +82,10 @@
                     </div>
                     <!-- Detail -->
                     <div class="mb-2">
-                        <span class="text-xs text-gray-500 font-semibold uppercase">DETAIL</span>
-                        <ul class="list-none space-y-1 text-gray-700 text-sm mt-1">
-                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Layar: 6.1 inch Liquid Retina HD Display</li>
-                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Prosesor: A13 Bionic Chip - Cepat dan Efisien</li>
-                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Kamera: Dual 12 MP (Wide & Ultra-Wide) + Night Mode</li>
-                        </ul>
+                        <span class="text-xs text-gray-500 font-semibold uppercase">DESKRIPSI PRODUK</span>
+                        <div class="prose prose-sm max-w-none text-gray-700 mt-1">
+                            {!! nl2br(e($product->description ?? '-')) !!}
+                        </div>
                     </div>
                     <!-- Kuantitas & Stok -->
                     <div class="flex items-center gap-8 mt-4 mb-2">
