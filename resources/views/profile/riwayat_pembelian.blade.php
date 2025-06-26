@@ -132,7 +132,7 @@
                     @empty
                         <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm text-center text-gray-500">
                             <p class="mb-4">Anda belum memiliki riwayat pembelian.</p>
-                            <a href="{{ route('home') }}" class="text-blue-500 hover:underline inline-block">Mulai Belanja Sekarang!</a>
+                            <a href="{{ route('welcome') }}" class="text-blue-500 hover:underline inline-block">Mulai Belanja Sekarang!</a>
                         </div>
                     @endforelse
 

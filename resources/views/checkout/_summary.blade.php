@@ -20,6 +20,12 @@
         </div>
     </div>
     <button id="pay-button" class="btn btn-primary w-full mt-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 {{ $cartItems->isEmpty() ? 'disabled' : '' }}">Bayar Sekarang</button>
+    <form id="checkout-products-form" style="display:none;">
+        @foreach($cartItems as $i => $item)
+            <input type="hidden" name="products[{{ $i }}][product_id]" value="{{ $item->product_id }}">
+            <input type="hidden" name="products[{{ $i }}][quantity]" value="{{ $item->quantity }}">
+        @endforeach
+    </form>
 </div>
 
 <!-- Tambahkan skrip Midtrans -->
@@ -29,22 +35,22 @@
         const payButton = document.getElementById('pay-button');
         if (payButton) {
             payButton.addEventListener('click', function () {
-                const cartItems = @json($cartItems);
-                if (!cartItems || cartItems.length === 0) {
+                const form = document.getElementById('checkout-products-form');
+                const formData = new FormData(form);
+                const products = [];
+                for (let pair of formData.entries()) {
+                    const match = pair[0].match(/^products\[(\d+)\]\[(product_id|quantity)\]$/);
+                    if (match) {
+                        const idx = match[1];
+                        const key = match[2];
+                        if (!products[idx]) products[idx] = {};
+                        products[idx][key] = pair[1];
+                    }
+                }
+                if (!products.length) {
                     alert('Keranjang Anda kosong. Tambahkan produk terlebih dahulu.');
                     return;
                 }
-
-                const productId = cartItems[0]?.product_id || null;
-                const quantity = cartItems[0]?.quantity || null;
-
-                if (!productId || !quantity) {
-                    alert('Data produk atau kuantitas tidak tersedia. Periksa keranjang Anda.');
-                    return;
-                }
-
-                console.log('Sending data:', { product_id: productId, quantity: quantity, shipping_cost: {{ $shippingCost }}, service_fee: {{ $serviceFee }} });
-
                 fetch('/checkout/store', {
                     method: 'POST',
                     headers: {
@@ -52,8 +58,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        product_id: productId,
-                        quantity: quantity,
+                        products: products,
                         shipping_cost: {{ $shippingCost }},
                         service_fee: {{ $serviceFee }}
                     })

@@ -55,10 +55,22 @@
                         <p>Produk</p>
                     </a>
                 </li>
+                <li class="nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.orders.index') }}" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-truck"></i>
+                        <p>Manajemen Order</p>
+                    </a>
+                </li>
                 <li class="nav-item {{ request()->routeIs('admin.users') ? 'active' : '' }}">
                     <a href="{{ route('admin.users') }}" class="collapsed" aria-expanded="false">
                         <i class="fa-solid fa-users"></i>
                         <p>Management Users</p>
+                    </a>
+                </li>
+                <li class="nav-item {{ request()->routeIs('admin.testimoni') ? 'active' : '' }}">
+                    <a href="{{ route('admin.testimoni') }}" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-star"></i>
+                        <p>Manage Testimoni</p>
                     </a>
                 </li>
                 <li class="nav-section">

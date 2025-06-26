@@ -9,8 +9,9 @@ class TestimonialController extends Controller
 {
     public function index()
     {
-        $testimonials = Testimonial::latest()->paginate(10);
-        return view('admin.testimonials.index', compact('testimonials'));
+        // Ambil testimoni beserta relasi user dan produk, urut terbaru
+        $testimonials = \App\Models\Testimonial::with(['user', 'product'])->latest()->get();
+        return view('Admin.testimoni', compact('testimonials'));
     }
 
     public function create()
@@ -63,10 +64,18 @@ class TestimonialController extends Controller
         return redirect()->route('admin.testimonials.index')->with('success', 'Testimoni berhasil dihapus!');
     }
 
-    public function approve(Testimonial $testimonial)
+    public function approve($id)
     {
-        $testimonial->is_approved = true;
-        $testimonial->save();
-        return redirect()->back()->with('success', 'Testimoni disetujui!');
+        $testi = \App\Models\Testimonial::findOrFail($id);
+        $testi->is_approved = true;
+        $testi->save();
+        return redirect()->back()->with('success', 'Testimoni berhasil disetujui.');
+    }
+
+    public function reject($id)
+    {
+        $testi = \App\Models\Testimonial::findOrFail($id);
+        $testi->delete();
+        return redirect()->back()->with('success', 'Testimoni berhasil ditolak/hapus.');
     }
 }

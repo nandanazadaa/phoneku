@@ -16,10 +16,12 @@ use App\Http\Controllers\Home\TestimonialController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use Pusher\Pusher;
 
+
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
 Route::get('/tim', function () {
-    return view('home.tim');
+
+    return view('Home/tim');
 })->name('tim');
 Route::get('/aboutus', function () {
     return view('home.aboutus');
@@ -49,6 +51,7 @@ Route::middleware(['guest:web'])->group(function () {
 });
 
 // Authenticated user routes
+
 Route::middleware(['auth:web'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -144,6 +147,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('testimonials', AdminTestimonialController::class);
         Route::post('testimonials/{testimonial}/approve', [AdminTestimonialController::class, 'approve'])->name('testimonials.approve');
 
+        // Admin testimoni (moderasi)
+        Route::get('/testimoni', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimoni');
+        Route::post('/testimoni/{id}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimoni.approve');
+        Route::post('/testimoni/{id}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->name('testimoni.reject');
+
+        // Admin order management
+        Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{id}/update', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('orders.update');
+
         // Admin logout
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
@@ -151,7 +164,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // Pusher authentication
 Route::post('/pusher/auth', function (Request $request) {
-    $pusher = new Pusher(
+
+    $pusher = new Pusher\Pusher(
         env('PUSHER_APP_KEY'),
         env('PUSHER_APP_SECRET'),
         env('PUSHER_APP_ID'),
