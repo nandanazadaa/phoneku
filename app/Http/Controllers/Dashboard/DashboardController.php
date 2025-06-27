@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
@@ -39,15 +41,50 @@ class DashboardController extends Controller
     /**
      * Show the admin dashboard
      */
-    public function dashboard()
+  public function dashboard()
     {
         if ($redirect = $this->redirectIfNotAdmin()) {
             return $redirect;
         }
-        
-        return view('admin.dashboard');
+
+        // Menggunakan cache untuk statistik dasar (cache selama 15 menit)
+        $stats = cache()->remember('dashboard_stats', 900, function () {
+            return [
+                'totalOrders' => Order::count(),
+                'totalCustomers' => User::where('role', 'customer')->count(),
+                'totalTransactions' => Order::sum('total'),
+            ];
+        });
+
+        // Menggunakan query yang dioptimalkan untuk data pemasukan bulanan
+        $incomeData = cache()->remember('dashboard_income', 900, function () {
+            return Order::select(
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('SUM(total) as total_income')
+            )
+            ->whereYear('created_at', now()->year)
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->orderBy(DB::raw('MONTH(created_at)'))
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'month' => \Carbon\Carbon::create()->month($item->month)->format('M'),
+                    'total_income' => $item->total_income
+                ];
+            });
+        });
+
+        $incomeLabels = $incomeData->pluck('month')->toArray();
+        $incomeData = $incomeData->pluck('total_income')->toArray();
+
+        return view('admin.dashboard', [
+            'totalOrders' => $stats['totalOrders'],
+            'totalCustomers' => $stats['totalCustomers'],
+            'totalTransactions' => $stats['totalTransactions'],
+            'incomeLabels' => $incomeLabels,
+            'incomeData' => $incomeData
+        ]);
     }
-    
     /**
      * Show the products page
      */
