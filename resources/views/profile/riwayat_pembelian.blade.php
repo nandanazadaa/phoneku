@@ -78,13 +78,27 @@
                                             Kode Pesanan: <span class="font-semibold">{{ $order->order_code }}</span>
                                         </p>
                                     </div>
-                                    <span class="text-sm px-3 py-1 rounded-full whitespace-nowrap
-                                        @if($order->order_status == 'dibuat') bg-yellow-100 text-yellow-700
-                                        @elseif($order->order_status == 'dikirimkan') bg-blue-100 text-blue-700
-                                        @elseif($order->order_status == 'telah sampai') bg-green-100 text-green-700
-                                        @endif">
-                                        {{ $order->order_status == 'telah sampai' ? 'Telah Sampai' : ucfirst($order->order_status) }}
-                                    </span>
+                                    <div class="flex flex-col md:flex-row gap-2">
+                                        <span class="text-sm px-3 py-1 rounded-full whitespace-nowrap
+                                            @if($order->payment_status == 'pending') bg-yellow-100 text-yellow-700
+                                            @elseif($order->payment_status == 'completed') bg-green-100 text-green-700
+                                            @elseif($order->payment_status == 'failed') bg-red-100 text-red-700
+                                            @elseif($order->payment_status == 'refunded') bg-gray-100 text-gray-700
+                                            @endif">
+                                            {{ ucfirst($order->payment_status) }}
+                                        </span>
+                                        <span class="text-sm px-3 py-1 rounded-full whitespace-nowrap
+                                            @if($order->order_status == 'dibuat') bg-yellow-100 text-yellow-700
+                                            @elseif($order->order_status == 'diproses') bg-blue-100 text-blue-700
+                                            @elseif($order->order_status == 'dikirimkan') bg-blue-100 text-blue-700
+                                            @elseif($order->order_status == 'dalam pengiriman') bg-blue-100 text-blue-700
+                                            @elseif($order->order_status == 'telah sampai') bg-green-100 text-green-700
+                                            @elseif($order->order_status == 'selesai') bg-green-100 text-green-700
+                                            @elseif($order->order_status == 'dibatalkan') bg-red-100 text-red-700
+                                            @endif">
+                                            {{ $order->order_status == 'telah sampai' ? 'Telah Sampai' : ucfirst($order->order_status) }}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 @foreach($order->orderItems as $item)

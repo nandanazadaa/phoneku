@@ -38,24 +38,79 @@
         .table-responsive {
             overflow-x: auto;
         }
-        /* Custom status badges to match existing style */
         .status-badge {
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .status-dibuat {
-            background-color: #ffc107;
-            color: #212529;
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-diproses {
+            background-color: #fff3e0;
+            color: #f57c00;
         }
         .status-dikirimkan {
-            background-color: #17a2b8;
-            color: #fff;
+            background-color: #e8f5e8;
+            color: #388e3c;
+        }
+        .status-dalam-pengiriman {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
         }
         .status-telah-sampai {
-            background-color: #28a745;
-            color: #fff;
+            background-color: #e0f2f1;
+            color: #00796b;
+        }
+        .status-selesai {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        .status-dibatalkan {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .status-pending {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        .status-completed {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        .status-failed {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .status-refunded {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .btn-group .btn {
+            border-radius: 4px;
+        }
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+        .card-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 1.5rem;
         }
     </style>
 @endpush
@@ -77,6 +132,39 @@
             <div class="card full-height">
                 <div class="card-body">
                     <div class="card-title">All Orders</div>
+                    
+                    <!-- Filter Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <form method="GET" action="{{ route('admin.orders.index') }}" class="form-inline">
+                                <div class="form-group mr-3">
+                                    <input type="text" name="q" class="form-control" placeholder="Search by order code or customer name..." value="{{ request('q') }}">
+                                </div>
+                                <div class="form-group mr-3">
+                                    <select name="status" class="form-control">
+                                        <option value="">All Status</option>
+                                        <option value="dibuat" {{ request('status') == 'dibuat' ? 'selected' : '' }}>Pesanan Dibuat</option>
+                                        <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Sedang Diproses</option>
+                                        <option value="dikirimkan" {{ request('status') == 'dikirimkan' ? 'selected' : '' }}>Dikirimkan</option>
+                                        <option value="dalam pengiriman" {{ request('status') == 'dalam pengiriman' ? 'selected' : '' }}>Dalam Pengiriman</option>
+                                        <option value="telah sampai" {{ request('status') == 'telah sampai' ? 'selected' : '' }}>Telah Sampai</option>
+                                        <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                        <option value="dibatalkan" {{ request('status') == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary mr-2">
+                                    <i class="fa fa-search mr-1"></i>Search
+                                </button>
+                                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
+                                    <i class="fa fa-refresh mr-1"></i>Reset
+                                </a>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <span class="text-muted">Total Orders: {{ $orders->total() }}</span>
+                        </div>
+                    </div>
+                    
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
@@ -114,7 +202,8 @@
                                     <th>Customer Name</th>
                                     <th>Order Date</th>
                                     <th>Total</th>
-                                    <th>Status</th>
+                                    <th>Order Status</th>
+                                    <th>Payment Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -132,75 +221,103 @@
                                             </span>
                                         </td>
                                         <td>
+                                            <span class="status-badge status-{{ str_replace(' ', '-', $order->payment_status) }}">
+                                                {{ ucfirst($order->payment_status) }}
+                                            </span>
+                                        </td>
+                                        <td>
                                             <div class="btn-group">
-    <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info mx-1">
-        <i class="fa fa-eye"></i>
-    </a>
-    <button type="button" class="btn btn-sm btn-warning mx-1" data-toggle="modal" data-target="#updateStatusModal{{ $order->id }}">
-        <i class="fa fa-edit"></i>
-    </button>
-    <button type="button" class="btn btn-sm btn-danger mx-1" data-toggle="modal" data-target="#deleteOrderModal{{ $order->id }}">
-        <i class="fa fa-trash"></i>
-    </button>
-</div>
-
+                                                <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-info mx-1" title="View Details">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-warning mx-1" data-toggle="modal" data-target="#updateStatusModal{{ $order->id }}" title="Update Status">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger mx-1" data-toggle="modal" data-target="#deleteOrderModal{{ $order->id }}" title="Delete Order">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
 
                                             <!-- Update Status Modal -->
-                                           <!-- Update Status Modal -->
-<div class="modal fade" id="updateStatusModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="updateStatusModalLabel{{ $order->id }}" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="updateStatusModalLabel{{ $order->id }}">Update Status for Order #{{ $order->order_code }}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('admin.orders.update', $order->id) }}" method="POST">
-                    @csrf
-                    <!-- Remove @method('PATCH') since the route uses POST -->
-                    <div class="form-group">
-                        <label for="order_status_{{ $order->id }}">Order Status</label>
-                        <select class="form-control @error('order_status') is-invalid @enderror" id="order_status_{{ $order->id }}" name="order_status" required>
-                            <option value="dibuat" {{ $order->order_status == 'dibuat' ? 'selected' : '' }}>Pesanan Dibuat</option>
-                            <option value="dikirimkan" {{ $order->order_status == 'dikirimkan' ? 'selected' : '' }}>Dikirimkan</option>
-                            <option value="telah sampai" {{ $order->order_status == 'telah sampai' ? 'selected' : '' }}>Telah Sampai</option>
-                        </select>
-                        @error('order_status')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Update Status</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+                                            <div class="modal fade" id="updateStatusModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="updateStatusModalLabel{{ $order->id }}" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="updateStatusModalLabel{{ $order->id }}">
+                                                                Update Status Order #{{ $order->order_code }}
+                                                            </h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <form action="{{ route('admin.orders.update', $order->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <div class="modal-body">
+                                                                <div class="form-group">
+                                                                    <label for="order_status_{{ $order->id }}">Status Pesanan</label>
+                                                                    <select class="form-control @error('order_status') is-invalid @enderror" id="order_status_{{ $order->id }}" name="order_status" required>
+                                                                        <option value="dibuat" {{ $order->order_status == 'dibuat' ? 'selected' : '' }}>Pesanan Dibuat</option>
+                                                                        <option value="diproses" {{ $order->order_status == 'diproses' ? 'selected' : '' }}>Sedang Diproses</option>
+                                                                        <option value="dikirimkan" {{ $order->order_status == 'dikirimkan' ? 'selected' : '' }}>Dikirimkan</option>
+                                                                        <option value="dalam pengiriman" {{ $order->order_status == 'dalam pengiriman' ? 'selected' : '' }}>Dalam Pengiriman</option>
+                                                                        <option value="telah sampai" {{ $order->order_status == 'telah sampai' ? 'selected' : '' }}>Telah Sampai</option>
+                                                                        <option value="selesai" {{ $order->order_status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                                                        <option value="dibatalkan" {{ $order->order_status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+                                                                    </select>
+                                                                    @error('order_status')
+                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                                
+                                                                <div class="form-group">
+                                                                    <label for="payment_status_{{ $order->id }}">Status Pembayaran</label>
+                                                                    <select class="form-control" id="payment_status_{{ $order->id }}" name="payment_status">
+                                                                        <option value="pending" {{ $order->payment_status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                                                        <option value="completed" {{ $order->payment_status == 'completed' ? 'selected' : '' }}>Completed</option>
+                                                                        <option value="failed" {{ $order->payment_status == 'failed' ? 'selected' : '' }}>Failed</option>
+                                                                        <option value="refunded" {{ $order->payment_status == 'refunded' ? 'selected' : '' }}>Refunded</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="notes_{{ $order->id }}">Catatan (Opsional)</label>
+                                                                    <textarea class="form-control" id="notes_{{ $order->id }}" name="notes" rows="3" placeholder="Tambahkan catatan untuk order ini...">{{ $order->notes ?? '' }}</textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                                <button type="submit" class="btn btn-primary">
+                                                                    <i class="fa fa-save mr-1"></i>Update Status
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <!-- Delete Order Modal -->
                                             <div class="modal fade" id="deleteOrderModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteOrderModalLabel{{ $order->id }}" aria-hidden="true">
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="deleteOrderModalLabel{{ $order->id }}">Confirm Delete</h5>
+                                                            <h5 class="modal-title" id="deleteOrderModalLabel{{ $order->id }}">Konfirmasi Hapus</h5>
                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                 <span aria-hidden="true">×</span>
                                                             </button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p>Are you sure you want to delete order <strong>#{{ $order->order_code }}</strong> for <strong>{{ $order->user ? $order->user->name : 'N/A' }}</strong>?</p>
-                                                            <p class="text-danger">This action cannot be undone.</p>
+                                                            <p>Apakah Anda yakin ingin menghapus order <strong>#{{ $order->order_code }}</strong> untuk <strong>{{ $order->user ? $order->user->name : 'N/A' }}</strong>?</p>
+                                                            <p class="text-danger">Tindakan ini tidak dapat dibatalkan.</p>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                            <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                            <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" style="display: inline;">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                                                <button type="submit" class="btn btn-danger">
+                                                                    <i class="fa fa-trash mr-1"></i>Hapus
+                                                                </button>
                                                             </form>
                                                         </div>
                                                     </div>
@@ -210,7 +327,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center">No orders found.</td>
+                                        <td colspan="8" class="text-center">No orders found.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -245,7 +362,7 @@
                     "infoFiltered": "(filtered from _MAX_ total orders)"
                 },
                 "columnDefs": [
-                    { "orderable": false, "targets": 6 } // Disable sorting on Actions column
+                    { "orderable": false, "targets": 7 } // Disable sorting on Actions column (now column 7)
                 ]
             });
 

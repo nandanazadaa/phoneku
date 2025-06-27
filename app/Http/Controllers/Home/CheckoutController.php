@@ -211,27 +211,76 @@ class CheckoutController extends Controller
     public function midtransCallback(Request $request)
     {
         try {
+            Log::info('Midtrans callback received:', $request->all());
+            
             $notif = new \Midtrans\Notification();
             $order = Order::where('order_code', $notif->order_id)->first();
+            
             if (!$order) {
+                Log::error('Order not found for callback: ' . $notif->order_id);
                 return response()->json(['error' => 'Order not found'], 404);
             }
 
-            if (in_array($notif->transaction_status, ['settlement', 'capture'])) {
-                $order->payment_status = 'completed';
-                $order->order_status = 'dibuat';
-            } elseif ($notif->transaction_status == 'pending') {
-                $order->payment_status = 'pending';
-                $order->order_status = 'dibuat';
-            } elseif (in_array($notif->transaction_status, ['expire', 'cancel', 'deny'])) {
-                $order->payment_status = 'failed';
-                $order->order_status = 'dibuat';
+            $oldPaymentStatus = $order->payment_status;
+            $oldOrderStatus = $order->order_status;
+
+            // Update payment status based on transaction status
+            switch ($notif->transaction_status) {
+                case 'capture':
+                case 'settlement':
+                    $order->payment_status = 'completed';
+                    $order->order_status = 'diproses'; // Auto update order status to processed
+                    break;
+                    
+                case 'pending':
+                    $order->payment_status = 'pending';
+                    $order->order_status = 'dibuat';
+                    break;
+                    
+                case 'expire':
+                case 'cancel':
+                case 'deny':
+                    $order->payment_status = 'failed';
+                    $order->order_status = 'dibatalkan';
+                    break;
+                    
+                case 'refund':
+                    $order->payment_status = 'refunded';
+                    $order->order_status = 'dibatalkan';
+                    break;
+                    
+                default:
+                    Log::warning('Unknown transaction status: ' . $notif->transaction_status);
+                    break;
             }
+
+            // Save midtrans transaction ID if available
+            if (!empty($notif->transaction_id)) {
+                $order->midtrans_transaction_id = $notif->transaction_id;
+            }
+
             $order->save();
-            Log::info('Midtrans callback processed for order: ' . $order->order_code . ' status: ' . $order->payment_status);
+
+            // Log the status change
+            Log::info('Midtrans callback processed successfully', [
+                'order_id' => $order->id,
+                'order_code' => $order->order_code,
+                'transaction_id' => $notif->transaction_id,
+                'transaction_status' => $notif->transaction_status,
+                'old_payment_status' => $oldPaymentStatus,
+                'new_payment_status' => $order->payment_status,
+                'old_order_status' => $oldOrderStatus,
+                'new_order_status' => $order->order_status,
+                'fraud_status' => $notif->fraud_status ?? 'N/A'
+            ]);
+
             return response()->json(['status' => 'ok']);
+            
         } catch (\Exception $e) {
-            Log::error('Midtrans callback error: ' . $e->getMessage());
+            Log::error('Midtrans callback error: ' . $e->getMessage(), [
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

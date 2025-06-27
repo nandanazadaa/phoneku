@@ -8,7 +8,8 @@
   {
       protected $fillable = [
           'user_id', 'order_code', 'subtotal', 'shipping_cost', 'service_fee', 'total',
-          'courier', 'courier_service', 'shipping_address', 'order_status', 'midtrans_transaction_id'
+          'courier', 'courier_service', 'shipping_address', 'order_status', 'payment_status', 
+          'midtrans_transaction_id', 'notes'
       ];
 
       public function user()

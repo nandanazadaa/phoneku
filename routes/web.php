@@ -155,10 +155,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/testimoni/{id}/reject', [\App\Http\Controllers\Admin\TestimonialController::class, 'reject'])->name('testimoni.reject');
 
         // Admin order management
-        Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
-        Route::patch('/orders/{id}/update', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('orders.update');
-        Route::delete('/orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
 
         // Admin logout
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
@@ -175,3 +172,6 @@ Route::post('/pusher/auth', function (Request $request) {
     );
     return $pusher->socket_auth($request->channel_name, $request->socket_id);
 })->middleware('auth:web,admin');
+
+// Midtrans callback route (no auth required)
+Route::post('/midtrans/callback', [\App\Http\Controllers\Home\CheckoutController::class, 'midtransCallback'])->name('midtrans.callback');

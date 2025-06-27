@@ -20,6 +20,8 @@
               $table->string('courier_service');
               $table->text('shipping_address');
               $table->string('order_status')->default('dibuat');
+              $table->string('payment_status')->default('pending');
+              $table->text('notes')->nullable();
               $table->string('midtrans_transaction_id')->nullable();
               $table->timestamps();
 

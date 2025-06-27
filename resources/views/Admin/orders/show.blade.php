@@ -12,7 +12,7 @@
         <div class="mb-2"><b>Alamat Pengiriman:</b> {{ $order->shipping_address }}</div>
         <div class="mb-2"><b>Kurir:</b> {{ $order->courier }} ({{ $order->courier_service }})</div>
         <div class="mb-2"><b>Status Pembayaran:</b> <span class="px-2 py-1 rounded text-xs @if($order->payment_status=='completed') bg-green-100 text-green-700 @elseif($order->payment_status=='pending') bg-yellow-100 text-yellow-700 @else bg-red-100 text-red-700 @endif">{{ ucfirst($order->payment_status) }}</span></div>
-        <div class="mb-2"><b>Status Pengiriman:</b> <span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">{{ $order->shipping_status ?? '-' }}</span></div>
+        <div class="mb-2"><b>Status Pesanan:</b> <span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">{{ ucfirst(str_replace('telah sampai', 'Telah Sampai', $order->order_status)) }}</span></div>
         <div class="mb-2"><b>Subtotal:</b> Rp{{ number_format($order->subtotal,0,',','.') }}</div>
         <div class="mb-2"><b>Ongkir:</b> Rp{{ number_format($order->shipping_cost,0,',','.') }}</div>
         <div class="mb-2"><b>Biaya Layanan:</b> Rp{{ number_format($order->service_fee,0,',','.') }}</div>
@@ -43,22 +43,31 @@
     </div>
     <form method="post" action="{{ route('admin.orders.update', $order->id) }}" class="bg-white rounded shadow p-4">
         @csrf
+        @method('PATCH')
+        <div class="mb-2">
+            <label class="block font-semibold mb-1">Status Pesanan</label>
+            <select name="order_status" class="border rounded px-2 py-1" required>
+                <option value="dibuat" @selected($order->order_status=='dibuat')>Pesanan Dibuat</option>
+                <option value="diproses" @selected($order->order_status=='diproses')>Sedang Diproses</option>
+                <option value="dikirimkan" @selected($order->order_status=='dikirimkan')>Dikirimkan</option>
+                <option value="dalam pengiriman" @selected($order->order_status=='dalam pengiriman')>Dalam Pengiriman</option>
+                <option value="telah sampai" @selected($order->order_status=='telah sampai')>Telah Sampai</option>
+                <option value="selesai" @selected($order->order_status=='selesai')>Selesai</option>
+                <option value="dibatalkan" @selected($order->order_status=='dibatalkan')>Dibatalkan</option>
+            </select>
+        </div>
         <div class="mb-2">
             <label class="block font-semibold mb-1">Status Pembayaran</label>
             <select name="payment_status" class="border rounded px-2 py-1">
                 <option value="pending" @selected($order->payment_status=='pending')>Pending</option>
                 <option value="completed" @selected($order->payment_status=='completed')>Completed</option>
                 <option value="failed" @selected($order->payment_status=='failed')>Failed</option>
+                <option value="refunded" @selected($order->payment_status=='refunded')>Refunded</option>
             </select>
         </div>
         <div class="mb-2">
-            <label class="block font-semibold mb-1">Status Pengiriman</label>
-            <select name="shipping_status" class="border rounded px-2 py-1">
-                <option value="processing" @selected($order->shipping_status=='processing')>Diproses</option>
-                <option value="shipped" @selected($order->shipping_status=='shipped')>Dikirim</option>
-                <option value="delivered" @selected($order->shipping_status=='delivered')>Selesai</option>
-                <option value="cancelled" @selected($order->shipping_status=='cancelled')>Dibatalkan</option>
-            </select>
+            <label class="block font-semibold mb-1">Catatan (Opsional)</label>
+            <textarea name="notes" class="border rounded px-2 py-1 w-full" rows="3" placeholder="Tambahkan catatan untuk order ini...">{{ $order->notes ?? '' }}</textarea>
         </div>
         <button class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Update Status</button>
     </form>
