@@ -129,7 +129,7 @@
                 const shippingCost = parseFloat(selectedService.getAttribute('data-cost') || 0);
                 const total = subtotal + shippingCost + serviceFee;
 
-                fetch('/checkout/store', {
+                fetch(window.location.origin + '/checkout/store', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -157,11 +157,15 @@
                         snap.pay(data.snap_token, {
                             onSuccess: function (result) {
                                 alert('Pembayaran berhasil! Order ID: ' + result.order_id);
-                                window.location.href = '/thank-you?order_id=' + result.order_id;
+                                const redirectUrl = window.location.origin + '/cart';
+                                console.log('Redirecting to:', redirectUrl);
+                                window.location.href = redirectUrl;
                             },
                             onPending: function (result) {
                                 alert('Pembayaran tertunda. Order ID: ' + result.order_id);
-                                window.location.href = '/checkout';
+                                const redirectUrl = window.location.origin + '/checkout';
+                                console.log('Redirecting to:', redirectUrl);
+                                window.location.href = redirectUrl;
                             },
                             onError: function (result) {
                                 alert('Pembayaran gagal! Silakan coba lagi. Detail: ' + JSON.stringify(result));

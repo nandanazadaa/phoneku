@@ -115,7 +115,7 @@
                                     @csrf
                                     <input type="hidden" name="quantity" id="cart-quantity" value="1">
                                     <input type="hidden" name="color" id="cart-color" value="{{ $selectedColor }}">
-                                    <button type="submit" class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-6 text-center text-base font-semibold hover:bg-blue-200 flex items-center gap-2"><i class="fas fa-cart-plus"></i> Keranjang</button>
+                                    <button type="submit" class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-6 text-center text-base font-semibold hover:bg-blue-200 flex items-center gap-2"><i class="fas fa-cart-plus"></i> Keranjang</button>
                                 </form>
                                 <form action="{{ route('buy.now', $product->id) }}" method="POST">
                                     @csrf
@@ -249,7 +249,8 @@
     @endsection
 
     @section('scripts')
-<script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Harga dinamis
         const unitPrice = @json($product->price);
@@ -326,8 +327,116 @@
                 document.getElementById('buy-color').value = this.value;
             });
         });
+
+        // AJAX Add to Cart
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const form = this.closest('form');
+                if (!form) {
+                    console.error('Form not found for add to cart button');
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const originalButtonText = this.innerHTML;
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...';
+
+                // Get CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    this.disabled = false;
+                    this.innerHTML = originalButtonText;
+                    alert('CSRF token tidak ditemukan. Silakan refresh halaman.');
+                    return;
+                }
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = "{{ route('login', ['redirect' => url()->full()]) }}";
+                        throw new Error('Unauthorized');
+                    }
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message || 'Produk berhasil ditambahkan ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        } else {
+                            alert(data.message || 'Produk berhasil ditambahkan ke keranjang.');
+                        }
+                        
+                        // Update cart count
+                        const cartCountElement = document.getElementById('cart-count');
+                        if (cartCountElement && data.cartCount !== undefined) {
+                            cartCountElement.textContent = data.cartCount;
+                            cartCountElement.classList.toggle('hidden', data.cartCount <= 0);
+                        }
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'Tidak dapat menambahkan produk ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        } else {
+                            alert(data.message || 'Tidak dapat menambahkan produk ke keranjang.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    if (error.message !== 'Unauthorized') {
+                        console.error('Add to Cart Error:', error);
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        } else {
+                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                        }
+                    }
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.innerHTML = originalButtonText;
+                });
+            });
+        });
     });
-</script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="{{ asset('js/product.js') }}"></script>
+    </script>
+    <script src="{{ asset('js/product.js') }}"></script>
     @endsection

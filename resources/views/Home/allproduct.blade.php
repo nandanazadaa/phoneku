@@ -296,95 +296,104 @@
             // Optional: AJAX Add to Cart
             document.querySelectorAll('.add-to-cart-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
                     const form = this.closest('form');
-                    if (form) {
-                        e.preventDefault();
-                        const formData = new FormData(form);
-                        const originalButtonText = this.innerHTML; // Simpan teks tombol asli
-                        this.disabled = true; // Disable tombol
-                        this.innerHTML =
-                            '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...'; // Loading state
-
-                        fetch(form.action, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute('content'),
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json',
-                                },
-                            })
-                            .then(response => {
-                                if (response.status === 401) { // Unauthorized
-                                    window.location.href =
-                                        "{{ route('login', ['redirect' => url()->full()]) }}";
-                                    throw new Error('Unauthorized');
-                                }
-                                if (!response.ok && response.status !== 400 && response
-                                    status !== 401) { // Handle non-validation errors
-                                    throw new Error('Network response was not ok: ' + response
-                                        .statusText);
-                                }
-                                return response.json().catch(() => {
-                                    // Handle cases where response might not be JSON (e.g., server error pages)
-                                    throw new Error(
-                                        'Invalid JSON response from server.');
-                                });
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Berhasil!',
-                                        text: data.message || 'Produk ditambahkan.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                    // Update cart count (sesuaikan selector)
-                                    const cartCountElement = document.getElementById(
-                                        'cart-count');
-                                    if (cartCountElement && data.cartCount !== undefined) {
-                                        cartCountElement.textContent = data.cartCount;
-                                        // Jika count 0, sembunyikan? Jika > 0, tampilkan.
-                                        cartCountElement.classList.toggle('hidden', data
-                                            .cartCount <= 0);
-                                    }
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Gagal',
-                                        text: data.message ||
-                                            'Tidak dapat menambahkan produk.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                if (error.message !== 'Unauthorized') {
-                                    console.error('Add to Cart Error:', error);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Terjadi kesalahan. Silakan coba lagi.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
-                                }
-                            })
-                            .finally(() => {
-                                // Kembalikan state tombol setelah selesai
-                                this.disabled = false;
-                                this.innerHTML = originalButtonText;
-                            });
+                    if (!form) {
+                        console.error('Form not found for add to cart button');
+                        return;
                     }
+
+                    const formData = new FormData(form);
+                    const originalButtonText = this.innerHTML;
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...';
+
+                    // Get CSRF token
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    if (!csrfToken) {
+                        console.error('CSRF token not found');
+                        this.disabled = false;
+                        this.innerHTML = originalButtonText;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'CSRF token tidak ditemukan. Silakan refresh halaman.',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        return;
+                    }
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (response.status === 401) {
+                            window.location.href = "{{ route('login', ['redirect' => url()->full()]) }}";
+                            throw new Error('Unauthorized');
+                        }
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message || 'Produk berhasil ditambahkan ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            
+                            // Update cart count
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement && data.cartCount !== undefined) {
+                                cartCountElement.textContent = data.cartCount;
+                                cartCountElement.classList.toggle('hidden', data.cartCount <= 0);
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'Tidak dapat menambahkan produk ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        if (error.message !== 'Unauthorized') {
+                            console.error('Add to Cart Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalButtonText;
+                    });
                 });
             });
         });

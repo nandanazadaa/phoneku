@@ -297,7 +297,7 @@
                 currentSlide = index;
             }
 
-            function startSlideShow() asas{
+            function startSlideShow() {
                 slideInterval = setInterval(function() {
                     let nextSlide = (currentSlide + 1) % slides.length;
                     showSlide(nextSlide);
@@ -378,7 +378,7 @@
                             }
                             return response.json();
                         })
-                        .then data => {
+                        .then(data => {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil!',

@@ -82,6 +82,7 @@ class CheckoutController extends Controller
                             ->firstOrFail();
             $shippingCost = $request->shipping_cost; // Use the dynamically provided shipping cost
             $serviceFee = $request->service_fee ?? 5000; // Default to 5000 if not provided
+            $applicationFee = $request->application_fee ?? 2000; // Default to 2000 if not provided
             $subtotal = 0;
             $itemDetails = [];
             $orderItems = [];
@@ -121,6 +122,7 @@ class CheckoutController extends Controller
                 'subtotal' => $subtotal,
                 'shipping_cost' => $shippingCost,
                 'service_fee' => $serviceFee,
+                'application_fee' => $applicationFee,
                 'total' => $total,
                 'courier' => $request->courier,
                 'courier_service' => $request->courier_service,
@@ -134,6 +136,25 @@ class CheckoutController extends Controller
 
             Cart::where('user_id', $user->id)->delete();
 
+            // Tambahkan ongkir dan biaya layanan ke item_details
+            if ($shippingCost > 0) {
+                $itemDetails[] = [
+                    'id' => 'SHIPPING',
+                    'price' => $shippingCost,
+                    'quantity' => 1,
+                    'name' => 'Ongkos Kirim (' . $request->courier . ' - ' . $request->courier_service . ')',
+                ];
+            }
+
+            if ($serviceFee > 0) {
+                $itemDetails[] = [
+                    'id' => 'SERVICE_FEE',
+                    'price' => $serviceFee,
+                    'quantity' => 1,
+                    'name' => 'Biaya Layanan',
+                ];
+            }
+
             $params = [
                 'transaction_details' => [
                     'order_id' => $order->order_code,
@@ -145,6 +166,11 @@ class CheckoutController extends Controller
                     'phone' => $user->profile->phone ?? '',
                 ],
                 'item_details' => $itemDetails,
+                'callbacks' => [
+                    'finish' => url('/cart'),
+                    'error' => url('/checkout'),
+                    'pending' => url('/checkout'),
+                ],
             ];
 
             Log::info('Midtrans Params:', $params);

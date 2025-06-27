@@ -12,24 +12,25 @@ use Illuminate\Support\Facades\Log;
 class CartController extends Controller
 {    public function addToCart(Request $request, $productId)
     {
-        $user = Auth::guard('web')->user();
+        $user = Auth::user();
         if (!$user) {
-            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Anda harus login terlebih dahulu.'], 401);
+            }
+            return redirect()->route('login', ['redirect' => url()->current()]);
         }
 
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-            'color' => 'nullable|string',
-        ]);
-
         $product = Product::findOrFail($productId);
-        $quantity = $request->quantity;
+        $quantity = $request->input('quantity', 1);
         $color = $request->input('color');
 
         // Validate color if product has color options
         if ($color && $product->color) {
             $colorOptions = array_map('trim', explode(',', $product->color));
             if (!in_array($color, $colorOptions)) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => 'Warna tidak valid.'], 400);
+                }
                 return redirect()->back()->with('error', 'Warna tidak valid.');
             }
         }
@@ -44,6 +45,9 @@ class CartController extends Controller
         $availableQuantity = $product->stock - $currentCartQuantity;
 
         if ($quantity > $availableQuantity) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi.'], 400);
+            }
             return redirect()->back()->with('error', 'Stok tidak mencukupi.');
         }
 
@@ -63,6 +67,17 @@ class CartController extends Controller
                 'product_id' => $productId,
                 'quantity' => $quantity,
                 'color' => $color,
+            ]);
+        }
+
+        // Get updated cart count
+        $cartCount = Cart::where('user_id', $user->id)->sum('quantity');
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil ditambahkan ke keranjang.',
+                'cartCount' => $cartCount
             ]);
         }
 
