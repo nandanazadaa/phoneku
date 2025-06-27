@@ -3,9 +3,11 @@
 @section('title', 'User Management - Atlantis Lite')
 
 @push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
     <style>
         .table th, .table td {
             vertical-align: middle;
+            padding: 12px;
         }
         .modal-content {
             border-radius: 10px;
@@ -21,6 +23,20 @@
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+            margin-bottom: 15px;
+        }
+        .dataTables_wrapper .dataTables_length {
+            float: left;
+            margin-bottom: 15px;
+        }
+        .table-responsive {
+            overflow-x: auto;
         }
     </style>
 @endpush
@@ -74,7 +90,7 @@
                         </div>
                     @endif
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table id="userTable" class="table table-hover table-striped">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -198,9 +214,27 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script>
-        // Ensure Bootstrap modals work with jQuery
         $(document).ready(function() {
+            // Initialize DataTable
+            $('#userTable').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [5, 10, 25, 50],
+                "order": [[0, "asc"]],
+                "language": {
+                    "search": "Search users:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ users",
+                    "infoEmpty": "Showing 0 to 0 of 0 users",
+                    "infoFiltered": "(filtered from _MAX_ total users)"
+                },
+                "columnDefs": [
+                    { "orderable": false, "targets": 3 } // Disable sorting on Actions column
+                ]
+            });
+
             // Handle modal close
             $('.modal .close, .modal [data-dismiss="modal"]').on('click', function() {
                 $(this).closest('.modal').modal('hide');

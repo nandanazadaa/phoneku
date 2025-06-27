@@ -1,65 +1,214 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Courier;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\Cart;
+use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Courier;
+use Midtrans\Config;
+use Midtrans\Snap;
 
-class CourierController extends Controller
+class CheckoutController extends Controller
 {
-public function index(Request $request)
-{
-    Log::info('Courier index method called at ' . now()->format('H:i A, d F Y') . ' WIB');
-    $query = Courier::query();
-    if ($request->has('q') && $request->q !== '') {
-        $q = $request->q;
-        $query->where('courier', 'like', "%$q%")
-              ->orWhere('service_type', 'like', "%$q%");
+    public function __construct()
+    {
+        $serverKey = config('midtrans.serverKey');
+        $clientKey = config('midtrans.clientKey');
+        $isProduction = config('midtrans.isProduction');
+        $is3ds = config('midtrans.is3ds');
+
+        if (empty($serverKey) || empty($clientKey)) {
+            throw new \Exception('Midtrans server or client key is not configured. Please check your .env file.');
+        }
+        Log::info('Midtrans Config - Server Key: ' . $serverKey . ', Client Key: ' . $clientKey . ', Is Production: ' . var_export($isProduction, true));
+
+        Config::$serverKey = $serverKey;
+        Config::$isProduction = $isProduction ?? false;
+        Config::$isSanitized = true;
+        Config::$is3ds = $is3ds ?? true;
     }
-    $couriers = $query->latest()->paginate(15);
-    Log::info('Admin accessed Courier Management page at ' . now()->format('H:i A, d F Y') . ' WIB with search: ' . $request->q);
-    return view('admin.courier', compact('couriers'));
-}
+
+    public function index()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
+        }
+
+        $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
+        if ($cartItems->isEmpty()) {
+            return view('home.checkout', ['cartItems' => collect(), 'subtotal' => 0, 'couriers' => collect(), 'shippingCost' => 0, 'serviceFee' => 0, 'total' => 0, 'user' => $user]);
+        }
+
+        $couriers = Courier::all();
+        $subtotal = $cartItems->sum(fn($item) => $item->product ? $item->product->price * $item->quantity : 0);
+        $serviceFee = 5000; // Static for now
+        $defaultCourier = $couriers->first();
+        $shippingCost = $defaultCourier ? $defaultCourier->shipping_cost : 20000;
+        $total = $subtotal + $shippingCost + $serviceFee;
+
+        return view('home.checkout', compact('cartItems', 'subtotal', 'couriers', 'shippingCost', 'serviceFee', 'total', 'user'));
+    }
+
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Anda harus login terlebih dahulu.'], 401);
+        }
+
+        Log::info('Checkout store request:', $request->all());
+
+        try {
+            $request->validate([
+                'products' => 'required|array|min:1',
+                'products.*.product_id' => 'required|exists:products,id',
+                'products.*.quantity' => 'required|integer|min:1',
+                'courier_id' => 'required|exists:couriers,id',
+            ]);
+
+            $courier = Courier::findOrFail($request->courier_id);
+            $shippingCost = $courier->shipping_cost;
+            $serviceFee = 5000;
+            $subtotal = 0;
+            $itemDetails = [];
+            $orderItems = [];
+
+            foreach ($request->products as $prod) {
+                $product = Product::findOrFail($prod['product_id']);
+                $quantity = $prod['quantity'];
+
+                // Check stock availability
+                $currentCartQuantity = Cart::where('user_id', $user->id)
+                    ->where('product_id', $product->id)
+                    ->sum('quantity');
+                $availableStock = $product->stock - ($currentCartQuantity - $quantity);
+                if ($quantity > $availableStock) {
+                    return response()->json(['error' => "Stok tidak mencukupi untuk produk {$product->name}."], 400);
+                }
+
+                $subtotal += $product->price * $quantity;
+                $itemDetails[] = [
+                    'id' => $product->id,
+                    'price' => $product->price,
+                    'quantity' => $quantity,
+                    'name' => $product->name,
+                ];
+                $orderItems[] = [
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'price' => $product->price,
+                ];
+            }
+
+            $total = $subtotal + $shippingCost + $serviceFee;
+
+            $order = Order::create([
+                'user_id' => $user->id,
+                'order_code' => 'ORD-' . time(),
+                'subtotal' => $subtotal,
+                'shipping_cost' => $shippingCost,
+                'service_fee' => $serviceFee,
+                'total' => $total,
+                'courier' => $courier->courier,
+                'courier_service' => $courier->service_type,
+                'shipping_address' => $user->profile->address ?? 'No address set',
+                'order_status' => 'dibuat',
+            ]);
+
+            foreach ($orderItems as $item) {
+                OrderItem::create(array_merge($item, ['order_id' => $order->id]));
+            }
+
+            // Clear cart after successful order creation
+            Cart::where('user_id', $user->id)->delete();
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->order_code,
+                    'gross_amount' => $total,
+                ],
+                'customer_details' => [
+                    'first_name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->profile->phone ?? '',
+                ],
+                'item_details' => $itemDetails,
+            ];
+
+            Log::info('Midtrans Params:', $params);
+            $snapToken = Snap::getSnapToken($params);
+            return response()->json(['snap_token' => $snapToken, 'order_id' => $order->order_code]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['error' => $e->validator->errors()->first(), 'errors' => $e->validator->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('Checkout Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function buyNow(Request $request, $productId)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
+        }
+
         $request->validate([
-            'courier' => 'required|in:jne,pos,tiki',
-            'service_type' => 'required|in:regular,express,economy',
-            'shipping_cost' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:1',
         ]);
 
-        $courier = Courier::create($request->only(['courier', 'service_type', 'shipping_cost']));
-        Log::info('New courier added at ' . now()->format('H:i A, d F Y') . ' WIB: ' . json_encode($courier));
-        return redirect()->route('admin.courier')->with('success', 'Courier method added successfully.');
-    }
+        $product = Product::findOrFail($productId);
+        $quantity = $request->quantity;
 
-    public function edit($id)
-    {
-        $courier = Courier::findOrFail($id);
-        return view('admin.courier', compact('courier')); // Note: The template handles edit within modals
-    }
+        $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity');
+        $availableStock = $product->stock - $currentCartQuantity;
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'courier' => 'required|in:jne,pos,tiki',
-            'service_type' => 'required|in:regular,express,economy',
-            'shipping_cost' => 'required|numeric|min:0',
+        if ($quantity > $availableStock) {
+            return redirect()->back()->withErrors(['quantity' => 'Stok tidak mencukupi untuk jumlah yang diminta.']);
+        }
+
+        Cart::where('user_id', $user->id)->delete();
+        Cart::create([
+            'user_id' => $user->id,
+            'product_id' => $productId,
+            'quantity' => $quantity,
         ]);
 
-        $courier = Courier::findOrFail($id);
-        $courier->update($request->only(['courier', 'service_type', 'shipping_cost']));
-        Log::info('Courier updated at ' . now()->format('H:i A, d F Y') . ' WIB: ' . json_encode($courier));
-        return redirect()->route('admin.courier')->with('success', 'Courier method updated successfully.');
+        return redirect()->route('checkout');
     }
 
-    public function destroy($id)
+    public function midtransCallback(Request $request)
     {
-        $courier = Courier::findOrFail($id);
-        $courier->delete();
-        Log::info('Courier deleted at ' . now()->format('H:i A, d F Y') . ' WIB: ' . json_encode($courier));
-        return redirect()->route('admin.courier')->with('success', 'Courier method deleted successfully.');
+        try {
+            $notif = new \Midtrans\Notification();
+            $order = Order::where('order_code', $notif->order_id)->first();
+            if (!$order) {
+                return response()->json(['error' => 'Order not found'], 404);
+            }
+
+            if (in_array($notif->transaction_status, ['settlement', 'capture'])) {
+                $order->payment_status = 'completed';
+                $order->order_status = 'dibuat';
+            } elseif ($notif->transaction_status == 'pending') {
+                $order->payment_status = 'pending';
+                $order->order_status = 'dibuat';
+            } elseif (in_array($notif->transaction_status, ['expire', 'cancel', 'deny'])) {
+                $order->payment_status = 'failed';
+                $order->order_status = 'dibuat';
+            }
+            $order->save();
+            Log::info('Midtrans callback processed for order: ' . $order->order_code . ' status: ' . $order->payment_status);
+            return response()->json(['status' => 'ok']);
+        } catch (\Exception $e) {
+            Log::error('Midtrans callback error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

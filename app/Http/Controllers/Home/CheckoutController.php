@@ -10,7 +10,7 @@ use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Courier; // Add Courier model
+use App\Models\Courier;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -23,7 +23,6 @@ class CheckoutController extends Controller
         $isProduction = config('midtrans.isProduction');
         $is3ds = config('midtrans.3ds');
 
-        // Validate keys
         if (empty($serverKey) || empty($clientKey)) {
             throw new \Exception('Midtrans server or client key is not configured. Please check your .env file.');
         }
@@ -37,13 +36,21 @@ class CheckoutController extends Controller
 
     public function index()
     {
-        $user = Auth::check() ? Auth::user() : null;
-        $cartItems = $user ? Cart::where('user_id', $user->id)->with('product')->get() : collect();
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
+        }
+
+        $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
+        if ($cartItems->isEmpty()) {
+            return view('home.checkout', ['cartItems' => collect(), 'subtotal' => 0, 'couriers' => collect(), 'shippingCost' => 0, 'serviceFee' => 0, 'total' => 0, 'user' => $user]);
+        }
+
+        $couriers = Courier::all();
         $subtotal = $cartItems->sum(fn($item) => $item->product ? $item->product->price * $item->quantity : 0);
-        $couriers = Courier::all(); // Load all available couriers
-        $selectedCourier = $couriers->first(); // Default to first courier for initial display
-        $shippingCost = $selectedCourier ? $selectedCourier->shipping_cost : 20000; // Fallback to 20000 if no couriers
         $serviceFee = 5000;
+        $defaultCourier = $couriers->first();
+        $shippingCost = $defaultCourier ? $defaultCourier->shipping_cost : 20000;
         $total = $subtotal + $shippingCost + $serviceFee;
 
         return view('home.checkout', compact('cartItems', 'subtotal', 'couriers', 'shippingCost', 'serviceFee', 'total', 'user'));
@@ -51,12 +58,12 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::check() ? Auth::user() : null;
+        $user = Auth::user();
         if (!$user) {
             return response()->json(['error' => 'Anda harus login terlebih dahulu.'], 401);
         }
 
-        Log::info('Request data:', $request->all());
+        Log::info('Checkout store request:', $request->all());
 
         try {
             $request->validate([
@@ -65,21 +72,32 @@ class CheckoutController extends Controller
                 'products.*.quantity' => 'required|integer|min:1',
                 'courier' => 'required|exists:couriers,courier',
                 'courier_service' => 'required|exists:couriers,service_type',
+                'shipping_cost' => 'required|numeric|min:0',
+                'total' => 'required|numeric|min:0',
             ]);
 
             // Fetch the selected courier details
             $courier = Courier::where('courier', $request->courier)
                             ->where('service_type', $request->courier_service)
                             ->firstOrFail();
-            $shippingCost = $courier->shipping_cost;
-            $serviceFee = 5000; // Kept as static for now; can be made dynamic if needed
+            $shippingCost = $request->shipping_cost; // Use the dynamically provided shipping cost
+            $serviceFee = $request->service_fee ?? 5000; // Default to 5000 if not provided
             $subtotal = 0;
             $itemDetails = [];
             $orderItems = [];
 
             foreach ($request->products as $prod) {
-                $product = \App\Models\Product::findOrFail($prod['product_id']);
+                $product = Product::findOrFail($prod['product_id']);
                 $quantity = $prod['quantity'];
+
+                $currentCartQuantity = Cart::where('user_id', $user->id)
+                    ->where('product_id', $product->id)
+                    ->sum('quantity');
+                $availableStock = $product->stock - ($currentCartQuantity - $quantity);
+                if ($quantity > $availableStock) {
+                    return response()->json(['error' => "Stok tidak mencukupi untuk produk {$product->name}."], 400);
+                }
+
                 $subtotal += $product->price * $quantity;
                 $itemDetails[] = [
                     'id' => $product->id,
@@ -93,12 +111,9 @@ class CheckoutController extends Controller
                     'price' => $product->price,
                 ];
             }
-            $total = $subtotal + $shippingCost + $serviceFee;
 
-            $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $product->id)->sum('quantity');
-            if ($quantity > ($product->stock - $currentCartQuantity)) {
-                return response()->json(['error' => 'Stok tidak mencukupi untuk jumlah yang diminta.'], 400);
-            }
+            // Use the total provided by the client for consistency
+            $total = $request->total;
 
             $order = Order::create([
                 'user_id' => $user->id,
@@ -110,17 +125,19 @@ class CheckoutController extends Controller
                 'courier' => $request->courier,
                 'courier_service' => $request->courier_service,
                 'shipping_address' => $user->profile->address ?? 'No address set',
-                'order_status' => 'dibuat', // Default status based on your migration
+                'order_status' => 'dibuat',
             ]);
 
             foreach ($orderItems as $item) {
-                \App\Models\OrderItem::create(array_merge($item, ['order_id' => $order->id]));
+                OrderItem::create(array_merge($item, ['order_id' => $order->id]));
             }
+
+            Cart::where('user_id', $user->id)->delete();
 
             $params = [
                 'transaction_details' => [
                     'order_id' => $order->order_code,
-                    'gross_amount' => $total,
+                    'gross_amount' => $total, // Use the dynamically provided total
                 ],
                 'customer_details' => [
                     'first_name' => $user->name,
@@ -136,40 +153,31 @@ class CheckoutController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['error' => $e->validator->errors()->first(), 'errors' => $e->validator->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Midtrans Error: ' . $e->getMessage());
+            Log::error('Checkout Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()], 500);
         }
     }
 
     public function buyNow(Request $request, $productId)
     {
-        $user = Auth::check() ? Auth::user() : null;
+        $user = Auth::user();
         if (!$user) {
             return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
         }
 
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
-
+        $request->validate(['quantity' => 'required|integer|min:1']);
         $product = Product::findOrFail($productId);
         $quantity = $request->quantity;
 
-        $currentCartQuantity = $user ? Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity') : 0;
-        $availableQuantity = $product->stock - $currentCartQuantity;
+        $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity');
+        $availableStock = $product->stock - $currentCartQuantity;
 
-        if ($quantity > $availableQuantity) {
+        if ($quantity > $availableStock) {
             return redirect()->back()->withErrors(['quantity' => 'Stok tidak mencukupi untuk jumlah yang diminta.']);
         }
 
-        if ($user) {
-            Cart::where('user_id', $user->id)->delete();
-            Cart::create([
-                'user_id' => $user->id,
-                'product_id' => $productId,
-                'quantity' => $quantity,
-            ]);
-        }
+        Cart::where('user_id', $user->id)->delete();
+        Cart::create(['user_id' => $user->id, 'product_id' => $productId, 'quantity' => $quantity]);
 
         return redirect()->route('checkout');
     }
@@ -185,13 +193,13 @@ class CheckoutController extends Controller
 
             if (in_array($notif->transaction_status, ['settlement', 'capture'])) {
                 $order->payment_status = 'completed';
-                $order->order_status = 'dibuat'; // Initial status after payment; can be updated later
+                $order->order_status = 'dibuat';
             } elseif ($notif->transaction_status == 'pending') {
                 $order->payment_status = 'pending';
                 $order->order_status = 'dibuat';
             } elseif (in_array($notif->transaction_status, ['expire', 'cancel', 'deny'])) {
                 $order->payment_status = 'failed';
-                $order->order_status = 'dibuat'; // Keep as created if payment fails
+                $order->order_status = 'dibuat';
             }
             $order->save();
             Log::info('Midtrans callback processed for order: ' . $order->order_code . ' status: ' . $order->payment_status);

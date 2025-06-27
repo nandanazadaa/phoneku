@@ -11,7 +11,6 @@
             <div class="lg:col-span-2 space-y-6">
                 @include('checkout._address')
                 @include('checkout._products')
-                @include('checkout._courier')
             </div>
             <!-- Kanan: Ringkasan & Bayar -->
             <div>
