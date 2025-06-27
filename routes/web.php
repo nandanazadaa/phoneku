@@ -14,13 +14,12 @@ use App\Http\Controllers\Home\CheckoutController;
 use App\Http\Controllers\Home\ContactController;
 use App\Http\Controllers\Home\TestimonialController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
+use App\Http\Controllers\Admin\CourierController; // Add CourierController
 use Pusher\Pusher;
-
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
 Route::get('/tim', function () {
-
     return view('Home/tim');
 })->name('tim');
 Route::get('/aboutus', function () {
@@ -51,7 +50,6 @@ Route::middleware(['guest:web'])->group(function () {
 });
 
 // Authenticated user routes
-
 Route::middleware(['auth:web'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -147,6 +145,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('testimonials', AdminTestimonialController::class);
         Route::post('testimonials/{testimonial}/approve', [AdminTestimonialController::class, 'approve'])->name('testimonials.approve');
 
+        // Admin courier management
+        Route::resource('courier', CourierController::class)->except(['show']);
+        Route::get('/courier', [\App\Http\Controllers\Admin\CourierController::class, 'index'])->name('courier');
+
         // Admin testimoni (moderasi)
         Route::get('/testimoni', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimoni');
         Route::post('/testimoni/{id}/approve', [\App\Http\Controllers\Admin\TestimonialController::class, 'approve'])->name('testimoni.approve');
@@ -156,6 +158,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
         Route::post('/orders/{id}/update', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('orders.update');
+        Route::delete('/orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('orders.destroy');
 
         // Admin logout
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
@@ -164,7 +167,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // Pusher authentication
 Route::post('/pusher/auth', function (Request $request) {
-
     $pusher = new Pusher\Pusher(
         env('PUSHER_APP_KEY'),
         env('PUSHER_APP_SECRET'),

@@ -19,7 +19,7 @@
               $table->string('courier');
               $table->string('courier_service');
               $table->text('shipping_address');
-              $table->string('payment_status')->default('pending');
+              $table->string('order_status')->default('dibuat');
               $table->string('midtrans_transaction_id')->nullable();
               $table->timestamps();
 

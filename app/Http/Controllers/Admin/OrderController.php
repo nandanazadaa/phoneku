@@ -13,8 +13,8 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query = Order::with(['user', 'orderItems.product']);
-        if ($request->has('status') && $request->status !== 'all') {
-            $query->where('payment_status', $request->status);
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('order_status', $request->status);
         }
         if ($request->has('q')) {
             $q = $request->q;
@@ -22,7 +22,7 @@ class OrderController extends Controller
                 $sub->where('order_code', 'like', "%$q%")
                     ->orWhereHas('user', function($u) use ($q) {
                         $u->where('name', 'like', "%$q%")
-                          ->orWhere('email', 'like', "%$q%") ;
+                          ->orWhere('email', 'like', "%$q%");
                     });
             });
         }
@@ -37,21 +37,23 @@ class OrderController extends Controller
         return view('admin.orders.show', compact('order'));
     }
 
-    // Update status order (payment_status atau shipping_status)
+    // Update order status
     public function update(Request $request, $id)
     {
         $order = Order::findOrFail($id);
         $request->validate([
-            'payment_status' => 'nullable|in:pending,completed,failed',
-            'shipping_status' => 'nullable|in:processing,shipped,delivered,cancelled',
+            'order_status' => 'required|in:dibuat,dikirimkan,telah sampai',
         ]);
-        if ($request->has('payment_status')) {
-            $order->payment_status = $request->payment_status;
-        }
-        if ($request->has('shipping_status')) {
-            $order->shipping_status = $request->shipping_status;
-        }
+        $order->order_status = $request->order_status;
         $order->save();
         return redirect()->back()->with('success', 'Status order berhasil diupdate.');
+    }
+
+    // Delete order
+    public function destroy($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->delete();
+        return redirect()->route('admin.orders.index')->with('success', 'Order berhasil dihapus.');
     }
 }

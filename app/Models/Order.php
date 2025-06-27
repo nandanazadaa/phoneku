@@ -8,7 +8,7 @@
   {
       protected $fillable = [
           'user_id', 'order_code', 'subtotal', 'shipping_cost', 'service_fee', 'total',
-          'courier', 'courier_service', 'shipping_address', 'payment_status', 'midtrans_transaction_id'
+          'courier', 'courier_service', 'shipping_address', 'order_status', 'midtrans_transaction_id'
       ];
 
       public function user()
@@ -21,12 +21,12 @@
           return $this->hasMany(OrderItem::class);
       }
       public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
+        {
+            return $this->hasMany(OrderItem::class);
+        }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
+        public function product()
+        {
+            return $this->belongsTo(Product::class);
+        }
   }

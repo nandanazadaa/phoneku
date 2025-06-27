@@ -10,6 +10,7 @@ use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Courier; // Add Courier model
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -39,11 +40,13 @@ class CheckoutController extends Controller
         $user = Auth::check() ? Auth::user() : null;
         $cartItems = $user ? Cart::where('user_id', $user->id)->with('product')->get() : collect();
         $subtotal = $cartItems->sum(fn($item) => $item->product ? $item->product->price * $item->quantity : 0);
-        $shippingCost = 20000;
+        $couriers = Courier::all(); // Load all available couriers
+        $selectedCourier = $couriers->first(); // Default to first courier for initial display
+        $shippingCost = $selectedCourier ? $selectedCourier->shipping_cost : 20000; // Fallback to 20000 if no couriers
         $serviceFee = 5000;
         $total = $subtotal + $shippingCost + $serviceFee;
 
-        return view('home.checkout', compact('cartItems', 'subtotal', 'shippingCost', 'serviceFee', 'total', 'user'));
+        return view('home.checkout', compact('cartItems', 'subtotal', 'couriers', 'shippingCost', 'serviceFee', 'total', 'user'));
     }
 
     public function store(Request $request)
@@ -60,12 +63,16 @@ class CheckoutController extends Controller
                 'products' => 'required|array|min:1',
                 'products.*.product_id' => 'required|exists:products,id',
                 'products.*.quantity' => 'required|integer|min:1',
-                'shipping_cost' => 'nullable|integer',
-                'service_fee' => 'nullable|integer',
+                'courier' => 'required|exists:couriers,courier',
+                'courier_service' => 'required|exists:couriers,service_type',
             ]);
 
-            $shippingCost = $request->shipping_cost ?? 20000;
-            $serviceFee = $request->service_fee ?? 5000;
+            // Fetch the selected courier details
+            $courier = Courier::where('courier', $request->courier)
+                            ->where('service_type', $request->courier_service)
+                            ->firstOrFail();
+            $shippingCost = $courier->shipping_cost;
+            $serviceFee = 5000; // Kept as static for now; can be made dynamic if needed
             $subtotal = 0;
             $itemDetails = [];
             $orderItems = [];
@@ -100,10 +107,10 @@ class CheckoutController extends Controller
                 'shipping_cost' => $shippingCost,
                 'service_fee' => $serviceFee,
                 'total' => $total,
-                'courier' => $request->courier ?? 'jne',
-                'courier_service' => $request->courier_service ?? 'REG',
+                'courier' => $request->courier,
+                'courier_service' => $request->courier_service,
                 'shipping_address' => $user->profile->address ?? 'No address set',
-                'payment_status' => 'pending',
+                'order_status' => 'dibuat', // Default status based on your migration
             ]);
 
             foreach ($orderItems as $item) {
@@ -129,7 +136,7 @@ class CheckoutController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['error' => $e->validator->errors()->first(), 'errors' => $e->validator->errors()], 422);
         } catch (\Exception $e) {
-            \Log::error('Midtrans Error: ' . $e->getMessage());
+            Log::error('Midtrans Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()], 500);
         }
     }
@@ -178,10 +185,13 @@ class CheckoutController extends Controller
 
             if (in_array($notif->transaction_status, ['settlement', 'capture'])) {
                 $order->payment_status = 'completed';
+                $order->order_status = 'dibuat'; // Initial status after payment; can be updated later
             } elseif ($notif->transaction_status == 'pending') {
                 $order->payment_status = 'pending';
+                $order->order_status = 'dibuat';
             } elseif (in_array($notif->transaction_status, ['expire', 'cancel', 'deny'])) {
                 $order->payment_status = 'failed';
+                $order->order_status = 'dibuat'; // Keep as created if payment fails
             }
             $order->save();
             Log::info('Midtrans callback processed for order: ' . $order->order_code . ' status: ' . $order->payment_status);
