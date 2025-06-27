@@ -157,7 +157,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Admin order management
         Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
-        Route::post('/orders/{id}/update', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('orders.update');
+        Route::patch('/orders/{id}/update', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('orders.update');
         Route::delete('/orders/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('orders.destroy');
 
         // Admin logout

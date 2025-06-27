@@ -130,10 +130,10 @@
                                         <td>{{ $courier->created_at->format('d-m-Y H:i') }}</td>
                                         <td>
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editCourierModal{{ $courier->id }}">
+                                                <button type="button" class="btn btn-warning btn-sm mx-1" data-toggle="modal" data-target="#editCourierModal{{ $courier->id }}">
                                                     <i class="fa fa-edit"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteCourierModal{{ $courier->id }}">
+                                                <button type="button" class="btn btn-danger btn-sm mx-1" data-toggle="modal" data-target="#deleteCourierModal{{ $courier->id }}">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </div>

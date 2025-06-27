@@ -50,7 +50,7 @@
                 <h5 class="text-white op-7 mb-2">Manage Customers & Admins</h5>
             </div>
             <div class="ml-md-auto py-2 py-md-0">
-                <button class="btn btn-secondary btn-round" data-toggle="modal" data-target="#addUserModal">+ Tambah Pengguna Baru</button>
+                <button class="btn btn-success btn-round" data-toggle="modal" data-target="#addUserModal">+ Tambah Pengguna Baru</button>
             </div>
         </div>
     </div>
@@ -106,11 +106,12 @@
                                         <td>{{ $user->email }}</td>
                                         <td>{{ ucfirst($user->role) }}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-warning mr-1" data-toggle="modal" data-target="#editUserModal{{ $user->id }}">Edit</button>
+                                            <button class="btn btn-sm btn-warning mr-1" data-toggle="modal" data-target="#editUserModal{{ $user->id }}"><i class="fa fa-edit"></i></button>
                                             <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">
+                                                <i class="fa fa-trash"></i></button>
                                             </form>
                                         </td>
                                     </tr>
