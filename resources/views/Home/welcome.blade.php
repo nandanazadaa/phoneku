@@ -116,27 +116,29 @@
                                         {{ $product->formatted_original_price }}
                                     </p>
                                 @endif
-                                <div class="flex mt-4 space-x-2">
+                                <div class="flex flex-row gap-2 mt-4">
                                     @auth
-                                        <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
                                             @csrf
                                             <input type="hidden" name="quantity" value="1">
                                             <button type="submit"
-                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200 transition-colors">
-                                            <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-0 text-center text-sm w-full hover:bg-blue-200 transition-colors flex items-center justify-center gap-1 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                                <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                             </button>
                                         </form>
                                         <a href="{{ route('product.show', $product) }}"
-                                            class="bg-blue-500 text-white rounded-lg py-2 px-8 text-sm text-center hover:bg-blue-600"><i
-                                                class="fas fa-shopping-bag mr-1"></i>Beli</a>
+                                            class="bg-blue-500 text-white rounded-lg py-2 px-0 text-sm text-center hover:bg-blue-600 flex items-center justify-center gap-1 flex-1 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                            <i class="fas fa-shopping-bag mr-1"></i>Beli
+                                        </a>
                                     @else
                                         <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                            class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200">
+                                            class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-0 text-center text-sm w-full hover:bg-blue-200 flex items-center justify-center gap-1 flex-1 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                                             <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                         </a>
                                         <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                            class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm text-center hover:bg-blue-600"><i
-                                                class="fas fa-shopping-bag mr-1"></i>Beli</a>
+                                            class="bg-blue-500 text-white rounded-lg py-2 px-0 text-sm text-center hover:bg-blue-600 flex items-center justify-center gap-1 flex-1 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                            <i class="fas fa-shopping-bag mr-1"></i>Beli
+                                        </a>
                                     @endauth
                                 </div>
                             </div>
@@ -190,26 +192,29 @@
                         @if ($product->has_discount)
                             <p class="text-white/70 line-through">{{ $product->formatted_original_price }}</p>
                         @endif
-                        <div class="flex mt-4 space-x-2">
+                        <div class="flex flex-col gap-2 mt-4">
                             @auth
                                 <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
                                     @csrf
                                     <button type="submit" data-cart-action="add" data-product-id="{{ $product->id }}"
-                                        class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                        class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200 flex items-center justify-center gap-1">
                                         <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                     </button>
                                 </form>
                                 <a href="{{ route('product.show', $product) }}"
-                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200"><i
-                                        class="fas fa-shopping-bag mr-1"></i>Beli</a>
+                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200 flex items-center justify-center gap-1">
+                                    <i class="fas fa-shopping-bag mr-1"></i>Beli
+                                </a>
                             @else
                                 <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200 flex items-center justify-center gap-1">
                                     <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                    <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200"><i
-                                            class="fas fa-shopping-bag mr-1"></i>Beli</a>
-                                @endauth
+                                </a>
+                                <a href="{{ route('login', ['redirect' => url()->current()]) }}"
+                                    class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200 flex items-center justify-center gap-1">
+                                    <i class="fas fa-shopping-bag mr-1"></i>Beli
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 </div>
@@ -373,7 +378,7 @@
                             }
                             return response.json();
                         })
-                        .then(data => {
+                        .then data => {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil!',
