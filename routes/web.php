@@ -156,6 +156,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Admin order management
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+        
+        // Manual payment status update
+        Route::post('/orders/{order}/update-payment-status', [\App\Http\Controllers\Admin\OrderController::class, 'updatePaymentStatus'])->name('orders.update-payment-status');
+        
+        // Check Midtrans status for pending orders
+        Route::post('/orders/check-midtrans-status', [\App\Http\Controllers\Admin\OrderController::class, 'checkMidtransStatus'])->name('orders.check-midtrans-status');
+        
+        // Search order by code
+        Route::get('/orders/search-by-code', [\App\Http\Controllers\Admin\OrderController::class, 'searchByCode'])->name('orders.search-by-code');
 
         // Admin logout
         Route::post('/logout', [AuthController::class, 'adminLogout'])->name('logout');
@@ -175,3 +184,12 @@ Route::post('/pusher/auth', function (Request $request) {
 
 // Midtrans callback route (no auth required)
 Route::post('/midtrans/callback', [\App\Http\Controllers\Home\CheckoutController::class, 'midtransCallback'])->name('midtrans.callback');
+
+// Test callback route for debugging
+Route::get('/test-callback', [\App\Http\Controllers\Home\CheckoutController::class, 'testCallback'])->name('test.callback');
+
+// Status consistency verification route
+Route::get('/verify-status', [\App\Http\Controllers\Home\CheckoutController::class, 'verifyStatusConsistency'])->name('verify.status');
+
+// Frontend payment status update route (alternative to callback)
+Route::post('/update-payment-status', [\App\Http\Controllers\Home\CheckoutController::class, 'updatePaymentStatus'])->name('update.payment.status');

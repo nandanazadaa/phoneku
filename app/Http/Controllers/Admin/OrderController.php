@@ -42,8 +42,8 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $request->validate([
-            'order_status' => 'required|in:dibuat,diproses,dikirimkan,dalam pengiriman,telah sampai,selesai,dibatalkan',
-            'payment_status' => 'nullable|in:pending,completed,failed,refunded',
+            'order_status' => 'required|in:' . implode(',', array_keys(Order::getOrderStatusOptions())),
+            'payment_status' => 'nullable|in:' . implode(',', array_keys(Order::getPaymentStatusOptions())),
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -78,5 +78,132 @@ class OrderController extends Controller
     {
         $order->delete();
         return redirect()->route('admin.orders.index')->with('success', 'Order berhasil dihapus.');
+    }
+
+    // Manual update payment status
+    public function updatePaymentStatus(Request $request, Order $order)
+    {
+        try {
+            $request->validate([
+                'payment_status' => 'required|in:pending,completed,failed,refunded',
+                'transaction_id' => 'nullable|string'
+            ]);
+
+            $oldPaymentStatus = $order->payment_status;
+            $oldOrderStatus = $order->order_status;
+
+            // Update payment status
+            $order->payment_status = $request->payment_status;
+            
+            // Update order status based on payment status
+            if ($request->payment_status === 'completed') {
+                $order->order_status = Order::ORDER_STATUS_DIPROSES;
+            } elseif ($request->payment_status === 'failed' || $request->payment_status === 'refunded') {
+                $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
+            }
+
+            // Save transaction ID if provided
+            if ($request->transaction_id) {
+                $order->midtrans_transaction_id = $request->transaction_id;
+            }
+
+            $order->save();
+
+            // Log the status change
+            Log::info("Payment status manually updated by admin", [
+                'order_id' => $order->id,
+                'order_code' => $order->order_code,
+                'old_payment_status' => $oldPaymentStatus,
+                'new_payment_status' => $order->payment_status,
+                'old_order_status' => $oldOrderStatus,
+                'new_order_status' => $order->order_status,
+                'updated_by' => auth()->user()->name ?? 'Admin'
+            ]);
+
+            return redirect()->back()->with('success', 'Status pembayaran berhasil diupdate.');
+
+        } catch (\Exception $e) {
+            Log::error('Manual payment status update error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengupdate status pembayaran: ' . $e->getMessage());
+        }
+    }
+
+    // Check Midtrans status for pending orders
+    public function checkMidtransStatus()
+    {
+        try {
+            $pendingOrders = Order::where('payment_status', 'pending')
+                ->where('created_at', '>=', now()->subDays(1))
+                ->get();
+
+            $updatedCount = 0;
+
+            foreach ($pendingOrders as $order) {
+                try {
+                    // Use Midtrans API to check status
+                    $status = \Midtrans\Transaction::status($order->order_code);
+                    
+                    if ($status->transaction_status === 'settlement') {
+                        $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
+                        $order->order_status = Order::ORDER_STATUS_DIPROSES;
+                        $order->midtrans_transaction_id = $status->transaction_id;
+                        $order->save();
+                        
+                        $updatedCount++;
+                        
+                        Log::info("Order status updated via Midtrans API check", [
+                            'order_code' => $order->order_code,
+                            'payment_status' => $order->payment_status,
+                            'order_status' => $order->order_status
+                        ]);
+                    }
+                    
+                } catch (\Exception $e) {
+                    Log::error("Error checking Midtrans status for order {$order->order_code}: " . $e->getMessage());
+                }
+            }
+
+            return redirect()->back()->with('success', "Berhasil mengupdate {$updatedCount} order dari {$pendingOrders->count()} pending orders.");
+
+        } catch (\Exception $e) {
+            Log::error('Check Midtrans status error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal mengecek status Midtrans: ' . $e->getMessage());
+        }
+    }
+
+    // Search order by order code
+    public function searchByCode(Request $request)
+    {
+        try {
+            $request->validate([
+                'order_code' => 'required|string'
+            ]);
+
+            $order = Order::where('order_code', $request->order_code)->first();
+
+            if ($order) {
+                return response()->json([
+                    'success' => true,
+                    'order' => [
+                        'id' => $order->id,
+                        'order_code' => $order->order_code,
+                        'payment_status' => $order->payment_status,
+                        'order_status' => $order->order_status,
+                        'customer_name' => $order->user ? $order->user->name : 'N/A'
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order tidak ditemukan'
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

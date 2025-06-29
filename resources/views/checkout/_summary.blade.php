@@ -156,22 +156,101 @@
                     if (data.snap_token) {
                         snap.pay(data.snap_token, {
                             onSuccess: function (result) {
+                                console.log('Payment Success:', result);
+                                
+                                // Update payment status via frontend callback
+                                fetch('/update-payment-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'settlement',
+                                        transaction_id: result.transaction_id
+                                    })
+                                })
+                                .then(response => {
+                                    console.log('Update status response:', response);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('Payment status updated:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error updating payment status:', error);
+                                });
+                                
                                 alert('Pembayaran berhasil! Order ID: ' + result.order_id);
                                 const redirectUrl = window.location.origin + '/cart';
                                 console.log('Redirecting to:', redirectUrl);
                                 window.location.href = redirectUrl;
                             },
                             onPending: function (result) {
+                                console.log('Payment Pending:', result);
+                                
+                                // Update payment status via frontend callback
+                                fetch('/update-payment-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'pending',
+                                        transaction_id: result.transaction_id
+                                    })
+                                })
+                                .then(response => {
+                                    console.log('Update status response:', response);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('Payment status updated:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error updating payment status:', error);
+                                });
+                                
                                 alert('Pembayaran tertunda. Order ID: ' + result.order_id);
                                 const redirectUrl = window.location.origin + '/checkout';
                                 console.log('Redirecting to:', redirectUrl);
                                 window.location.href = redirectUrl;
                             },
                             onError: function (result) {
+                                console.log('Payment Error:', result);
+                                
+                                // Update payment status via frontend callback
+                                fetch('/update-payment-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'deny',
+                                        transaction_id: result.transaction_id
+                                    })
+                                })
+                                .then(response => {
+                                    console.log('Update status response:', response);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('Payment status updated:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error updating payment status:', error);
+                                });
+                                
                                 alert('Pembayaran gagal! Silakan coba lagi. Detail: ' + JSON.stringify(result));
                                 console.error('Error:', result);
                             },
                             onClose: function () {
+                                console.log('Payment popup closed');
                                 alert('Anda telah menutup popup pembayaran.');
                             }
                         });

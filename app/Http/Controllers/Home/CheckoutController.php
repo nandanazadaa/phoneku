@@ -13,6 +13,7 @@ use App\Models\OrderItem;
 use App\Models\Courier;
 use Midtrans\Config;
 use Midtrans\Snap;
+use App\Models\User;
 
 class CheckoutController extends Controller
 {
@@ -212,12 +213,25 @@ class CheckoutController extends Controller
     {
         try {
             Log::info('Midtrans callback received:', $request->all());
+            Log::info('Request headers:', $request->headers->all());
+            
+            // Tambahkan debugging untuk melihat raw input
+            $rawInput = file_get_contents('php://input');
+            Log::info('Raw input:', ['raw' => $rawInput]);
             
             $notif = new \Midtrans\Notification();
+            Log::info('Notification object created:', [
+                'order_id' => $notif->order_id ?? 'null',
+                'transaction_status' => $notif->transaction_status ?? 'null',
+                'transaction_id' => $notif->transaction_id ?? 'null',
+                'fraud_status' => $notif->fraud_status ?? 'null'
+            ]);
+            
             $order = Order::where('order_code', $notif->order_id)->first();
             
             if (!$order) {
                 Log::error('Order not found for callback: ' . $notif->order_id);
+                Log::info('Available orders:', Order::pluck('order_code')->toArray());
                 return response()->json(['error' => 'Order not found'], 404);
             }
 
@@ -228,25 +242,25 @@ class CheckoutController extends Controller
             switch ($notif->transaction_status) {
                 case 'capture':
                 case 'settlement':
-                    $order->payment_status = 'completed';
-                    $order->order_status = 'diproses'; // Auto update order status to processed
+                    $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
+                    $order->order_status = Order::ORDER_STATUS_DIPROSES;
                     break;
                     
                 case 'pending':
-                    $order->payment_status = 'pending';
-                    $order->order_status = 'dibuat';
+                    $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                    $order->order_status = Order::ORDER_STATUS_DIBUAT;
                     break;
                     
                 case 'expire':
                 case 'cancel':
                 case 'deny':
-                    $order->payment_status = 'failed';
-                    $order->order_status = 'dibatalkan';
+                    $order->payment_status = Order::PAYMENT_STATUS_FAILED;
+                    $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
                     break;
                     
                 case 'refund':
-                    $order->payment_status = 'refunded';
-                    $order->order_status = 'dibatalkan';
+                    $order->payment_status = Order::PAYMENT_STATUS_REFUNDED;
+                    $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
                     break;
                     
                 default:
@@ -278,6 +292,223 @@ class CheckoutController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Midtrans callback error: ' . $e->getMessage(), [
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function testCallback(Request $request)
+    {
+        try {
+            Log::info('Test callback endpoint called');
+            
+            // Simulate Midtrans callback data
+            $testData = [
+                'order_id' => 'ORD-' . time(),
+                'transaction_status' => 'settlement',
+                'transaction_id' => 'TEST-' . time(),
+                'fraud_status' => 'accept'
+            ];
+            
+            Log::info('Test data:', $testData);
+            
+            // Create a test order if needed
+            $order = Order::where('order_code', $testData['order_id'])->first();
+            if (!$order) {
+                // Create a test order
+                $user = Auth::user() ?? User::first();
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'order_code' => $testData['order_id'],
+                    'subtotal' => 100000,
+                    'shipping_cost' => 10000,
+                    'service_fee' => 5000,
+                    'total' => 115000,
+                    'courier' => 'JNE',
+                    'courier_service' => 'REG',
+                    'shipping_address' => 'Test Address',
+                    'order_status' => Order::ORDER_STATUS_DIBUAT,
+                    'payment_status' => Order::PAYMENT_STATUS_PENDING
+                ]);
+            }
+            
+            // Process the test callback
+            $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
+            $order->order_status = Order::ORDER_STATUS_DIPROSES;
+            $order->midtrans_transaction_id = $testData['transaction_id'];
+            $order->save();
+            
+            Log::info('Test callback processed successfully', [
+                'order_id' => $order->id,
+                'order_code' => $order->order_code,
+                'payment_status' => $order->payment_status,
+                'order_status' => $order->order_status
+            ]);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Test callback processed successfully',
+                'order' => $order
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Test callback error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function verifyStatusConsistency()
+    {
+        try {
+            $results = [];
+            
+            // Define expected status values using constants
+            $expectedPaymentStatuses = [
+                Order::PAYMENT_STATUS_PENDING,
+                Order::PAYMENT_STATUS_COMPLETED,
+                Order::PAYMENT_STATUS_FAILED,
+                Order::PAYMENT_STATUS_REFUNDED
+            ];
+            $expectedOrderStatuses = [
+                Order::ORDER_STATUS_DIBUAT,
+                Order::ORDER_STATUS_DIPROSES,
+                Order::ORDER_STATUS_DIKIRIMKAN,
+                Order::ORDER_STATUS_DALAM_PENGIRIMAN,
+                Order::ORDER_STATUS_TELAH_SAMPAI,
+                Order::ORDER_STATUS_SELESAI,
+                Order::ORDER_STATUS_DIBATALKAN
+            ];
+            
+            // Check database values
+            $dbPaymentStatuses = Order::distinct()->pluck('payment_status')->toArray();
+            $dbOrderStatuses = Order::distinct()->pluck('order_status')->toArray();
+            
+            // Check for inconsistencies
+            $invalidPaymentStatuses = array_diff($dbPaymentStatuses, $expectedPaymentStatuses);
+            $invalidOrderStatuses = array_diff($dbOrderStatuses, $expectedOrderStatuses);
+            
+            $results['payment_status'] = [
+                'expected' => $expectedPaymentStatuses,
+                'found_in_db' => $dbPaymentStatuses,
+                'invalid' => $invalidPaymentStatuses,
+                'is_consistent' => empty($invalidPaymentStatuses)
+            ];
+            
+            $results['order_status'] = [
+                'expected' => $expectedOrderStatuses,
+                'found_in_db' => $dbOrderStatuses,
+                'invalid' => $invalidOrderStatuses,
+                'is_consistent' => empty($invalidOrderStatuses)
+            ];
+            
+            // Check callback mapping
+            $callbackMapping = [
+                'capture' => ['payment_status' => Order::PAYMENT_STATUS_COMPLETED, 'order_status' => Order::ORDER_STATUS_DIPROSES],
+                'settlement' => ['payment_status' => Order::PAYMENT_STATUS_COMPLETED, 'order_status' => Order::ORDER_STATUS_DIPROSES],
+                'pending' => ['payment_status' => Order::PAYMENT_STATUS_PENDING, 'order_status' => Order::ORDER_STATUS_DIBUAT],
+                'expire' => ['payment_status' => Order::PAYMENT_STATUS_FAILED, 'order_status' => Order::ORDER_STATUS_DIBATALKAN],
+                'cancel' => ['payment_status' => Order::PAYMENT_STATUS_FAILED, 'order_status' => Order::ORDER_STATUS_DIBATALKAN],
+                'deny' => ['payment_status' => Order::PAYMENT_STATUS_FAILED, 'order_status' => Order::ORDER_STATUS_DIBATALKAN],
+                'refund' => ['payment_status' => Order::PAYMENT_STATUS_REFUNDED, 'order_status' => Order::ORDER_STATUS_DIBATALKAN]
+            ];
+            
+            $results['callback_mapping'] = $callbackMapping;
+            
+            // Check validation rules
+            $validationRules = [
+                'payment_status' => 'in:pending,completed,failed,refunded',
+                'order_status' => 'in:dibuat,diproses,dikirimkan,dalam pengiriman,telah sampai,selesai,dibatalkan'
+            ];
+            
+            $results['validation_rules'] = $validationRules;
+            
+            // Overall consistency check
+            $results['overall_consistent'] = $results['payment_status']['is_consistent'] && $results['order_status']['is_consistent'];
+            
+            Log::info('Status consistency check completed', $results);
+            
+            return response()->json($results);
+            
+        } catch (\Exception $e) {
+            Log::error('Status consistency check error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updatePaymentStatus(Request $request)
+    {
+        try {
+            $request->validate([
+                'order_id' => 'required|string',
+                'transaction_status' => 'required|string',
+                'transaction_id' => 'nullable|string'
+            ]);
+
+            $order = Order::where('order_code', $request->order_id)->first();
+            
+            if (!$order) {
+                Log::error('Order not found for frontend update: ' . $request->order_id);
+                return response()->json(['error' => 'Order not found'], 404);
+            }
+
+            $oldPaymentStatus = $order->payment_status;
+            $oldOrderStatus = $order->order_status;
+
+            // Update status berdasarkan transaction status
+            switch ($request->transaction_status) {
+                case 'capture':
+                case 'settlement':
+                    $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
+                    $order->order_status = Order::ORDER_STATUS_DIPROSES;
+                    break;
+                    
+                case 'pending':
+                    $order->payment_status = Order::PAYMENT_STATUS_PENDING;
+                    $order->order_status = Order::ORDER_STATUS_DIBUAT;
+                    break;
+                    
+                case 'expire':
+                case 'cancel':
+                case 'deny':
+                    $order->payment_status = Order::PAYMENT_STATUS_FAILED;
+                    $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
+                    break;
+                    
+                case 'refund':
+                    $order->payment_status = Order::PAYMENT_STATUS_REFUNDED;
+                    $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
+                    break;
+                    
+                default:
+                    Log::warning('Unknown transaction status from frontend: ' . $request->transaction_status);
+                    break;
+            }
+
+            // Save transaction ID if available
+            if ($request->transaction_id) {
+                $order->midtrans_transaction_id = $request->transaction_id;
+            }
+
+            $order->save();
+
+            // Log the status change
+            Log::info('Payment status updated via frontend', [
+                'order_id' => $order->id,
+                'order_code' => $order->order_code,
+                'transaction_id' => $request->transaction_id,
+                'transaction_status' => $request->transaction_status,
+                'old_payment_status' => $oldPaymentStatus,
+                'new_payment_status' => $order->payment_status,
+                'old_order_status' => $oldOrderStatus,
+                'new_order_status' => $order->order_status
+            ]);
+
+            return response()->json(['status' => 'success']);
+            
+        } catch (\Exception $e) {
+            Log::error('Update payment status error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
                 'trace' => $e->getTraceAsString()
             ]);

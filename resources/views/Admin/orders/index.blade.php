@@ -161,7 +161,20 @@
                             </form>
                         </div>
                         <div class="col-md-4 text-right">
-                            <span class="text-muted">Total Orders: {{ $orders->total() }}</span>
+                            <div class="mb-2">
+                                <span class="text-muted">Total Orders: {{ $orders->total() }}</span>
+                            </div>
+                            <div>
+                                <form method="POST" action="{{ route('admin.orders.check-midtrans-status') }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-sm mr-2" title="Check Midtrans Status for Pending Orders">
+                                        <i class="fa fa-sync mr-1"></i>Check Midtrans Status
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#manualUpdateModal" title="Manual Update Payment Status">
+                                    <i class="fa fa-edit mr-1"></i>Manual Update
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -342,6 +355,62 @@
         </div>
     </div>
 </div>
+
+<!-- Manual Update Payment Status Modal -->
+<div class="modal fade" id="manualUpdateModal" tabindex="-1" role="dialog" aria-labelledby="manualUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manualUpdateModalLabel">Manual Update Payment Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="#" method="POST" id="manualUpdateForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="order_code">Order Code</label>
+                        <input type="text" class="form-control" id="order_code" name="order_code" placeholder="Masukkan Order Code (contoh: ORD-1234567890)" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="payment_status">Payment Status</label>
+                        <select class="form-control" id="payment_status" name="payment_status" required>
+                            <option value="">Pilih Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="failed">Failed</option>
+                            <option value="refunded">Refunded</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction_id">Transaction ID (Opsional)</label>
+                        <input type="text" class="form-control" id="transaction_id" name="transaction_id" placeholder="Masukkan Transaction ID dari Midtrans">
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle mr-1"></i>
+                        <strong>Petunjuk:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Masukkan Order Code yang ingin diupdate</li>
+                            <li>Pilih status pembayaran yang sesuai</li>
+                            <li>Transaction ID opsional (untuk referensi)</li>
+                            <li>Status order akan otomatis diupdate sesuai payment status</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save mr-1"></i>Update Payment Status
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -374,6 +443,48 @@
             // Ensure modals are initialized correctly
             $('.modal').on('shown.bs.modal', function () {
                 $(this).find('[autofocus]').focus();
+            });
+
+            // Handle manual update form submission
+            $('#manualUpdateForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const orderCode = $('#order_code').val();
+                const paymentStatus = $('#payment_status').val();
+                const transactionId = $('#transaction_id').val();
+                
+                if (!orderCode || !paymentStatus) {
+                    alert('Order Code dan Payment Status harus diisi!');
+                    return;
+                }
+                
+                // Find order by order code
+                $.ajax({
+                    url: '/admin/orders/search-by-code',
+                    method: 'GET',
+                    data: { order_code: orderCode },
+                    success: function(response) {
+                        if (response.order) {
+                            // Update form action and submit
+                            $('#manualUpdateForm').attr('action', '/admin/orders/' + response.order.id + '/update-payment-status');
+                            
+                            // Add order_id to form
+                            if (!$('#order_id').length) {
+                                $('#manualUpdateForm').append('<input type="hidden" name="order_id" value="' + response.order.id + '">');
+                            } else {
+                                $('#order_id').val(response.order.id);
+                            }
+                            
+                            // Submit form
+                            $('#manualUpdateForm')[0].submit();
+                        } else {
+                            alert('Order dengan code ' + orderCode + ' tidak ditemukan!');
+                        }
+                    },
+                    error: function() {
+                        alert('Terjadi kesalahan saat mencari order. Silakan coba lagi.');
+                    }
+                });
             });
         });
     </script>
