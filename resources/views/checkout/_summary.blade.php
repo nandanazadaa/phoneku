@@ -124,7 +124,12 @@
         if (payButton) {
             payButton.addEventListener('click', function () {
                 if (!courierSelect.value || !serviceSelect.value) {
-                    alert('Silakan pilih kurir dan jenis layanan terlebih dahulu.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Peringatan',
+                        text: 'Silakan pilih kurir dan jenis layanan terlebih dahulu.',
+                        confirmButtonColor: '#3B82F6'
+                    });
                     return;
                 }
 
@@ -141,7 +146,12 @@
                     }
                 }
                 if (!products.length) {
-                    alert('Keranjang Anda kosong. Tambahkan produk terlebih dahulu.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Keranjang Kosong',
+                        text: 'Keranjang Anda kosong. Tambahkan produk terlebih dahulu.',
+                        confirmButtonColor: '#3B82F6'
+                    });
                     return;
                 }
 
@@ -202,10 +212,8 @@
                                     console.error('Error updating payment status:', error);
                                 });
                                 
-                                alert('Pembayaran berhasil! Order ID: ' + result.order_id);
-                                const redirectUrl = window.location.origin + '/cart';
-                                console.log('Redirecting to:', redirectUrl);
-                                window.location.href = redirectUrl;
+                                // Payment success will be handled by Midtrans callback redirect
+                                console.log('Payment completed successfully. Redirecting to success page...');
                             },
                             onPending: function (result) {
                                 console.log('Payment Pending:', result);
@@ -234,10 +242,30 @@
                                     console.error('Error updating payment status:', error);
                                 });
                                 
-                                alert('Pembayaran tertunda. Order ID: ' + result.order_id);
-                                const redirectUrl = window.location.origin + '/checkout';
-                                console.log('Redirecting to:', redirectUrl);
-                                window.location.href = redirectUrl;
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Pembayaran Tertunda',
+                                    html: `
+                                        <div class="text-center">
+                                            <p class="mb-3">Pembayaran Anda sedang dalam proses.</p>
+                                            <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                                                <p class="text-sm text-gray-600">Order ID:</p>
+                                                <p class="font-semibold text-gray-800">${result.order_id}</p>
+                                            </div>
+                                            <p class="text-sm text-gray-600">Silakan selesaikan pembayaran Anda. Anda akan diarahkan kembali ke halaman checkout.</p>
+                                        </div>
+                                    `,
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#3B82F6',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        const redirectUrl = window.location.origin + '/checkout';
+                                        console.log('Redirecting to:', redirectUrl);
+                                        window.location.href = redirectUrl;
+                                    }
+                                });
                             },
                             onError: function (result) {
                                 console.log('Payment Error:', result);
@@ -266,23 +294,68 @@
                                     console.error('Error updating payment status:', error);
                                 });
                                 
-                                alert('Pembayaran gagal! Silakan coba lagi. Detail: ' + JSON.stringify(result));
-                                console.error('Error:', result);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Pembayaran Gagal',
+                                    html: `
+                                        <div class="text-center">
+                                            <p class="mb-3">Maaf, pembayaran Anda gagal diproses.</p>
+                                            <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                                                <p class="text-sm text-gray-600">Order ID:</p>
+                                                <p class="font-semibold text-gray-800">${result.order_id || 'N/A'}</p>
+                                            </div>
+                                            <p class="text-sm text-gray-600">Silakan coba lagi atau hubungi customer service jika masalah berlanjut.</p>
+                                        </div>
+                                    `,
+                                    confirmButtonText: 'Coba Lagi',
+                                    confirmButtonColor: '#EF4444',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        // Redirect to checkout page to try again
+                                        const redirectUrl = window.location.origin + '/checkout';
+                                        console.log('Redirecting to checkout to try again:', redirectUrl);
+                                        window.location.href = redirectUrl;
+                                    }
+                                });
                             },
                             onClose: function () {
                                 console.log('Payment popup closed');
-                                alert('Anda telah menutup popup pembayaran.');
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Pembayaran Dibatalkan',
+                                    text: 'Anda telah menutup popup pembayaran. Silakan coba lagi jika ingin melanjutkan pembayaran.',
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#3B82F6'
+                                });
                             }
                         });
                     } else if (data.error) {
-                        alert('Error: ' + data.error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.error,
+                            confirmButtonColor: '#EF4444'
+                        });
                     } else {
-                        alert('Gagal mendapatkan token pembayaran. Silakan coba lagi.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Token Pembayaran Gagal',
+                            text: 'Gagal mendapatkan token pembayaran. Silakan coba lagi.',
+                            confirmButtonText: 'Coba Lagi',
+                            confirmButtonColor: '#EF4444'
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Fetch error:', error);
-                    alert('Terjadi kesalahan saat membuat pesanan: ' + error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan',
+                        text: 'Terjadi kesalahan saat membuat pesanan: ' + error.message,
+                        confirmButtonColor: '#EF4444'
+                    });
                 });
             });
         }

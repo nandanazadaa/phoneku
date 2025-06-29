@@ -168,7 +168,7 @@ class CheckoutController extends Controller
                 ],
                 'item_details' => $itemDetails,
                 'callbacks' => [
-                    'finish' => url('/cart'),
+                    'finish' => url('/checkout/success?order_id=' . $order->order_code),
                     'error' => url('/checkout'),
                     'pending' => url('/checkout'),
                 ],
@@ -556,5 +556,16 @@ class CheckoutController extends Controller
                 'order_code' => $order->order_code
             ]);
         }
+    }
+
+    public function success(Request $request)
+    {
+        $orderId = $request->query('order_id');
+        
+        if (!$orderId) {
+            return redirect()->route('cart');
+        }
+
+        return view('checkout.success', compact('orderId'));
     }
 }

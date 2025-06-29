@@ -78,6 +78,7 @@ Route::middleware(['auth:web'])->group(function () {
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::post('/buy-now/{productId}', [CheckoutController::class, 'buyNow'])->name('buy.now');
 
     // Purchase history
