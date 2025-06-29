@@ -35,7 +35,6 @@
             <form id="filter-form" action="{{ route('allproduct') }}" method="GET" class="contents">
                 <input type="hidden" name="search" value="{{ request('search') }}"> {{-- Pertahankan search query --}}
 
-                <!-- Dropdown Kategori -->
                 <div class="relative w-full">
                     <select name="category" onchange="document.getElementById('filter-form').submit()"
                         class="appearance-none bg-white border border-gray-300 text-gray-700 p-2 pl-4 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200">
@@ -50,7 +49,6 @@
                         class="fas fa-chevron-down text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
 
-                <!-- Dropdown Brand (Contoh - Idealnya diambil dari DB) -->
                 <div class="relative w-full">
                     {{-- Anda bisa mengambil daftar brand unik dari produk yang ada --}}
                     @php
@@ -71,7 +69,6 @@
                 </div>
 
 
-                <!-- Dropdown Rentang Harga (Contoh) -->
                 <div class="relative w-full">
                     <select name="price_range" onchange="document.getElementById('filter-form').submit()"
                         class="appearance-none bg-white border border-gray-300 text-gray-700 p-2 pl-4 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200">
@@ -93,7 +90,6 @@
 
     </div>
 
-    <!-- Product Section -->
     <div class="container mx-auto px-4 pt-4 pb-8">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
             <div>
@@ -115,23 +111,10 @@
             @endif
         </div>
 
-        <!-- Products Grid (DINAMIS) -->
         <div class="relative">
-            <!-- Tombol Navigasi Slider -->
-            <!-- <button onclick="scrollSlider('product-slider', -1)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button onclick="scrollSlider('product-slider', 1)"
-                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
-                <i class="fas fa-chevron-right"></i>
-            </button> -->
-
-            <!-- Slider Container -->
             <div id="product-grid" class="px-6 py-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                     @forelse($products as $product)
-                        <!-- Product Card -->
                         <div
                             class="w-72 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
                             {{-- Link ke halaman detail produk --}}
@@ -180,7 +163,7 @@
                                     <div class="flex mt-4 space-x-2">
                                         @if ($product->stock > 0)
                                             @auth('web')
-                                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form">
                                                     @csrf
                                                     <input type="hidden" name="quantity" value="1">
                                                     <button type="submit"
@@ -203,9 +186,10 @@
                                                 </a>
                                             @endauth
                                         @else
-                                            <span
-                                                class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
-                                                Habis</span>
+                                            <button type="button"
+                                                class="out-of-stock-btn text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full hover:bg-red-200 transition duration-200">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -242,11 +226,9 @@
                         </div>
                     </div>
                 @endforelse
+                </div>
             </div>
         </div>
-        <!-- AKHIR Products Grid -->
-
-        <!-- Pagination Links -->
         @if ($products->hasPages())
             <div class="flex justify-center mt-10">
                 <nav role="navigation" aria-label="Pagination Navigation"
@@ -284,158 +266,133 @@
 
 @endsection
 
-@section('styles')
-    {{-- Tambahkan style khusus jika perlu --}}
-    <style src="{{ asset('\css\allproduct.css') }}"></style>
-@endsection
-
 @section('scripts')
     {{-- Tambahkan script JS jika perlu, misal untuk AJAX add to cart --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> {{-- Contoh: SweetAlert --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // AJAX Add to Cart
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Mencegah form redirect
+                    
+                    const button = this.querySelector('.add-to-cart-btn');
+                    const formData = new FormData(this);
+                    const originalButtonText = button.innerHTML; // Simpan teks tombol asli
+                    button.disabled = true; // Disable tombol
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...'; // Loading state
 
-            const hamburgerButton = document.getElementById('hamburger-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (hamburgerButton && mobileMenu) {
-                hamburgerButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                    mobileMenu.classList.toggle('active');
-
-                    // Toggle hamburger icon between menu and X
-                    const isOpen = !mobileMenu.classList.contains('hidden');
-                    const svg = hamburgerButton.querySelector('svg');
-
-                    if (isOpen) {
-                        svg.innerHTML = `
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        `;
-                    } else {
-                        svg.innerHTML = `
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        `;
+                    // Dapatkan CSRF token dari meta tag
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    if (!csrfToken) {
+                        console.error('CSRF token not found!');
+                        button.disabled = false;
+                        button.innerHTML = originalButtonText;
+                        return;
                     }
-                });
 
-                // Close menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    const isClickInside = hamburgerButton.contains(event.target) ||
-                        mobileMenu.contains(event.target);
-
-                    if (!isClickInside && !mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                        mobileMenu.classList.remove('active');
-                        const svg = hamburgerButton.querySelector('svg');
-                        svg.innerHTML = `
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        `;
-                    }
-                });
-            }
-            // Optional: AJAX Add to Cart
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    const form = this.closest('form');
-                    if (form) {
-                        e.preventDefault();
-                        const formData = new FormData(form);
-                        const originalButtonText = this.innerHTML; // Simpan teks tombol asli
-                        this.disabled = true; // Disable tombol
-                        this.innerHTML =
-                            '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...'; // Loading state
-
-                        fetch(form.action, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute('content'),
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json',
-                                },
-                            })
-                            .then(response => {
-                                if (response.status === 401) { // Unauthorized
-                                    window.location.href =
-                                        "{{ route('login', ['redirect' => url()->full()]) }}";
-                                    throw new Error('Unauthorized');
-                                }
-                                if (!response.ok && response.status !== 400 && response
-                                    status !== 401) { // Handle non-validation errors
-                                    throw new Error('Network response was not ok: ' + response
-                                        .statusText);
-                                }
-                                return response.json().catch(() => {
-                                    // Handle cases where response might not be JSON (e.g., server error pages)
-                                    throw new Error(
-                                        'Invalid JSON response from server.');
-                                });
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Berhasil!',
-                                        text: data.message || 'Produk ditambahkan.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                    // Update cart count (sesuaikan selector)
-                                    const cartCountElement = document.getElementById(
-                                        'cart-count');
-                                    if (cartCountElement && data.cartCount !== undefined) {
-                                        cartCountElement.textContent = data.cartCount;
-                                        // Jika count 0, sembunyikan? Jika > 0, tampilkan.
-                                        cartCountElement.classList.toggle('hidden', data
-                                            .cartCount <= 0);
-                                    }
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Gagal',
-                                        text: data.message ||
-                                            'Tidak dapat menambahkan produk.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                if (error.message !== 'Unauthorized') {
-                                    console.error('Add to Cart Error:', error);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Terjadi kesalahan. Silakan coba lagi.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
-                                }
-                            })
-                            .finally(() => {
-                                // Kembalikan state tombol setelah selesai
-                                this.disabled = false;
-                                this.innerHTML = originalButtonText;
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (response.status === 401) { // Unauthorized
+                            window.location.href = "{{ route('login', ['redirect' => url()->full()]) }}";
+                            throw new Error('Unauthorized');
+                        }
+                        return response.json().catch(() => {
+                            throw new Error('Invalid JSON response from server.');
+                        });
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message || 'Produk berhasil ditambahkan ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
                             });
-                    }
+                            // Update cart count (sesuaikan selector jika perlu)
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement && data.cartCount !== undefined) {
+                                cartCountElement.textContent = data.cartCount;
+                                cartCountElement.classList.toggle('hidden', data.cartCount <= 0);
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'Tidak dapat menambahkan produk.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        if (error.message !== 'Unauthorized') {
+                            console.error('Add to Cart Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        // Kembalikan state tombol setelah selesai
+                        button.disabled = false;
+                        button.innerHTML = originalButtonText;
+                    });
+                });
+            });
+
+            // Add event listener for out of stock items
+            document.querySelectorAll('.out-of-stock-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Stok Habis',
+                        text: 'Maaf, produk ini sedang tidak tersedia.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 });
             });
         });
 
         function scrollSlider(id, direction) {
             const slider = document.getElementById(id);
-            const scrollAmount = 300 * direction;
-            slider.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
+            if (slider) {
+                const scrollAmount = 300 * direction;
+                slider.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
         }
     </script>
+@endsection
+
+@section('styles')
+    {{-- Tambahkan style khusus jika perlu --}}
+    <style>
+        /* Anda bisa menambahkan style khusus di sini jika diperlukan */
+    </style>
 @endsection

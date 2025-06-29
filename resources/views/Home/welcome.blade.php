@@ -165,9 +165,10 @@
                                             </a>
                                         @endauth
                                     @else
-                                        <span
-                                            class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
-                                            Habis</span>
+                                        <button type="button"
+                                            class="out-of-stock-btn text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full hover:bg-red-200 transition duration-200">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
+                                        </button>
                                     @endif
                                 </div>
                             </div>
@@ -280,9 +281,10 @@
                                             </a>
                                         @endauth
                                     @else
-                                        <span
-                                            class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
-                                            Habis</span>
+                                        <button type="button"
+                                            class="out-of-stock-btn text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full hover:bg-red-200 transition duration-200">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
+                                        </button>
                                     @endif
                                 </div>
                             </div>
@@ -345,6 +347,7 @@
 @endsection
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // const slider = document.getElementById('handphone-slider');
         // let isDown = false;
@@ -454,117 +457,136 @@
             }
 
             // Add to Cart AJAX Functionality
-            document.querySelectorAll('[data-cart-action="add"]').forEach(button => {
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
-
+                    
                     const form = this.closest('form');
-                    const productId = this.getAttribute('data-product-id');
-
-                    // Check if user is logged in before proceeding
-                    const isLoggedIn = document.body.classList.contains('user-logged-in') ||
-                        document.querySelector('meta[name="user-logged-in"]') !== null;
-
-                    if (!isLoggedIn) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Login Diperlukan',
-                            text: 'Silakan login untuk menambahkan produk ke keranjang.',
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                        }).then(() => {
-                            window.location.href =
-                                `/login?redirect=${encodeURIComponent(window.location.href)}`;
-                        });
+                    if (!form) {
+                        console.error('Form not found for add to cart button');
                         return;
                     }
 
                     const formData = new FormData(form);
+                    const originalButtonText = this.innerHTML;
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...';
 
-                    // Add CSRF token
+                    // Get CSRF token
                     const csrfToken = document.querySelector('meta[name="csrf-token"]');
                     if (!csrfToken) {
                         console.error('CSRF token not found');
+                        this.disabled = false;
+                        this.innerHTML = originalButtonText;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'CSRF token tidak ditemukan. Silakan refresh halaman.',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
                         return;
                     }
 
                     fetch(form.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                            },
-                            credentials: 'same-origin'
-                        })
-                        .then(response => {
-                            if (response.status === 401) {
-                                throw new Error('User not authenticated');
-                            }
-                            if (!response.ok) {
-                                return response.json().then(data => {
-                                    throw new Error(data.message ||
-                                        'Network response was not ok');
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (response.status === 401) {
+                            window.location.href = "{{ route('login', ['redirect' => url()->full()]) }}";
+                            throw new Error('Unauthorized');
+                        }
+                        if (!response.ok && response.status !== 400 && response.status !== 401) {
+                            throw new Error('Network response was not ok: ' + response.statusText);
+                        }
+                        return response.json().catch(() => {
+                            throw new Error('Invalid JSON response from server.');
+                        });
+                    })
+                    .then(data => {
+                        if (data.success) {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil!',
-                                text: data.message ||
-                                    'Produk berhasil ditambahkan ke keranjang!',
+                                text: data.message || 'Produk berhasil ditambahkan ke keranjang.',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
-                                timer: 2000,
-                                timerProgressBar: true,
+                                timer: 2000
                             });
+                            
+                            // Update cart count
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement && data.cartCount !== undefined) {
+                                cartCountElement.textContent = data.cartCount;
+                                cartCountElement.classList.toggle('hidden', data.cartCount <= 0);
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'Tidak dapat menambahkan produk ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        if (error.message !== 'Unauthorized') {
+                            console.error('Add to Cart Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalButtonText;
+                    });
+                });
+            });
 
-                            const cartCount = document.getElementById('cart-count');
-                            if (cartCount && data.cartCount !== undefined) {
-                                cartCount.textContent = data.cartCount;
-                                cartCount.classList.remove('hidden');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Fetch Error:', error);
-                            if (error.message === 'User not authenticated') {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Login Diperlukan',
-                                    text: 'Silakan login untuk menambahkan produk ke keranjang.',
-                                    toast: true,
-                                    position: 'top-end',
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    timerProgressBar: true,
-                                }).then(() => {
-                                    window.location.href =
-                                        `/login?redirect=${encodeURIComponent(window.location.href)}`;
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Gagal!',
-                                    text: error.message ||
-                                        'Terjadi kesalahan saat menambahkan produk ke keranjang.',
-                                    toast: true,
-                                    position: 'top-end',
-                                    showConfirmButton: false,
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                });
-                            }
-                        });
+            // Add event listener for out of stock items
+            document.querySelectorAll('.out-of-stock-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Stok Habis',
+                        text: 'Maaf, produk ini sedang tidak tersedia.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 });
             });
         });
+
+        function scrollSlider(id, direction) {
+            const slider = document.getElementById(id);
+            const scrollAmount = 300 * direction;
+            slider.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
     </script>
 @endsection
 

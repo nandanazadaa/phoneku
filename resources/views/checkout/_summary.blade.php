@@ -19,22 +19,42 @@
     </div>
 
     <!-- Transaction Summary -->
-    <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
-            <span>Total Harga ({{ $cartItems->count() }} Barang)</span>
-            <span>Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
+    <div class="space-y-3 text-sm">
+        <!-- Product Breakdown -->
+        <div class="border-b border-gray-200 pb-3">
+            <h4 class="font-semibold text-gray-700 mb-2">Detail Produk</h4>
+            @foreach($cartItems as $item)
+            <div class="flex justify-between items-center mb-1">
+                <div class="flex-1">
+                    <div class="text-gray-800">{{ $item->product->name }}</div>
+                    <div class="text-xs text-gray-500">{{ $item->quantity }} × Rp{{ number_format($item->product->price, 0, ',', '.') }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="font-medium text-gray-800">Rp{{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}</div>
+                </div>
+            </div>
+            @endforeach
         </div>
-        <div class="flex justify-between">
-            <span>Ongkos Kirim</span>
-            <span id="shipping-cost-display">Rp{{ number_format($shippingCost, 0, ',', '.') }}</span>
+
+        <!-- Cost Breakdown -->
+        <div class="space-y-2">
+            <div class="flex justify-between">
+                <span class="text-gray-700">Subtotal ({{ $cartItems->count() }} Barang)</span>
+                <span class="font-medium">Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Ongkos Kirim</span>
+                <span id="shipping-cost-display" class="font-medium">Rp{{ number_format($shippingCost, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Biaya Aplikasi</span>
+                <span id="service-fee-display" class="font-medium">Rp{{ number_format($serviceFee, 0, ',', '.') }}</span>
+            </div>
         </div>
-        <div class="flex justify-between">
-            <span>Biaya Aplikasi</span>
-            <span id="service-fee-display">Rp{{ number_format($serviceFee, 0, ',', '.') }}</span>
-        </div>
-        <hr class="my-2">
-        <div class="flex justify-between font-bold text-lg">
-            <span>Total</span>
+        
+        <hr class="my-3 border-gray-300">
+        <div class="flex justify-between font-bold text-lg text-gray-800">
+            <span>Total Pembayaran</span>
             <span id="total-display">Rp{{ number_format($total, 0, ',', '.') }}</span>
         </div>
     </div>

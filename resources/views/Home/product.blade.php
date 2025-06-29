@@ -128,7 +128,9 @@
                                 <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}" class="bg-blue-600 text-white rounded-lg py-2 px-8 text-base font-semibold hover:bg-blue-700 flex items-center gap-2"><i class="fas fa-shopping-bag"></i> Beli</a>
                             @endauth
                         @else
-                            <span class="text-red-600 font-semibold py-2 px-6 border-2 border-red-300 rounded-lg bg-red-50 w-full text-center hover:bg-red-100 transition-all duration-200">Stok Habis</span>
+                            <button type="button" class="out-of-stock-btn text-red-600 font-semibold py-2 px-6 border-2 border-red-300 rounded-lg bg-red-50 w-full text-center hover:bg-red-100 transition-all duration-200">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -433,6 +435,22 @@
                 .finally(() => {
                     this.disabled = false;
                     this.innerHTML = originalButtonText;
+                });
+            });
+        });
+
+        // Add event listener for out of stock items
+        document.querySelectorAll('.out-of-stock-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Stok Habis',
+                    text: 'Maaf, produk ini sedang tidak tersedia.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
                 });
             });
         });
