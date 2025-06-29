@@ -3,6 +3,26 @@
 @section('title', 'Beranda - PhoneKu Handphone & Aksesoris')
 
 @section('content')
+<script>
+
+    function scrollSlider(id, direction) {
+    const slider = document.getElementById(id);
+    const totalScroll = 300; // total scroll in px
+    const step = 10;         // scroll per frame
+    const intervalTime = 5;  // delay per step (ms)
+    let scrolled = 0;
+
+    const scrollInterval = setInterval(() => {
+        slider.scrollLeft += direction * step;
+        scrolled += step;
+
+        if (scrolled >= totalScroll) {
+            clearInterval(scrollInterval);
+        }
+    }, intervalTime);
+}
+</script>
+
     <!-- Header Section with Wave -->
     <div class="relative bg-blue-500">
         <!-- Banner Container -->
@@ -80,12 +100,12 @@
             </button>
 
             <!-- Produk Slider -->
-            <div id="handphone-slider" class="overflow-x-auto hide-scrollbar scroll-smooth py-4 px-8">
+            <div id="handphone-slider" class="overflow-x-auto scroll-smooth py-4 px-8 " >
                 <div class="flex space-x-4 min-w-max">
                     @forelse($phones as $product)
                         <!-- Product Card -->
                         <div
-                            class="w-64 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
+                            class="w-72 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
                             <div class="bg-gray-100 w-full h-56 flex items-center justify-center p-4 relative group">
                                 @if ($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
@@ -109,35 +129,46 @@
                                 @endif
                             </div>
                             <div class="p-4 flex flex-col flex-grow">
-                                <h3 class="font-semibold text-base text-gray-800 mb-2">{{ $product->name }}</h3>
-                                <p class="text-blue-600 font-bold text-lg">{{ $product->formatted_price }}</p>
+                                <h3 class="font-semibold text-base flex-grow mb-2">
+                                    <a href="{{ route('product.show', $product) }}"
+                                        class="hover:text-blue-600 line-clamp-2"
+                                        title="{{ $product->name }}">{{ $product->name }}</a>
+                                </h3>                                <p class="text-blue-600 font-bold text-lg">{{ $product->formatted_price }}</p>
                                 @if ($product->original_price && $product->original_price > $product->price)
                                     <p class="text-gray-500 line-through text-sm">
                                         {{ $product->formatted_original_price }}
                                     </p>
                                 @endif
                                 <div class="flex mt-4 space-x-2">
-                                    @auth
-                                        <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit"
-                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200 transition-colors">
-                                            <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                            </button>
-                                        </form>
-                                        <a href="{{ route('product.show', $product) }}"
-                                            class="bg-blue-500 text-white rounded-lg py-2 px-8 text-sm text-center hover:bg-blue-600"><i
-                                                class="fas fa-shopping-bag mr-1"></i>Beli</a>
+                                    @if ($product->stock > 0)
+                                        @auth('web')
+                                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit"
+                                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                                    <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                                </button>
+                                            </form>
+                                            <a href="{{ route('product.show', $product) }}"
+                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                <i class="fas fa-eye mr-1"></i> Detail
+                                            </a>
+                                        @else
+                                            <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
+                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-200 transition duration-200">
+                                                <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                            </a>
+                                            <a href="{{ route('product.show', $product) }}"
+                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                <i class="fas fa-eye mr-1"></i> Detail
+                                            </a>
+                                        @endauth
                                     @else
-                                        <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                            class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-4 text-center text-sm w-full hover:bg-blue-200">
-                                            <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                        </a>
-                                        <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                            class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm text-center hover:bg-blue-600"><i
-                                                class="fas fa-shopping-bag mr-1"></i>Beli</a>
-                                    @endauth
+                                        <span
+                                            class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
+                                            Habis</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -168,57 +199,103 @@
         </div>
 
         <!-- Products Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            @forelse($accessories as $product)
-                <!-- Product Card -->
-                <div
-                    class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
-                    <div
-                        class="product-image-container bg-gray-100 w-full h-56 flex items-center justify-center flex-shrink-0 p-4 relative group">
-                        @if ($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                class="product-image max-h-full object-contain transition duration-500 ease-in-out transform group-hover:scale-105">
-                        @else
-                            <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
-                                <i class="fa fa-image text-5xl"></i>
+        
+        <div class="relative">
+            <!-- Tombol Navigasi -->
+            <button
+                class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border rounded-full shadow p-2 z-10 hover:bg-gray-100"
+                onclick="scrollSlider('accessory-slider', -1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button
+                class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white border rounded-full shadow p-2 z-10 hover:bg-gray-100"
+                onclick="scrollSlider('accessory-slider', 1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Produk Slider -->
+            <div id="accessory-slider" class="overflow-x-auto scroll-smooth py-4 px-8 " >
+                <div class="flex space-x-4 min-w-max">
+                    @forelse($accessories as $product)
+                        <!-- Product Card -->
+                        <div
+                            class="w-72 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
+                            <div class="bg-gray-100 w-full h-56 flex items-center justify-center p-4 relative group">
+                                @if ($product->image)
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                        class="max-h-full object-contain transition transform group-hover:scale-105">
+                                @else
+                                    <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
+                                        <i class="fa fa-image text-5xl"></i>
+                                    </div>
+                                @endif
+                                @if ($product->original_price && $product->original_price > $product->price)
+                                    @php
+                                        $discountPercentage = round(
+                                            (($product->original_price - $product->price) / $product->original_price) *
+                                                100,
+                                        );
+                                    @endphp
+                                    <span
+                                        class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                        {{ $discountPercentage }}% OFF
+                                    </span>
+                                @endif
                             </div>
-                        @endif
-                    </div>
-                    <div class="p-4 text-blue-600 flex flex-col flex-grow">
-                        <h3 class="font-semibold text-base text-gray-800 flex-grow mb-2">{{ $product->name }}</h3>
-                        <p class="text-2xl font-bold mt-1">{{ $product->formatted_price }}</p>
-                        @if ($product->has_discount)
-                            <p class="text-white/70 line-through">{{ $product->formatted_original_price }}</p>
-                        @endif
-                        <div class="flex mt-4 space-x-2">
-                            @auth
-                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    <button type="submit" data-cart-action="add" data-product-id="{{ $product->id }}"
-                                        class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
-                                        <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                    </button>
-                                </form>
-                                <a href="{{ route('product.show', $product) }}"
-                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200"><i
-                                        class="fas fa-shopping-bag mr-1"></i>Beli</a>
-                            @else
-                                <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
-                                    <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                    <a href="{{ route('login', ['redirect' => url()->current()]) }}"
-                                        class="bg-blue-500 text-white rounded-lg py-2 px-10 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200"><i
-                                            class="fas fa-shopping-bag mr-1"></i>Beli</a>
-                                @endauth
+                            <div class="p-4 flex flex-col flex-grow">
+                                <h3 class="font-semibold text-base flex-grow mb-2">
+                                    <a href="{{ route('product.show', $product) }}"
+                                        class="hover:text-blue-600 line-clamp-2"
+                                        title="{{ $product->name }}">{{ $product->name }}</a>
+                                </h3>                                  
+                                <p class="text-blue-600 font-bold text-lg">{{ $product->formatted_price }}</p>
+                                @if ($product->original_price && $product->original_price > $product->price)
+                                    <p class="text-gray-500 line-through text-sm">
+                                        {{ $product->formatted_original_price }}
+                                    </p>
+                                @endif
+                                <div class="flex mt-4 space-x-2">
+                                    @if ($product->stock > 0)
+                                        @auth('web')
+                                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit"
+                                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
+                                                    <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                                </button>
+                                            </form>
+                                            <a href="{{ route('product.show', $product) }}"
+                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                <i class="fas fa-eye mr-1"></i> Detail
+                                            </a>
+                                        @else
+                                            <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
+                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-200 transition duration-200">
+                                                <i class="fas fa-cart-plus mr-1"></i> Keranjang
+                                            </a>
+                                            <a href="{{ route('product.show', $product) }}"
+                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                <i class="fas fa-eye mr-1"></i> Detail
+                                            </a>
+                                        @endauth
+                                    @else
+                                        <span
+                                            class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
+                                            Habis</span>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    @empty
+                        <div class="text-center w-full py-8">
+                            <p class="text-gray-500">Tidak ada produk Aksesoris tersedia saat ini.</p>
+                        </div>
+                    @endforelse
                 </div>
-            @empty
-                <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center py-8">
-                    <p class="text-gray-500">Tidak ada produk aksesoris tersedia saat ini.</p>
-                </div>
-            @endforelse
+            </div>
         </div>
+        
 
         <!-- View All Button -->
         <div class="flex justify-center mt-8">
@@ -231,11 +308,74 @@
 @endsection
 
 @section('styles')
-    <style src="{{ asset('\css\welcome.css') }}"></style>
+    <style src="{{ asset('\css\welcome.css') }}">
+    #handphone-slider::-webkit-scrollbar {
+        height: 8px;
+    }
+    #handphone-slider::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+    #handphone-slider::-webkit-scrollbar-thumb {
+        background-color: #3b82f6;
+        border-radius: 10px;
+        border: 2px solid #f0f0f0;
+    }
+    #handphone-slider::-webkit-scrollbar-thumb:hover {
+        background-color: #2563eb;
+    }
+
+    
+    #accessory-slider::-webkit-scrollbar {
+        height: 8px;
+    }
+    #accessory-slider::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+    #accessory-slider::-webkit-scrollbar-thumb {
+        background-color: #3b82f6;
+        border-radius: 10px;
+        border: 2px solid #f0f0f0;
+    }
+    #accessory-slider::-webkit-scrollbar-thumb:hover {
+        background-color: #2563eb;
+    }
+    </style>
 @endsection
 
 @section('scripts')
     <script>
+        // const slider = document.getElementById('handphone-slider');
+        // let isDown = false;
+        // let startX;
+        // let scrollLeft;
+
+        // slider.addEventListener('mousedown', (e) => {
+        //     isDown = true;
+        //     slider.classList.add('cursor-grabbing');
+        //     startX = e.pageX - slider.offsetLeft;
+        //     scrollLeft = slider.scrollLeft;
+        // });
+
+        // slider.addEventListener('mouseleave', () => {
+        //     isDown = false;
+        //     slider.classList.remove('cursor-grabbing');
+        // });
+
+        // slider.addEventListener('mouseup', () => {
+        //     isDown = false;
+        //     slider.classList.remove('cursor-grabbing');
+        // });
+
+        // slider.addEventListener('mousemove', (e) => {
+        //     if (!isDown) return;
+        //     e.preventDefault();
+        //     const x = e.pageX - slider.offsetLeft;
+        //     const walk = (x - startX) * 1.5; // speed
+        //     slider.scrollLeft = scrollLeft - walk;
+        // });
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Hamburger Menu Toggle
             const hamburger = document.querySelector('.hamburger');

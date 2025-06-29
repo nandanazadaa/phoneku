@@ -71,18 +71,24 @@
                         @if ($item->product)
                             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-200 rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
                                 <div class="flex items-start gap-6 w-full sm:w-auto">
-                                    <div class="relative">
-                                        <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : 'https://via.placeholder.com/150' }}"
-                                            alt="{{ $item->product->name }}"
-                                            class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border border-gray-200" />
+                                    <div class="relative group">
+                                        <a href="{{ route('product.show', $item->product) }}">
+                                            <img src="{{ $item->product->image ? asset('storage/' . $item->product->image) : 'https://via.placeholder.com/150' }}"
+                                                alt="{{ $item->product->name }}"
+                                                class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border border-gray-200 
+                                                    transform group-hover:scale-105 transition duration-300 ease-in-out" />
+                                        </a>
                                         @if ($item->quantity > $item->product->stock)
-                                            <span class="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full transform translate-x-1/2 -translate-y-1/2">
+                                            <span
+                                                class="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full transform translate-x-1/2 -translate-y-1/2">
                                                 Stok kurang
                                             </span>
                                         @endif
                                     </div>
                                     <div class="space-y-1 flex-1">
-                                        <h3 class="font-bold text-lg text-gray-800">{{ $item->product->name }}</h3>
+                                        <a href="{{ route('product.show', $item->product) }}">
+                                            <h3 class="font-bold text-lg text-gray-800 hover:text-blue-600 line-clamp-2">{{ $item->product->name }}</h3>
+                                        </a>
                                         <p class="text-sm text-gray-600">{{ $item->product->color ?? 'Red' }}</p>
                                         <p class="text-sm text-gray-500">SKU: {{ $item->product->sku ?? 'N/A' }}</p>
                                         <p class="text-sm font-medium {{ $item->product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">

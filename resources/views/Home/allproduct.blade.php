@@ -3,7 +3,6 @@
 @section('title', 'Semua Produk - PhoneKu') {{-- Judul halaman dinamis --}}
 
 @section('content')
-
     <div class="container mx-auto px-4 pt-12 pb-8">
         {{-- Search Bar --}}
         <div class="relative w-full mb-6">
@@ -23,7 +22,7 @@
                         @endif
                     @endforeach
                     <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white p-3 px-5 rounded-r-full transition duration-200">
+                        class="bg-blue-500 hover:bg-blue-700 text-white p-3 px-5 rounded-r-full transition duration-200">
                         <i class="fas fa-search text-xl"></i>
                     </button>
                 </div>
@@ -118,18 +117,18 @@
         <!-- Products Grid (DINAMIS) -->
         <div class="relative">
             <!-- Tombol Navigasi Slider -->
-            <button onclick="scrollSlider('product-slider', -1)"
+            <!-- <button onclick="scrollSlider('product-slider', -1)"
                 class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
                 <i class="fas fa-chevron-left"></i>
             </button>
             <button onclick="scrollSlider('product-slider', 1)"
                 class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
                 <i class="fas fa-chevron-right"></i>
-            </button>
+            </button> -->
 
             <!-- Slider Container -->
-            <div id="product-slider" class="overflow-x-auto hide-scrollbar scroll-smooth px-6">
-                <div class="flex gap-6 w-max">
+            <div id="product-grid" class="px-6 py-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                     @forelse($products as $product)
                         <!-- Product Card -->
                         <div
@@ -180,9 +179,9 @@
                                     <div class="flex mt-4 space-x-2">
                                         @if ($product->stock > 0)
                                             @auth('web')
-                                                <form action="{{ route('cart.add', $product->id) }}" method="POST"
-                                                    class="flex-1">
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
                                                     @csrf
+                                                    <input type="hidden" name="quantity" value="1">
                                                     <button type="submit"
                                                         class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
                                                         <i class="fas fa-cart-plus mr-1"></i> Keranjang
@@ -212,30 +211,73 @@
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-16 w-full">
-                            <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 text-xl font-semibold">Oops! Produk tidak ditemukan.</p>
+                    <div class="col-span-full flex items-center justify-center min-h-[60vh] px-4">
+                        <div class="text-center max-w-md mx-auto">
+                            <div class="mb-6">
+                                <i class="fas fa-box-open text-8xl text-gray-300 mb-4"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">
+                                Oops! Produk tidak ditemukan
+                            </h3>
                             @if (request()->hasAny(['category', 'brand', 'price_range', 'search']))
-                                <p class="text-gray-500 mt-2">Coba ubah filter atau kata kunci pencarian Anda.</p>
+                                <p class="text-gray-500 text-base mb-4 leading-relaxed">
+                                    Coba ubah filter atau kata kunci pencarian Anda untuk menemukan produk yang sesuai.
+                                </p>
                                 <a href="{{ route('allproduct') }}"
-                                    class="mt-4 inline-block text-blue-600 hover:underline font-medium">
-                                    <i class="fas fa-sync-alt mr-1"></i> Reset Filter
+                                    class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm shadow-sm">
+                                    <i class="fas fa-sync-alt mr-2"></i> 
+                                    Reset Semua Filter
                                 </a>
                             @else
-                                <p class="text-gray-500 mt-2">Saat ini belum ada produk yang tersedia.</p>
+                                <p class="text-gray-500 text-base mb-4 leading-relaxed">
+                                    Saat ini belum ada produk yang tersedia. Silakan coba lagi nanti.
+                                </p>
+                                <a href="{{ route('home') }}"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm shadow-sm">
+                                    <i class="fas fa-home mr-2"></i> 
+                                    Kembali ke Beranda
+                                </a>
                             @endif
                         </div>
-                    @endforelse
-                </div>
+                    </div>
+                @endforelse
             </div>
         </div>
         <!-- AKHIR Products Grid -->
 
         <!-- Pagination Links -->
-        <div class="mt-12">
-            {{-- Render pagination links, mempertahankan query string --}}
-            {{ $products->appends(request()->query())->onEachSide(1)->links() }}
-        </div>
+        @if ($products->hasPages())
+            <div class="flex justify-center mt-10">
+                <nav role="navigation" aria-label="Pagination Navigation"
+                    class="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
+                    {{-- Previous Page Link --}}
+                    @if ($products->onFirstPage())
+                        <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">←</span>
+                    @else
+                        <a href="{{ $products->previousPageUrl() }}"
+                            class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">←</a>
+                    @endif
+
+                    {{-- Pagination Elements --}}
+                    @foreach ($products->links()->elements[0] as $page => $url)
+                        @if ($page == $products->currentPage())
+                            <span class="px-4 py-2 text-sm bg-blue-500 text-white">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}"
+                                class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($products->hasMorePages())
+                        <a href="{{ $products->nextPageUrl() }}"
+                            class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">→</a>
+                    @else
+                        <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">→</span>
+                    @endif
+                </nav>
+            </div>
+        @endif
 
     </div>
 
@@ -318,8 +360,7 @@
                                         "{{ route('login', ['redirect' => url()->full()]) }}";
                                     throw new Error('Unauthorized');
                                 }
-                                if (!response.ok && response.status !== 400 && response
-                                    status !== 401) { // Handle non-validation errors
+                                if (!response.ok && response.status !== 400 && response.status !== 401) { // Handle non-validation errors
                                     throw new Error('Network response was not ok: ' + response
                                         .statusText);
                                 }
