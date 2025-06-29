@@ -14,7 +14,7 @@
             <p class="text-gray-700 mb-4">Order ID: <span class="font-semibold">{{ $orderId }}</span></p>
         @endif
         <p class="text-gray-600 mb-6">Kami akan segera memproses pesanan Anda. Cek status pesanan di halaman profil Anda.</p>
-        <a href="{{ route('welcome') }}" class="btn btn-primary bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Kembali ke Beranda</a>
+        <a href="{{ route('cart') }}" class="btn btn-primary bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Kembali ke Keranjang</a>
     </div>
 </body>
 </html>

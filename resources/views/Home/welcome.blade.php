@@ -432,7 +432,7 @@
                 currentSlide = index;
             }
 
-            function startSlideShow() asas{
+            function startSlideShow() {
                 slideInterval = setInterval(function() {
                     let nextSlide = (currentSlide + 1) % slides.length;
                     showSlide(nextSlide);

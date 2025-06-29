@@ -534,28 +534,18 @@
 @endpush
 
 @section('content')
-<div class="panel-header bg-light-gradient">
+<div class="panel-header bg-primary-gradient">
     <div class="page-inner py-5">
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
             <div>
-                <h2 class="pb-2 fw-bold">Produk Management</h2>
-                <h5 class="op-7 mb-2">Manage Produk yang ada di toko anda!</h5>
-            </div>
-            <div class="ml-md-auto py-2 py-md-0">
-                {{-- Tombol Tambah Produk (via Modal) tetap ada di sini --}}
-                 <button class="btn btn-white btn-border btn-round mr-2" data-toggle="modal" data-target="#createProductModal">
-                    <i class="fa fa-plus"></i> Tambah Produk
-                 </button>
-                 {{-- Tombol Kembali ke List Produk hanya muncul jika tidak di tab 'list' --}}
-                @if(request('tab', 'list') !== 'list')
-                     <a href="{{ route('admin.products') }}?tab=list" class="btn btn-white btn-border btn-round mr-2">
-                         <i class="fa fa-arrow-left"></i> Kembali ke List Produk
-                     </a>
-                @endif
+                <h2 class="text-white pb-2 fw-bold">Management Products</h2>
+                <h5 class="text-white op-7 mb-2">Manage Products Konter</h5>
             </div>
         </div>
     </div>
 </div>
+<br>
+<br>
 
 <div class="page-inner mt--5">
     <!-- Tabs -->
@@ -687,13 +677,13 @@
                                         <td>
                                             <div class="btn-group">
                                                 {{-- Link to edit tab --}}
-                                                <a href="{{ route('admin.products') }}?tab=edit&id={{ $product->id }}" class="btn btn-sm btn-warning">
+                                                <a href="{{ route('admin.products') }}?tab=edit&id={{ $product->id }}" class="btn btn-sm btn-warning mx-1">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#viewProductModal{{ $product->id }}">
+                                                <button type="button" class="btn btn-sm btn-info mx-1" data-toggle="modal" data-target="#viewProductModal{{ $product->id }}">
                                                     <i class="fa fa-eye"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteProductModal{{ $product->id }}">
+                                                <button type="button" class="btn btn-sm btn-danger mx-1" data-toggle="modal" data-target="#deleteProductModal{{ $product->id }}">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </div>
