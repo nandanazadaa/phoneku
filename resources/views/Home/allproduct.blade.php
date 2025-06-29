@@ -193,7 +193,7 @@
                                                     <i class="fas fa-eye mr-1"></i> Detail
                                                 </a>
                                             @else
-                                                <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
+                                                <a href="{{ route('login', ['redirect' => route('allproduct', request()->query())]) }}"
                                                     class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-200 transition duration-200">
                                                     <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                                 </a>
