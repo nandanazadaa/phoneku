@@ -61,6 +61,11 @@ class OrderController extends Controller
         
         $order->save();
 
+        // Reduce stock when order status is changed to "diproses"
+        if ($request->order_status === 'diproses' && $oldStatus !== 'diproses') {
+            $this->reduceProductStock($order);
+        }
+
         // Log the status change
         Log::info("Order status updated", [
             'order_id' => $order->id,
@@ -98,6 +103,9 @@ class OrderController extends Controller
             // Update order status based on payment status
             if ($request->payment_status === 'completed') {
                 $order->order_status = Order::ORDER_STATUS_DIPROSES;
+                
+                // Reduce stock when payment is completed
+                $this->reduceProductStock($order);
             } elseif ($request->payment_status === 'failed' || $request->payment_status === 'refunded') {
                 $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
             }
@@ -148,6 +156,9 @@ class OrderController extends Controller
                         $order->order_status = Order::ORDER_STATUS_DIPROSES;
                         $order->midtrans_transaction_id = $status->transaction_id;
                         $order->save();
+                        
+                        // Reduce stock when payment is completed
+                        $this->reduceProductStock($order);
                         
                         $updatedCount++;
                         
@@ -204,6 +215,43 @@ class OrderController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Reduce product stock when order is confirmed
+     */
+    private function reduceProductStock(Order $order)
+    {
+        try {
+            $order->load('orderItems.product');
+            
+            foreach ($order->orderItems as $item) {
+                $product = $item->product;
+                if ($product) {
+                    $oldStock = $product->stock;
+                    $newStock = max(0, $oldStock - $item->quantity);
+                    
+                    $product->stock = $newStock;
+                    $product->save();
+                    
+                    Log::info('Product stock reduced by admin', [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'order_id' => $order->id,
+                        'order_code' => $order->order_code,
+                        'quantity_ordered' => $item->quantity,
+                        'old_stock' => $oldStock,
+                        'new_stock' => $newStock,
+                        'updated_by' => auth()->user()->name ?? 'Admin'
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error reducing product stock: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'order_code' => $order->order_code
+            ]);
         }
     }
 }

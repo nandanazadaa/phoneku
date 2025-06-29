@@ -27,6 +27,7 @@
                     <th class="px-2 py-1 border">Qty</th>
                     <th class="px-2 py-1 border">Harga Satuan</th>
                     <th class="px-2 py-1 border">Subtotal</th>
+                    <th class="px-2 py-1 border">Stok Saat Ini</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +37,15 @@
                     <td class="px-2 py-1 border">{{ $item->quantity }}</td>
                     <td class="px-2 py-1 border">Rp{{ number_format($item->price,0,',','.') }}</td>
                     <td class="px-2 py-1 border">Rp{{ number_format($item->quantity * $item->price,0,',','.') }}</td>
+                    <td class="px-2 py-1 border">
+                        @if($item->product)
+                            <span class="px-2 py-1 rounded text-xs @if($item->product->stock > 10) bg-green-100 text-green-700 @elseif($item->product->stock > 0) bg-yellow-100 text-yellow-700 @else bg-red-100 text-red-700 @endif">
+                                {{ $item->product->stock }} unit
+                            </span>
+                        @else
+                            <span class="text-gray-500">Produk tidak ditemukan</span>
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

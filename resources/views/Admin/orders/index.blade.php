@@ -215,6 +215,7 @@
                                     <th>Customer Name</th>
                                     <th>Order Date</th>
                                     <th>Total</th>
+                                    <th>Items</th>
                                     <th>Order Status</th>
                                     <th>Payment Status</th>
                                     <th>Actions</th>
@@ -228,6 +229,17 @@
                                         <td>{{ $order->user ? $order->user->name : 'N/A' }}</td>
                                         <td>{{ $order->created_at->format('d M Y H:i') }}</td>
                                         <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ $order->orderItems->count() }} item(s)<br>
+                                                @foreach($order->orderItems->take(2) as $item)
+                                                    <span class="badge badge-info">{{ $item->product->name ?? 'N/A' }} ({{ $item->quantity }})</span>
+                                                @endforeach
+                                                @if($order->orderItems->count() > 2)
+                                                    <span class="badge badge-secondary">+{{ $order->orderItems->count() - 2 }} more</span>
+                                                @endif
+                                            </small>
+                                        </td>
                                         <td>
                                             <span class="status-badge status-{{ str_replace(' ', '-', $order->order_status) }}">
                                                 {{ str_replace('telah sampai', 'Telah Sampai', ucfirst($order->order_status)) }}
@@ -340,7 +352,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center">No orders found.</td>
+                                        <td colspan="9" class="text-center">No orders found.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -431,7 +443,7 @@
                     "infoFiltered": "(filtered from _MAX_ total orders)"
                 },
                 "columnDefs": [
-                    { "orderable": false, "targets": 7 } // Disable sorting on Actions column (now column 7)
+                    { "orderable": false, "targets": 8 } // Disable sorting on Actions column (now column 8)
                 ]
             });
 

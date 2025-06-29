@@ -244,6 +244,9 @@ class CheckoutController extends Controller
                 case 'settlement':
                     $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
                     $order->order_status = Order::ORDER_STATUS_DIPROSES;
+                    
+                    // Reduce stock when payment is successful
+                    $this->reduceProductStock($order);
                     break;
                     
                 case 'pending':
@@ -462,6 +465,9 @@ class CheckoutController extends Controller
                 case 'settlement':
                     $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
                     $order->order_status = Order::ORDER_STATUS_DIPROSES;
+                    
+                    // Reduce stock when payment is successful
+                    $this->reduceProductStock($order);
                     break;
                     
                 case 'pending':
@@ -513,6 +519,42 @@ class CheckoutController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Reduce product stock when order is confirmed
+     */
+    private function reduceProductStock(Order $order)
+    {
+        try {
+            $order->load('orderItems.product');
+            
+            foreach ($order->orderItems as $item) {
+                $product = $item->product;
+                if ($product) {
+                    $oldStock = $product->stock;
+                    $newStock = max(0, $oldStock - $item->quantity);
+                    
+                    $product->stock = $newStock;
+                    $product->save();
+                    
+                    Log::info('Product stock reduced', [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'order_id' => $order->id,
+                        'order_code' => $order->order_code,
+                        'quantity_ordered' => $item->quantity,
+                        'old_stock' => $oldStock,
+                        'new_stock' => $newStock
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error reducing product stock: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'order_code' => $order->order_code
+            ]);
         }
     }
 }
