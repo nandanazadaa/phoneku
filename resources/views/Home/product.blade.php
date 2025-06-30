@@ -52,14 +52,15 @@
                         <span class="text-xs text-gray-500 font-semibold uppercase mr-2">WARNA</span>
                         <div class="flex items-center gap-2" id="color-options">
                             @php
-                                $colors = $product->color_options ? (is_array($product->color_options) ? $product->color_options : explode(',', $product->color_options)) : [$product->color];
-                                $selectedColor = old('color', $product->color ?? (isset($colors[0]) ? trim($colors[0]) : ''));
+                                $colors = $product->color_options ? (is_array($product->color_options) ? $product->color_options : explode(',', $product->color_options)) : (isset($product->color) ? explode(',', $product->color) : []);
+                                $colors = array_filter(array_map('trim', $colors));
+                                $selectedColor = old('color', $product->color ?? (isset($colors[0]) ? $colors[0] : ''));
                             @endphp
                             @foreach($colors as $color)
-                                <label class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center cursor-pointer relative">
-                                    <input type="radio" name="color" value="{{ trim($color) }}" class="sr-only color-radio" {{ $selectedColor == trim($color) ? 'checked' : '' }}>
-                                    <span class="block w-4 h-4 rounded-full" style="background: {{ trim($color) }};"></span>
-                                    @if($selectedColor == trim($color))
+                                <label class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer relative" style="border-color: {{ $selectedColor == $color ? '#3b82f6' : '#d1d5db' }};">
+                                    <input type="radio" name="color" value="{{ $color }}" class="sr-only color-radio" {{ $selectedColor == $color ? 'checked' : '' }}>
+                                    <span class="block w-4 h-4 rounded-full" style="background: {{ $color }};"></span>
+                                    @if($selectedColor == $color)
                                         <span class="absolute inset-0 border-2 border-blue-500 rounded-full pointer-events-none"></span>
                                     @endif
                                 </label>
@@ -81,12 +82,10 @@
                     </div>
                     <!-- Detail -->
                     <div class="mb-2">
-                        <span class="text-xs text-gray-500 font-semibold uppercase">DETAIL</span>
-                        <ul class="list-none space-y-1 text-gray-700 text-sm mt-1">
-                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Layar: 6.1 inch Liquid Retina HD Display</li>
-                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Prosesor: A13 Bionic Chip - Cepat dan Efisien</li>
-                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Kamera: Dual 12 MP (Wide & Ultra-Wide) + Night Mode</li>
-                        </ul>
+                        <span class="text-xs text-gray-500 font-semibold uppercase">DESKRIPSI PRODUK</span>
+                        <div class="prose prose-sm max-w-none text-gray-700 mt-1">
+                            {!! nl2br(e($product->description ?? '-')) !!}
+                        </div>
                     </div>
                     <!-- Kuantitas & Stok -->
                     <div class="flex items-center gap-8 mt-4 mb-2">
@@ -116,7 +115,7 @@
                                     @csrf
                                     <input type="hidden" name="quantity" id="cart-quantity" value="1">
                                     <input type="hidden" name="color" id="cart-color" value="{{ $selectedColor }}">
-                                    <button type="submit" class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-6 text-center text-base font-semibold hover:bg-blue-200 flex items-center gap-2"><i class="fas fa-cart-plus"></i> Keranjang</button>
+                                    <button type="submit" class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-6 text-center text-base font-semibold hover:bg-blue-200 flex items-center gap-2"><i class="fas fa-cart-plus"></i> Keranjang</button>
                                 </form>
                                 <form action="{{ route('buy.now', $product->id) }}" method="POST">
                                     @csrf
@@ -129,7 +128,9 @@
                                 <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}" class="bg-blue-600 text-white rounded-lg py-2 px-8 text-base font-semibold hover:bg-blue-700 flex items-center gap-2"><i class="fas fa-shopping-bag"></i> Beli</a>
                             @endauth
                         @else
-                            <span class="text-red-600 font-semibold py-2 px-6 border-2 border-red-300 rounded-lg bg-red-50 w-full text-center hover:bg-red-100 transition-all duration-200">Stok Habis</span>
+                            <button type="button" class="out-of-stock-btn text-red-600 font-semibold py-2 px-6 border-2 border-red-300 rounded-lg bg-red-50 w-full text-center hover:bg-red-100 transition-all duration-200">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -250,7 +251,8 @@
     @endsection
 
     @section('scripts')
-<script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Harga dinamis
         const unitPrice = @json($product->price);
@@ -327,8 +329,132 @@
                 document.getElementById('buy-color').value = this.value;
             });
         });
+
+        // AJAX Add to Cart
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const form = this.closest('form');
+                if (!form) {
+                    console.error('Form not found for add to cart button');
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const originalButtonText = this.innerHTML;
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...';
+
+                // Get CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    this.disabled = false;
+                    this.innerHTML = originalButtonText;
+                    alert('CSRF token tidak ditemukan. Silakan refresh halaman.');
+                    return;
+                }
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = "{{ route('login', ['redirect' => url()->full()]) }}";
+                        throw new Error('Unauthorized');
+                    }
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message || 'Produk berhasil ditambahkan ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        } else {
+                            alert(data.message || 'Produk berhasil ditambahkan ke keranjang.');
+                        }
+                        
+                        // Update cart count
+                        const cartCountElement = document.getElementById('cart-count');
+                        if (cartCountElement && data.cartCount !== undefined) {
+                            cartCountElement.textContent = data.cartCount;
+                            cartCountElement.classList.toggle('hidden', data.cartCount <= 0);
+                        }
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'Tidak dapat menambahkan produk ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        } else {
+                            alert(data.message || 'Tidak dapat menambahkan produk ke keranjang.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    if (error.message !== 'Unauthorized') {
+                        console.error('Add to Cart Error:', error);
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        } else {
+                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                        }
+                    }
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.innerHTML = originalButtonText;
+                });
+            });
+        });
+
+        // Add event listener for out of stock items
+        document.querySelectorAll('.out-of-stock-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Stok Habis',
+                    text: 'Maaf, produk ini sedang tidak tersedia.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        });
     });
-</script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="{{ asset('js/product.js') }}"></script>
+    </script>
+    <script src="{{ asset('js/product.js') }}"></script>
     @endsection

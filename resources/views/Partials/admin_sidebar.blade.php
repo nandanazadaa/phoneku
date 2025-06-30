@@ -1,5 +1,5 @@
 <!-- Sidebar -->
-<div class="sidebar sidebar-style-2">           
+<div class="sidebar sidebar-style-2">
     <div class="sidebar-wrapper scrollbar scrollbar-inner">
         <div class="sidebar-content">
             <div class="user">
@@ -37,6 +37,12 @@
                 </div>
             </div>
             <ul class="nav nav-primary">
+                <li class="nav-section">
+                    <span class="sidebar-mini-icon">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </span>
+                    <h4 class="text-section">Dashboard</h4>
+                </li>
                 <li class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}" class="collapsed" aria-expanded="false">
                         <i class="fas fa-home"></i>
@@ -55,10 +61,28 @@
                         <p>Produk</p>
                     </a>
                 </li>
+                <li class="nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.orders.index') }}" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-truck"></i>
+                        <p>Management Order</p>
+                    </a>
+                </li>
                 <li class="nav-item {{ request()->routeIs('admin.users') ? 'active' : '' }}">
                     <a href="{{ route('admin.users') }}" class="collapsed" aria-expanded="false">
                         <i class="fa-solid fa-users"></i>
                         <p>Management Users</p>
+                    </a>
+                </li>
+                <li class="nav-item {{ request()->routeIs('admin.testimoni') ? 'active' : '' }}">
+                    <a href="{{ route('admin.testimoni') }}" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-star"></i>
+                        <p>Management Testimoni</p>
+                    </a>
+                </li>
+                <li class="nav-item {{ request()->routeIs('admin.courier') ? 'active' : '' }}">
+                    <a href="{{ route('admin.courier') }}" class="collapsed" aria-expanded="false">
+                        <i class="fa-solid fa-cubes"></i>
+                        <p>Management Kurir</p>
                     </a>
                 </li>
                 <li class="nav-section">

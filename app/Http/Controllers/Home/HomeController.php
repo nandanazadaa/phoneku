@@ -13,6 +13,7 @@ class HomeController extends Controller
 {
     public function index()
     {
+
         $featuredPhones = Product::phones()->featured()->take(4)->get();
         $featuredAccessories = Product::accessories()->featured()->take(4)->get();
         $phones = Product::phones()->latest()->take(4)->get();

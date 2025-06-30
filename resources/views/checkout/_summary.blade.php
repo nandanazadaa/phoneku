@@ -2,7 +2,7 @@
     <h2 class="text-lg md:text-xl font-semibold mb-4">Ringkasan Transaksi</h2>
     <div class="space-y-2 text-sm">
         <div class="flex justify-between">
-            <span>Total Harga ({{ $cartItems->count() }} Barang)</span>
+            <span>Total Harga (1 Barang)</span>
             <span>Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
         </div>
         <div class="flex justify-between">
@@ -13,13 +13,23 @@
             <span>Biaya Aplikasi</span>
             <span>Rp{{ number_format($serviceFee, 0, ',', '.') }}</span>
         </div>
-        <hr class="my-2">
-        <div class="flex justify-between font-bold text-lg">
-            <span>Total</span>
-            <span>Rp{{ number_format($total, 0, ',', '.') }}</span>
+        
+        <hr class="my-3 border-gray-300">
+        <div class="flex justify-between font-bold text-lg text-gray-800">
+            <span>Total Pembayaran</span>
+            <span id="total-display">Rp{{ number_format($total, 0, ',', '.') }}</span>
         </div>
     </div>
+
     <button id="pay-button" class="btn btn-primary w-full mt-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 {{ $cartItems->isEmpty() ? 'disabled' : '' }}">Bayar Sekarang</button>
+    <form id="checkout-products-form" style="display:none;">
+        @foreach($cartItems as $i => $item)
+            <input type="hidden" name="products[{{ $i }}][product_id]" value="{{ $item->product_id }}">
+            <input type="hidden" name="products[{{ $i }}][quantity]" value="{{ $item->quantity }}">
+        @endforeach
+        <input type="hidden" name="courier" id="selected-courier">
+        <input type="hidden" name="courier_service" id="selected-courier-service">
+    </form>
 </div>
 
 <!-- Tambahkan skrip Midtrans -->
@@ -27,29 +37,83 @@
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
         const payButton = document.getElementById('pay-button');
+        const courierSelect = document.getElementById('courier');
+        const serviceSelect = document.getElementById('courier-service');
+        const shippingCostDisplay = document.getElementById('shipping-cost-display');
+        const serviceFeeDisplay = document.getElementById('service-fee-display');
+        const totalDisplay = document.getElementById('total-display');
+        const selectedCourierInput = document.getElementById('selected-courier');
+        const selectedCourierServiceInput = document.getElementById('selected-courier-service');
+        const subtotal = {{ $subtotal }};
+        const serviceFee = {{ $serviceFee }};
+
+        // Filter service types based on selected courier
+        courierSelect.addEventListener('change', function() {
+            const selectedCourier = this.value;
+            const options = serviceSelect.options;
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (!selectedCourier || option.getAttribute('data-courier') === selectedCourier) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+            serviceSelect.value = ''; // Reset service selection
+            updateDisplay();
+        });
+
+        // Update shipping cost and total display
+        serviceSelect.addEventListener('change', function() {
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            const selectedService = serviceSelect.options[serviceSelect.selectedIndex];
+            const shippingCost = parseFloat(selectedService ? selectedService.getAttribute('data-cost') || 0 : 0);
+            const total = subtotal + shippingCost + serviceFee;
+
+            shippingCostDisplay.textContent = 'Rp' + shippingCost.toLocaleString('id-ID');
+            totalDisplay.textContent = 'Rp' + total.toLocaleString('id-ID');
+            selectedCourierInput.value = courierSelect.value || '';
+            selectedCourierServiceInput.value = serviceSelect.value || '';
+        }
+
+        // Initial update
+        updateDisplay();
+
+        // Handle payment button click
         if (payButton) {
             payButton.addEventListener('click', function () {
-                const cartItems = @json($cartItems);
-                if (!cartItems || cartItems.length === 0) {
-                    alert('Keranjang Anda kosong. Tambahkan produk terlebih dahulu.');
+                if (!courierSelect.value || !serviceSelect.value) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Peringatan',
+                        text: 'Silakan pilih kurir dan jenis layanan terlebih dahulu.',
+                        confirmButtonColor: '#3B82F6'
+                    });
                     return;
                 }
 
-                const products = cartItems.map(item => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity
-                }));
+                const productId = cartItems[0]?.product_id || null;
+                const quantity = cartItems[0]?.quantity || null;
 
-                console.log('Sending data:', { products, shipping_cost: {{ $shippingCost }}, service_fee: {{ $serviceFee }} });
+                if (!productId || !quantity) {
+                    alert('Data produk atau kuantitas tidak tersedia. Periksa keranjang Anda.');
+                    return;
+                }
 
-                fetch('/checkout/store', {
+                console.log('Sending data:', { product_id: productId, quantity: quantity, shipping_cost: {{ $shippingCost }}, service_fee: {{ $serviceFee }} });
+
+                fetch(window.location.origin + '/checkout/store', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        products: products,
+                        product_id: productId,
+                        quantity: quantity,
                         shipping_cost: {{ $shippingCost }},
                         service_fee: {{ $serviceFee }}
                     })
@@ -66,35 +130,180 @@
                     if (data.snap_token) {
                         snap.pay(data.snap_token, {
                             onSuccess: function (result) {
-                                alert('Pembayaran berhasil! Order ID: ' + result.order_id);
-                                window.location.href = '/thank-you?order_id=' + result.order_id;
+                                console.log('Payment Success:', result);
+                                
+                                // Update payment status via frontend callback
+                                fetch('/update-payment-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'settlement',
+                                        transaction_id: result.transaction_id
+                                    })
+                                })
+                                .then(response => {
+                                    console.log('Update status response:', response);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('Payment status updated:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error updating payment status:', error);
+                                });
+                                
+                                // Payment success will be handled by Midtrans callback redirect
+                                console.log('Payment completed successfully. Redirecting to success page...');
                             },
                             onPending: function (result) {
-                                alert('Pembayaran tertunda. Order ID: ' + result.order_id);
-                                window.location.href = '/checkout';
+                                console.log('Payment Pending:', result);
+                                
+                                // Update payment status via frontend callback
+                                fetch('/update-payment-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'pending',
+                                        transaction_id: result.transaction_id
+                                    })
+                                })
+                                .then(response => {
+                                    console.log('Update status response:', response);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('Payment status updated:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error updating payment status:', error);
+                                });
+                                
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Pembayaran Tertunda',
+                                    html: `
+                                        <div class="text-center">
+                                            <p class="mb-3">Pembayaran Anda sedang dalam proses.</p>
+                                            <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                                                <p class="text-sm text-gray-600">Order ID:</p>
+                                                <p class="font-semibold text-gray-800">${result.order_id}</p>
+                                            </div>
+                                            <p class="text-sm text-gray-600">Silakan selesaikan pembayaran Anda. Anda akan diarahkan kembali ke halaman checkout.</p>
+                                        </div>
+                                    `,
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#3B82F6',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        const redirectUrl = window.location.origin + '/checkout';
+                                        console.log('Redirecting to:', redirectUrl);
+                                        window.location.href = redirectUrl;
+                                    }
+                                });
                             },
                             onError: function (result) {
-                                alert('Pembayaran gagal! Silakan coba lagi. Detail: ' + JSON.stringify(result));
-                                console.error('Error:', result);
+                                console.log('Payment Error:', result);
+                                
+                                // Update payment status via frontend callback
+                                fetch('/update-payment-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'deny',
+                                        transaction_id: result.transaction_id
+                                    })
+                                })
+                                .then(response => {
+                                    console.log('Update status response:', response);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('Payment status updated:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error updating payment status:', error);
+                                });
+                                
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Pembayaran Gagal',
+                                    html: `
+                                        <div class="text-center">
+                                            <p class="mb-3">Maaf, pembayaran Anda gagal diproses.</p>
+                                            <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                                                <p class="text-sm text-gray-600">Order ID:</p>
+                                                <p class="font-semibold text-gray-800">${result.order_id || 'N/A'}</p>
+                                            </div>
+                                            <p class="text-sm text-gray-600">Silakan coba lagi atau hubungi customer service jika masalah berlanjut.</p>
+                                        </div>
+                                    `,
+                                    confirmButtonText: 'Coba Lagi',
+                                    confirmButtonColor: '#EF4444',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        // Redirect to checkout page to try again
+                                        const redirectUrl = window.location.origin + '/checkout';
+                                        console.log('Redirecting to checkout to try again:', redirectUrl);
+                                        window.location.href = redirectUrl;
+                                    }
+                                });
                             },
                             onClose: function () {
-                                alert('Anda telah menutup popup pembayaran.');
+                                console.log('Payment popup closed');
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Pembayaran Dibatalkan',
+                                    text: 'Anda telah menutup popup pembayaran. Silakan coba lagi jika ingin melanjutkan pembayaran.',
+                                    confirmButtonText: 'OK',
+                                    confirmButtonColor: '#3B82F6'
+                                });
                             }
                         });
                     } else if (data.error) {
-                        alert('Error: ' + data.error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.error,
+                            confirmButtonColor: '#EF4444'
+                        });
                     } else {
-                        alert('Gagal mendapatkan token pembayaran. Silakan coba lagi.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Token Pembayaran Gagal',
+                            text: 'Gagal mendapatkan token pembayaran. Silakan coba lagi.',
+                            confirmButtonText: 'Coba Lagi',
+                            confirmButtonColor: '#EF4444'
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Fetch error:', error);
-                    alert('Terjadi kesalahan saat membuat pesanan: ' + error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan',
+                        text: 'Terjadi kesalahan saat membuat pesanan: ' + error.message,
+                        confirmButtonColor: '#EF4444'
+                    });
                 });
             });
         }
     });
 </script>
 
-<!-- Tambahkan meta tag CSRF -->
 <meta name="csrf-token" content="{{ csrf_token() }}">

@@ -8,9 +8,14 @@
             <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="w-20 h-20 object-contain rounded-lg border">
             <div class="flex-1">
                 <div class="font-semibold text-gray-800">{{ $item->product->name }}</div>
-                <div class="text-sm text-green-600">Tersedia</div>
+                <div class="text-sm text-gray-600">Jumlah: {{ $item->quantity }}</div>
+                <div class="text-sm text-gray-500">Harga Satuan: Rp{{ number_format($item->product->price, 0, ',', '.') }}</div>
+                <div class="text-sm text-green-600 font-medium">Tersedia</div>
             </div>
-            <div class="font-bold text-lg text-gray-800">Rp{{ number_format($item->product->price, 0, ',', '.') }}</div>
+            <div class="text-right">
+                <div class="font-bold text-lg text-gray-800">Rp{{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}</div>
+                <div class="text-xs text-gray-500">Total</div>
+            </div>
         </div>
         @empty
         <div class="text-center text-gray-500">Tidak ada produk di keranjang.</div>

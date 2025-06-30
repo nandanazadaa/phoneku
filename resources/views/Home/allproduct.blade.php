@@ -23,7 +23,7 @@
                         @endif
                     @endforeach
                     <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white p-3 px-5 rounded-r-full transition duration-200">
+                        class="bg-blue-500 hover:bg-blue-700 text-white p-3 px-5 rounded-r-full transition duration-200">
                         <i class="fas fa-search text-xl"></i>
                     </button>
                 </div>
@@ -35,7 +35,6 @@
             <form id="filter-form" action="{{ route('allproduct') }}" method="GET" class="contents">
                 <input type="hidden" name="search" value="{{ request('search') }}"> {{-- Pertahankan search query --}}
 
-                <!-- Dropdown Kategori -->
                 <div class="relative w-full">
                     <select name="category" onchange="document.getElementById('filter-form').submit()"
                         class="appearance-none bg-white border border-gray-300 text-gray-700 p-2 pl-4 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200">
@@ -50,7 +49,6 @@
                         class="fas fa-chevron-down text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
 
-                <!-- Dropdown Brand (Contoh - Idealnya diambil dari DB) -->
                 <div class="relative w-full">
                     {{-- Anda bisa mengambil daftar brand unik dari produk yang ada --}}
                     @php
@@ -71,7 +69,6 @@
                 </div>
 
 
-                <!-- Dropdown Rentang Harga (Contoh) -->
                 <div class="relative w-full">
                     <select name="price_range" onchange="document.getElementById('filter-form').submit()"
                         class="appearance-none bg-white border border-gray-300 text-gray-700 p-2 pl-4 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200">
@@ -93,7 +90,6 @@
 
     </div>
 
-    <!-- Product Section -->
     <div class="container mx-auto px-4 pt-4 pb-8">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
             <div>
@@ -115,23 +111,10 @@
             @endif
         </div>
 
-        <!-- Products Grid (DINAMIS) -->
         <div class="relative">
-            <!-- Tombol Navigasi Slider -->
-            <button onclick="scrollSlider('product-slider', -1)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button onclick="scrollSlider('product-slider', 1)"
-                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-300 rounded-full shadow p-2 hover:bg-gray-100">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-
-            <!-- Slider Container -->
-            <div id="product-slider" class="overflow-x-auto hide-scrollbar scroll-smooth px-6">
-                <div class="flex gap-6 w-max">
+            <div id="product-grid" class="px-6 py-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                     @forelse($products as $product)
-                        <!-- Product Card -->
                         <div
                             class="w-72 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
                             {{-- Link ke halaman detail produk --}}
@@ -180,9 +163,9 @@
                                     <div class="flex mt-4 space-x-2">
                                         @if ($product->stock > 0)
                                             @auth('web')
-                                                <form action="{{ route('cart.add', $product->id) }}" method="POST"
-                                                    class="flex-1">
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form">
                                                     @csrf
+                                                    <input type="hidden" name="quantity" value="1">
                                                     <button type="submit"
                                                         class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
                                                         <i class="fas fa-cart-plus mr-1"></i> Keranjang
@@ -203,47 +186,84 @@
                                                 </a>
                                             @endauth
                                         @else
-                                            <span
-                                                class="text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full">Stok
-                                                Habis</span>
+                                            <button type="button"
+                                                class="out-of-stock-btn text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full hover:bg-red-200 transition duration-200">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-16 w-full">
-                            <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 text-xl font-semibold">Oops! Produk tidak ditemukan.</p>
+                    <div class="col-span-full flex items-center justify-center min-h-[60vh] px-4">
+                        <div class="text-center max-w-md mx-auto">
+                            <div class="mb-6">
+                                <i class="fas fa-box-open text-8xl text-gray-300 mb-4"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-700 mb-2">
+                                Oops! Produk tidak ditemukan
+                            </h3>
                             @if (request()->hasAny(['category', 'brand', 'price_range', 'search']))
-                                <p class="text-gray-500 mt-2">Coba ubah filter atau kata kunci pencarian Anda.</p>
+                                <p class="text-gray-500 text-base mb-4 leading-relaxed">
+                                    Coba ubah filter atau kata kunci pencarian Anda untuk menemukan produk yang sesuai.
+                                </p>
                                 <a href="{{ route('allproduct') }}"
-                                    class="mt-4 inline-block text-blue-600 hover:underline font-medium">
-                                    <i class="fas fa-sync-alt mr-1"></i> Reset Filter
+                                    class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm shadow-sm">
+                                    <i class="fas fa-sync-alt mr-2"></i> 
+                                    Reset Semua Filter
                                 </a>
                             @else
-                                <p class="text-gray-500 mt-2">Saat ini belum ada produk yang tersedia.</p>
+                                <p class="text-gray-500 text-base mb-4 leading-relaxed">
+                                    Saat ini belum ada produk yang tersedia. Silakan coba lagi nanti.
+                                </p>
+                                <a href="{{ route('home') }}"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm shadow-sm">
+                                    <i class="fas fa-home mr-2"></i> 
+                                    Kembali ke Beranda
+                                </a>
                             @endif
                         </div>
-                    @endforelse
+                    </div>
+                @endforelse
                 </div>
             </div>
         </div>
-        <!-- AKHIR Products Grid -->
+        @if ($products->hasPages())
+            <div class="flex justify-center mt-10">
+                <nav role="navigation" aria-label="Pagination Navigation"
+                    class="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
+                    {{-- Previous Page Link --}}
+                    @if ($products->onFirstPage())
+                        <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">←</span>
+                    @else
+                        <a href="{{ $products->previousPageUrl() }}"
+                            class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">←</a>
+                    @endif
 
-        <!-- Pagination Links -->
-        <div class="mt-12">
-            {{-- Render pagination links, mempertahankan query string --}}
-            {{ $products->appends(request()->query())->onEachSide(1)->links() }}
-        </div>
+                    {{-- Pagination Elements --}}
+                    @foreach ($products->links()->elements[0] as $page => $url)
+                        @if ($page == $products->currentPage())
+                            <span class="px-4 py-2 text-sm bg-blue-500 text-white">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}"
+                                class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($products->hasMorePages())
+                        <a href="{{ $products->nextPageUrl() }}"
+                            class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">→</a>
+                    @else
+                        <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">→</span>
+                    @endif
+                </nav>
+            </div>
+        @endif
 
     </div>
 
-@endsection
-
-@section('styles')
-    {{-- Tambahkan style khusus jika perlu --}}
-    <style src="{{ asset('\css\allproduct.css') }}"></style>
 @endsection
 
 @section('scripts')
@@ -251,148 +271,128 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> {{-- Contoh: SweetAlert --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // AJAX Add to Cart
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Mencegah form redirect
+                    
+                    const button = this.querySelector('.add-to-cart-btn');
+                    const formData = new FormData(this);
+                    const originalButtonText = button.innerHTML; // Simpan teks tombol asli
+                    button.disabled = true; // Disable tombol
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...'; // Loading state
 
-            const hamburgerButton = document.getElementById('hamburger-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (hamburgerButton && mobileMenu) {
-                hamburgerButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                    mobileMenu.classList.toggle('active');
-
-                    // Toggle hamburger icon between menu and X
-                    const isOpen = !mobileMenu.classList.contains('hidden');
-                    const svg = hamburgerButton.querySelector('svg');
-
-                    if (isOpen) {
-                        svg.innerHTML = `
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        `;
-                    } else {
-                        svg.innerHTML = `
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        `;
+                    // Dapatkan CSRF token dari meta tag
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    if (!csrfToken) {
+                        console.error('CSRF token not found!');
+                        button.disabled = false;
+                        button.innerHTML = originalButtonText;
+                        return;
                     }
-                });
 
-                // Close menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    const isClickInside = hamburgerButton.contains(event.target) ||
-                        mobileMenu.contains(event.target);
-
-                    if (!isClickInside && !mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                        mobileMenu.classList.remove('active');
-                        const svg = hamburgerButton.querySelector('svg');
-                        svg.innerHTML = `
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        `;
-                    }
-                });
-            }
-            // Optional: AJAX Add to Cart
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    const form = this.closest('form');
-                    if (form) {
-                        e.preventDefault();
-                        const formData = new FormData(form);
-                        const originalButtonText = this.innerHTML; // Simpan teks tombol asli
-                        this.disabled = true; // Disable tombol
-                        this.innerHTML =
-                            '<i class="fas fa-spinner fa-spin mr-1"></i> Menambah...'; // Loading state
-
-                        fetch(form.action, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute('content'),
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json',
-                                },
-                            })
-                            .then(response => {
-                                if (response.status === 401) { // Unauthorized
-                                    window.location.href =
-                                        "{{ route('login', ['redirect' => url()->full()]) }}";
-                                    throw new Error('Unauthorized');
-                                }
-                                if (!response.ok && response.status !== 400 && response
-                                    status !== 401) { // Handle non-validation errors
-                                    throw new Error('Network response was not ok: ' + response
-                                        .statusText);
-                                }
-                                return response.json().catch(() => {
-                                    // Handle cases where response might not be JSON (e.g., server error pages)
-                                    throw new Error(
-                                        'Invalid JSON response from server.');
-                                });
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Berhasil!',
-                                        text: data.message || 'Produk ditambahkan.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                    // Update cart count (sesuaikan selector)
-                                    const cartCountElement = document.getElementById(
-                                        'cart-count');
-                                    if (cartCountElement && data.cartCount !== undefined) {
-                                        cartCountElement.textContent = data.cartCount;
-                                        // Jika count 0, sembunyikan? Jika > 0, tampilkan.
-                                        cartCountElement.classList.toggle('hidden', data
-                                            .cartCount <= 0);
-                                    }
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Gagal',
-                                        text: data.message ||
-                                            'Tidak dapat menambahkan produk.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                if (error.message !== 'Unauthorized') {
-                                    console.error('Add to Cart Error:', error);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Terjadi kesalahan. Silakan coba lagi.',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 3000
-                                    });
-                                }
-                            })
-                            .finally(() => {
-                                // Kembalikan state tombol setelah selesai
-                                this.disabled = false;
-                                this.innerHTML = originalButtonText;
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (response.status === 401) { // Unauthorized
+                            window.location.href = "{{ route('login', ['redirect' => url()->full()]) }}";
+                            throw new Error('Unauthorized');
+                        }
+                        return response.json().catch(() => {
+                            throw new Error('Invalid JSON response from server.');
+                        });
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message || 'Produk berhasil ditambahkan ke keranjang.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
                             });
-                    }
+                            // Update cart count (sesuaikan selector jika perlu)
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement && data.cartCount !== undefined) {
+                                cartCountElement.textContent = data.cartCount;
+                                cartCountElement.classList.toggle('hidden', data.cartCount <= 0);
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message || 'Tidak dapat menambahkan produk.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        if (error.message !== 'Unauthorized') {
+                            console.error('Add to Cart Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        // Kembalikan state tombol setelah selesai
+                        button.disabled = false;
+                        button.innerHTML = originalButtonText;
+                    });
+                });
+            });
+
+            // Add event listener for out of stock items
+            document.querySelectorAll('.out-of-stock-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Stok Habis',
+                        text: 'Maaf, produk ini sedang tidak tersedia.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 });
             });
         });
 
         function scrollSlider(id, direction) {
             const slider = document.getElementById(id);
-            const scrollAmount = 300 * direction;
-            slider.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
+            if (slider) {
+                const scrollAmount = 300 * direction;
+                slider.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
         }
     </script>
+@endsection
+
+@section('styles')
+    {{-- Tambahkan style khusus jika perlu --}}
+    <style>
+        /* Anda bisa menambahkan style khusus di sini jika diperlukan */
+    </style>
 @endsection
