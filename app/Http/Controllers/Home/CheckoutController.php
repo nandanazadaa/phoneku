@@ -129,7 +129,7 @@ class CheckoutController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['error' => $e->validator->errors()->first(), 'errors' => $e->validator->errors()], 422);
         } catch (\Exception $e) {
-            \Log::error('Midtrans Error: ' . $e->getMessage());
+            Log::error('Midtrans Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()], 500);
         }
     }

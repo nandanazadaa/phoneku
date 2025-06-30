@@ -9,12 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
 use App\Models\Testimonial;
 
-
 class HomeController extends Controller
 {
     public function index()
     {
-
         $featuredPhones = Product::phones()->featured()->take(4)->get();
         $featuredAccessories = Product::accessories()->featured()->take(4)->get();
         $phones = Product::phones()->latest()->take(4)->get();
@@ -40,14 +38,13 @@ class HomeController extends Controller
         }
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         if ($brand) {
-            // Bandingkan slug dari kolom brand dengan slug dari filter
             $query->whereRaw('LOWER(REPLACE(REPLACE(brand, " ", "-"), ".", "")) = ?', [strtolower($brand)]);
         }
 
@@ -60,7 +57,7 @@ class HomeController extends Controller
                     $query->whereBetween('price', [$min, $max]);
                 } elseif ($min && !$max) {
                     $query->where('price', '>=', $min);
-                } elseif (!$min && $max) {
+                } elseif (!$max) {
                     $query->where('price', '<=', $max);
                 }
             }
@@ -71,7 +68,6 @@ class HomeController extends Controller
         return view('home.allproduct', compact('products'));
     }
 
-
     /**
      * Display a specific product.
      */
@@ -81,15 +77,24 @@ class HomeController extends Controller
             ->where('id', '!=', $product->id)
             ->limit(4)
             ->get();
+
         $cartQuantity = 0;
         if (Auth::guard('web')->check()) {
             $cartQuantity = Cart::where('user_id', Auth::guard('web')->id())
                 ->where('product_id', $product->id)
                 ->sum('quantity');
         }
-        $testimonials = \App\Models\Testimonial::where('is_approved', true)
+
+        $testimonials = Testimonial::where('is_approved', true)
             ->where('product_id', $product->id)
-            ->latest()->take(6)->get();
-        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials'));
+            ->latest()
+            ->take(6)
+            ->get();
+
+        // Pass selectedColor for color options (if applicable)
+        $colors = $product->color_options ? (is_array($product->color_options) ? $product->color_options : explode(',', $product->color_options)) : [$product->color];
+        $selectedColor = old('color', $product->color ?? (isset($colors[0]) ? trim($colors[0]) : ''));
+
+        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials', 'selectedColor'));
     }
 }

@@ -2,7 +2,7 @@
     <h2 class="text-lg md:text-xl font-semibold mb-4">Ringkasan Transaksi</h2>
     <div class="space-y-2 text-sm">
         <div class="flex justify-between">
-            <span>Total Harga (1 Barang)</span>
+            <span>Total Harga ({{ $cartItems->count() }} Barang)</span>
             <span>Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
         </div>
         <div class="flex justify-between">
@@ -35,15 +35,12 @@
                     return;
                 }
 
-                const productId = cartItems[0]?.product_id || null;
-                const quantity = cartItems[0]?.quantity || null;
+                const products = cartItems.map(item => ({
+                    product_id: item.product_id,
+                    quantity: item.quantity
+                }));
 
-                if (!productId || !quantity) {
-                    alert('Data produk atau kuantitas tidak tersedia. Periksa keranjang Anda.');
-                    return;
-                }
-
-                console.log('Sending data:', { product_id: productId, quantity: quantity, shipping_cost: {{ $shippingCost }}, service_fee: {{ $serviceFee }} });
+                console.log('Sending data:', { products, shipping_cost: {{ $shippingCost }}, service_fee: {{ $serviceFee }} });
 
                 fetch('/checkout/store', {
                     method: 'POST',
@@ -52,8 +49,7 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        product_id: productId,
-                        quantity: quantity,
+                        products: products,
                         shipping_cost: {{ $shippingCost }},
                         service_fee: {{ $serviceFee }}
                     })

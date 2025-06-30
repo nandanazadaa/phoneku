@@ -257,7 +257,7 @@
         const maxStock = @json($product->stock);
         const quantityInput = document.getElementById('quantity-input');
         const totalPrice = document.getElementById('total-price');
-        const minusBtn = document.getElementById('qty-minus');
+        const minusBtn = document.getElementById('qty-minus');  
         const plusBtn = document.getElementById('qty-plus');
         function updateTotalPrice() {
             let qty = parseInt(quantityInput.value) || 1;
