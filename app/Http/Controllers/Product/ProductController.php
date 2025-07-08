@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
+use App\Models\Testimonial;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -208,5 +209,21 @@ class ProductController extends Controller
         }
 
         return view('admin.products.preview', compact('product', 'imagePreview'));
+    }
+    
+    public function show($id) {
+        $product = Product::findOrFail($id);
+
+        $testimonials = Testimonial::where('product_id', $product->id)
+                    ->with('user')
+                    ->get();
+
+        $averageRating = $testimonials->avg('rating') ?? 0; // hitung rata-rata
+
+        return view('Home.product', [
+            'product' => $product,
+            'testimonials' => $testimonials,
+            'averageRating' => $averageRating,
+        ]);
     }
 }

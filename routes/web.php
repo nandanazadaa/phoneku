@@ -13,6 +13,8 @@ use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\Home\CheckoutController;
 use App\Http\Controllers\Home\ContactController;
 use App\Http\Controllers\Home\TestimonialController;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Admin\CourierController; // Add CourierController
 use Pusher\Pusher;
@@ -25,7 +27,7 @@ Route::get('/tim', function () {
 Route::get('/aboutus', function () {
     return view('home.aboutus');
 })->name('aboutus');
-Route::get('/product/{product}', [HomeController::class, 'showProduct'])->name('product.show');
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 Route::get('/allproduct', [HomeController::class, 'allProducts'])->name('allproduct');
 Route::get('/kontak', function () {
     return view('home.kontak');
@@ -47,6 +49,8 @@ Route::middleware(['guest:web'])->group(function () {
         return view('auth.registrasi');
     })->name('registrasi');
     Route::post('/registrasi', [AuthController::class, 'register'])->name('registrasi.post');
+    Route::post('/send-otp', [AuthController::class, 'sendOtp'])->name('send.otp');
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
 });
 
 // Authenticated user routes
@@ -58,6 +62,8 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/profilekeamanan', [ProfileController::class, 'privasiKeamanan'])->name('profilekeamanan');
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/ulasan/{orderItem}', [TestimonialController::class, 'create'])->name('ulasan.form');
+    Route::post('/ulasan/{orderItem}', [TestimonialController::class, 'storeFromOrder'])->name('ulasan.storeFromOrder');
 
     // Profile - change email
     Route::get('/ubah_email', [ProfileController::class, 'ubahEmail'])->name('ubah_email');

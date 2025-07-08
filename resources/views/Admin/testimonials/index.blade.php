@@ -34,13 +34,17 @@
                         @endfor
                     </td>
                     <td class="py-2 px-4 border-b max-w-xs">{{ $testi->message }}</td>
-                    <td class="py-2 px-4 border-b">
-                        @if($testi->photo)
-                            <img src="{{ asset('storage/' . $testi->photo) }}" alt="Foto Testimoni" class="w-16 h-16 object-cover rounded">
-                        @else
-                            -
-                        @endif
-                    </td>
+                    <td>
+    @if($testi->photo)
+        @if(\Storage::disk('public')->exists($testi->photo))
+            <img src="{{ asset('storage/' . $testi->photo) }}" alt="{{ $testi->name }}" class="product-table-image" width="100">
+        @else
+            <span class="badge badge-danger">File not found: {{ $testi->photo }}</span>
+        @endif
+    @else
+        <span class="badge badge-secondary">No Image</span>
+    @endif
+</td>
                     <td class="py-2 px-4 border-b">
                         @if($testi->is_approved)
                             <span class="text-green-600 font-semibold">Disetujui</span>

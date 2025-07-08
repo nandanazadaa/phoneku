@@ -173,7 +173,7 @@
                                                 </form>
                                                 <a href="{{ route('product.show', $product) }}"
                                                     class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                    <i class="fas fa-eye mr-1"></i> Detail
+                                                    <i class="fas fa-shopping-bag"></i> Beli
                                                 </a>
                                             @else
                                                 <a href="{{ route('login', ['redirect' => route('allproduct', request()->query())]) }}"
@@ -182,7 +182,7 @@
                                                 </a>
                                                 <a href="{{ route('product.show', $product) }}"
                                                     class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                    <i class="fas fa-eye mr-1"></i> Detail
+                                                    <i class="fas fa-shopping-bag"></i> Beli
                                                 </a>
                                             @endauth
                                         @else
@@ -217,7 +217,7 @@
                                 <p class="text-gray-500 text-base mb-4 leading-relaxed">
                                     Saat ini belum ada produk yang tersedia. Silakan coba lagi nanti.
                                 </p>
-                                <a href="{{ route('home') }}"
+                                <a href="{{ route('welcome') }}"
                                     class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm shadow-sm">
                                     <i class="fas fa-home mr-2"></i> 
                                     Kembali ke Beranda

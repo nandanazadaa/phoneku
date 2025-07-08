@@ -38,13 +38,20 @@
                     <h1 class="text-2xl md:text-3xl font-bold mb-2 text-gray-800">{{ $product->name }}</h1>
                     <div class="flex items-center mb-4">
                         <div class="star-rating flex text-lg">
-                            <span class="star"><i class="fas fa-star"></i></span>
-                            <span class="star"><i class="fas fa-star"></i></span>
-                            <span class="star"><i class="fas fa-star"></i></span>
-                            <span class="star"><i class="fas fa-star"></i></span>
-                            <span class="star empty"><i class="far fa-star"></i></span>
+                            @php $rounded = round($averageRating * 2) / 2; @endphp
+                            @for ($i = 1; $i <= 5; $i++)
+                                @if ($i <= floor($rounded))
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                @elseif ($i - 0.5 == $rounded)
+                                    <i class="fas fa-star-half-alt text-yellow-400"></i>
+                                @else
+                                    <i class="far fa-star text-gray-300"></i>
+                                @endif
+                            @endfor
                         </div>
-                        <span class="text-gray-500 ml-2 text-sm">(15 Ulasan)</span>
+                        <span class="text-gray-500 ml-2 text-sm">
+                            ({{ $testimonials->count() }} Ulasan)
+                        </span>
                     </div>
                     <!-- Warna -->
                     @if($product->color || $product->color_options)
@@ -142,14 +149,16 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
                 @forelse($testimonials as $testi)
                     <div class="bg-white border border-gray-200 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-                        <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-2 overflow-hidden">
+                        <div class="  flex items-center justify-center mb-2 overflow-hidden">
                             @if($testi->photo)
-                                <img src="{{ asset('storage/' . $testi->photo) }}" alt="{{ $testi->name }}" class="w-12 h-12 object-cover rounded-full">
+                                <img src="{{ asset('storage/' . $testi->photo) }}" alt="{{ $testi->name }}" class=" object-cover w-30 h-28">
                             @else
-                                <i class="fas fa-user text-2xl text-gray-400"></i>
+                                <i class="fas fa-image text-2xl text-gray-400"></i>
                             @endif
                         </div>
-                        <h4 class="font-semibold text-gray-800">{{ $testi->name }}</h4>
+                        <h4 class="font-semibold text-gray-800 mb-1">
+                            {{ $testi->user->name ?? '-' }}
+                        </h4>
                         @if($testi->city)
                             <p class="text-xs text-gray-500 mb-2">{{ $testi->city }}</p>
                         @endif

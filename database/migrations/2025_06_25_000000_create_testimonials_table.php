@@ -8,10 +8,10 @@ return new class extends Migration {
     {
         Schema::create('testimonials', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('city')->nullable();
             $table->tinyInteger('rating')->default(5);
-            $table->text('message');
+            $table->text('message')->nullable();
             $table->string('photo')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->timestamps();

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
@@ -8,35 +9,87 @@ use App\Models\OrderItem;
 
 class TestimonialController extends Controller
 {
+    /**
+     * Formulir untuk mengisi ulasan.
+     */
+    public function create($orderItemId)
+    {
+        $orderItem = OrderItem::with('product')->findOrFail($orderItemId);
+        return view('profile.ulasan_form', compact('orderItem'));
+    }
+
+    /**
+     * Simpan ulasan dari halaman riwayat pembelian.
+     */
+    public function storeFromOrder(Request $request, $orderItemId)
+    {
+        $orderItem = OrderItem::findOrFail($orderItemId);
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'message' => 'required|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $testimonial = new Testimonial();
+        $testimonial->user_id = auth()->id();
+        $testimonial->product_id = $orderItem->product_id;
+        $testimonial->name = auth()->user()->name;
+        $testimonial->city = auth()->user()->profile->city ?? null;
+        $testimonial->rating = $request->rating;
+        $testimonial->message = $request->message;
+        $testimonial->is_approved = true; // ubah ke true jika ingin langsung disetujui
+
+        // Simpan foto jika ada
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('testimonials', 'public');
+            $testimonial->photo = $path;
+        }
+
+        $testimonial->save();
+
+        return redirect()->route('riwayatbeli')->with('success', 'Ulasan berhasil dikirim.');
+    }
+
+    /**
+     * Simpan ulasan umum (bukan dari order item, jika ada route ini).
+     */
     public function store(Request $request)
     {
         $user = auth('web')->user();
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'rating' => 'required|integer|min:1|max:5',
             'message' => 'required|string',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        // Cek apakah user pernah membeli produk ini
-        $hasBought = OrderItem::whereHas('order', function($q) use ($user) {
+
+        // Pastikan user pernah membeli produk
+        $hasBought = OrderItem::whereHas('order', function ($q) use ($user) {
             $q->where('user_id', $user->id)->where('status', 'selesai');
         })->where('product_id', $request->product_id)->exists();
+
         if (!$hasBought) {
             return back()->with('error', 'Anda hanya bisa memberi testimoni untuk produk yang sudah dibeli.');
         }
-        $data = [
-            'user_id' => $user->id,
-            'product_id' => $request->product_id,
-            'name' => $user->name,
-            'city' => $user->profile->city ?? null,
-            'rating' => $request->rating,
-            'message' => $request->message,
-            'is_approved' => false,
-        ];
+
+        $testimonial = new Testimonial();
+        $testimonial->user_id = $user->id;
+        $testimonial->product_id = $request->product_id;
+        $testimonial->name = $user->name;
+        $testimonial->city = $user->profile->city ?? null;
+        $testimonial->rating = $request->rating;
+        $testimonial->message = $request->message;
+        $testimonial->is_approved = false;
+
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('testimonials', 'public');
+            $path = $request->file('photo')->store('testimonials', 'public');
+            $testimonial->photo = $path;
         }
-        \App\Models\Testimonial::create($data);
+
+        $testimonial->save();
+
         return back()->with('success', 'Testimoni Anda berhasil dikirim dan menunggu persetujuan admin.');
     }
 }

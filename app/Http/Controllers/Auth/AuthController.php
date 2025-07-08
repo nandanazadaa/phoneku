@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -221,5 +223,70 @@ class AuthController extends Controller
         // $request->session()->invalidate(); // HAPUS supaya tidak menendang session user
         // $request->session()->regenerateToken(); // HAPUS supaya tidak menendang session user
         return redirect()->route('admin.login');
+    }
+
+    public function sendOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $otp = rand(100000, 999999);
+        $email = $request->email;
+
+        // Simpan OTP dan email ke session
+        Session::put('otp', $otp);
+        Session::put('otp_email', $email);
+        Session::put('otp_expires_at', now()->addMinutes(2));
+
+        // Kirim email dengan Gmail SMTP
+        Mail::raw("Kode OTP Anda adalah: $otp", function ($message) use ($email) {
+            $message->to($email)
+                    ->subject('Kode OTP Anda');
+        });
+
+        return back()->with('success', 'Kode OTP berhasil dikirim!');
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'otp' => 'required|numeric'
+        ]);
+
+        // Ambil OTP dari input user
+        $inputOtp = $request->input('otp');
+
+        // Ambil OTP yang disimpan di session sebelumnya
+        $storedOtp = Session::get('otp');
+        $storedEmail = Session::get('otp_email'); // jika ingin tahu email-nya juga
+        $expiresAt = Session::get('otp_expires_at');
+
+        if (!$expiresAt || now()->gt($expiresAt)) {
+            Session::forget(['otp', 'otp_email', 'otp_expires_at']);
+            return back()->withErrors(['otp' => 'Kode OTP telah kadaluarsa. Silakan minta ulang.']);
+        }
+
+        // Periksa apakah OTP cocok
+        if ($inputOtp == $storedOtp) {
+            // Ambil user dari email
+            $user = User::where('email', $storedEmail)->first();
+
+            if (!$user) {
+                return back()->withErrors(['otp' => 'Akun dengan email ini tidak ditemukan.']);
+            }
+
+            // Login pengguna
+            Auth::guard('web')->login($user);
+
+            // Hapus data OTP dari session
+            Session::forget(['otp', 'otp_email', 'otp_expires_at']);
+
+            // Arahkan ke halaman dashboard atau sesuai kebutuhan
+            return redirect()->route('welcome')->with('success', 'Login berhasil melalui OTP.');
+        } else {
+            return back()->withErrors(['otp' => 'Kode OTP tidak valid.']);
+        }
     }
 }

@@ -1,17 +1,55 @@
 <div class="bg-white p-4 md:p-6 rounded-lg shadow sticky top-6">
     <h2 class="text-lg md:text-xl font-semibold mb-4">Ringkasan Transaksi</h2>
-    <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
-            <span>Total Harga (1 Barang)</span>
-            <span>Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
+
+    <!-- Courier Selection -->
+    <div class="mb-4">
+        <h3 class="text-md font-semibold mb-2">Pilih Kurir</h3>
+        <select class="form-control mb-2 w-full border rounded p-2" id="courier" name="courier" required>
+            <option value="">Pilih Kurir</option>
+            @foreach($couriers as $courier)
+                <option value="{{ $courier->courier }}">{{ ucfirst($courier->courier) }}</option>
+            @endforeach
+        </select>
+        <select class="form-control mb-2 w-full border rounded p-2" id="courier-service" name="courier_service" required>
+            <option value="">Pilih Jenis Layanan</option>
+            @foreach($couriers as $courier)
+                <option value="{{ $courier->service_type }}" data-courier="{{ $courier->courier }}" data-cost="{{ $courier->shipping_cost }}">{{ ucfirst($courier->service_type) }} (Rp{{ number_format($courier->shipping_cost, 0, ',', '.') }})</option>
+            @endforeach
+        </select>
+    </div>
+
+    <!-- Transaction Summary -->
+    <div class="space-y-3 text-sm">
+        <!-- Product Breakdown -->
+        <div class="border-b border-gray-200 pb-3">
+            <h4 class="font-semibold text-gray-700 mb-2">Detail Produk</h4>
+            @foreach($cartItems as $item)
+            <div class="flex justify-between items-center mb-1">
+                <div class="flex-1">
+                    <div class="text-gray-800">{{ $item->product->name }}</div>
+                    <div class="text-xs text-gray-500">{{ $item->quantity }} × Rp{{ number_format($item->product->price, 0, ',', '.') }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="font-medium text-gray-800">Rp{{ number_format($item->product->price * $item->quantity, 0, ',', '.') }}</div>
+                </div>
+            </div>
+            @endforeach
         </div>
-        <div class="flex justify-between">
-            <span>Ongkos Kirim</span>
-            <span>Rp{{ number_format($shippingCost, 0, ',', '.') }}</span>
-        </div>
-        <div class="flex justify-between">
-            <span>Biaya Aplikasi</span>
-            <span>Rp{{ number_format($serviceFee, 0, ',', '.') }}</span>
+
+        <!-- Cost Breakdown -->
+        <div class="space-y-2">
+            <div class="flex justify-between">
+                <span class="text-gray-700">Subtotal ({{ $cartItems->count() }} Barang)</span>
+                <span class="font-medium">Rp{{ number_format($subtotal, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Ongkos Kirim</span>
+                <span id="shipping-cost-display" class="font-medium">Rp{{ number_format($shippingCost, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Biaya Aplikasi</span>
+                <span id="service-fee-display" class="font-medium">Rp{{ number_format($serviceFee, 0, ',', '.') }}</span>
+            </div>
         </div>
         
         <hr class="my-3 border-gray-300">
@@ -95,15 +133,31 @@
                     return;
                 }
 
-                const productId = cartItems[0]?.product_id || null;
-                const quantity = cartItems[0]?.quantity || null;
-
-                if (!productId || !quantity) {
-                    alert('Data produk atau kuantitas tidak tersedia. Periksa keranjang Anda.');
+                const form = document.getElementById('checkout-products-form');
+                const formData = new FormData(form);
+                const products = [];
+                for (let pair of formData.entries()) {
+                    const match = pair[0].match(/^products\[(\d+)\]\[(product_id|quantity)\]$/);
+                    if (match) {
+                        const idx = match[1];
+                        const key = match[2];
+                        if (!products[idx]) products[idx] = {};
+                        products[idx][key] = pair[1];
+                    }
+                }
+                if (!products.length) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Keranjang Kosong',
+                        text: 'Keranjang Anda kosong. Tambahkan produk terlebih dahulu.',
+                        confirmButtonColor: '#3B82F6'
+                    });
                     return;
                 }
 
-                console.log('Sending data:', { product_id: productId, quantity: quantity, shipping_cost: {{ $shippingCost }}, service_fee: {{ $serviceFee }} });
+                const selectedService = serviceSelect.options[serviceSelect.selectedIndex];
+                const shippingCost = parseFloat(selectedService.getAttribute('data-cost') || 0);
+                const total = subtotal + shippingCost + serviceFee;
 
                 fetch(window.location.origin + '/checkout/store', {
                     method: 'POST',
@@ -112,10 +166,12 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        product_id: productId,
-                        quantity: quantity,
-                        shipping_cost: {{ $shippingCost }},
-                        service_fee: {{ $serviceFee }}
+                        products: products,
+                        courier: courierSelect.value,
+                        courier_service: serviceSelect.value,
+                        shipping_cost: shippingCost,
+                        service_fee: serviceFee,
+                        total: total // Send the dynamically calculated total
                     })
                 })
                 .then(response => {

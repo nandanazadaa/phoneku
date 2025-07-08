@@ -124,10 +124,20 @@
                                                 <p class="font-semibold text-gray-800">Rp{{ number_format($item->quantity * $item->price, 0, ',', '.') }}</p>
                                             </div>
 
-                                            <button
-                                                class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-5 py-2 rounded-full w-full md:w-auto">
-                                                Beli Lagi
-                                            </button>
+                                            <div class="flex flex-col gap-2 w-full md:w-auto text-right">
+        @if($item->product)
+            <a href="{{ route('product.show', $item->product->id) }}"
+               class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-5 py-2 rounded-full flex items-center justify-center">
+                Beli Lagi
+            </a>
+        @endif
+        @if($order->payment_status === 'completed' && $order->order_status === 'selesai' && !$item->review)
+            <a href="{{ route('ulasan.form', ['orderItem' => $item->id]) }}"
+               class="bg-blue-700 hover:bg-blue-600 text-white text-sm px-5 py-2 rounded-full">
+                Tambah Ulasan
+            </a>
+        @endif
+    </div>
                                         </div>
                                     </div>
                                 @endforeach

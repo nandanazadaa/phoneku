@@ -3,7 +3,7 @@ use Illuminate\Support\Facades\Route;
 ?>
 
 <!-- Top Navigation -->
-<div class="bg-blue-500 relative">
+<div class="bg-blue-500 relative z-50">
     <div class="container mx-auto px-4 py-2 flex justify-end text-white space-x-4 text-sm">
         @guest
             <a href="{{ route('login') }}" class="hover:underline">Masuk</a>

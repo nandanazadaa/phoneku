@@ -152,7 +152,7 @@
                                             </form>
                                             <a href="{{ route('product.show', $product) }}"
                                                 class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                <i class="fas fa-eye mr-1"></i> Detail
+                                                <i class="fas fa-shopping-bag"></i> Beli
                                             </a>
                                         @else
                                             <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
@@ -161,7 +161,7 @@
                                             </a>
                                             <a href="{{ route('product.show', $product) }}"
                                                 class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                <i class="fas fa-eye mr-1"></i> Detail
+                                                <i class="fas fa-shopping-bag"></i> Beli
                                             </a>
                                         @endauth
                                     @else

@@ -29,38 +29,58 @@
                     <p class="text-sm opacity-90">Silahkan masukkan terlebih dahulu email anda!</p>
                 </div>
 
-                <form class="space-y-5">
-                    <div>
-                        <label for="phone" class="block text-white mb-2 text-sm">Alamat Email</label>
-                        <div class="relative">
-                            <input type="tel" id="phone" 
-                                   class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 pr-28"
-                                   placeholder="Masukkan akun email">
-                            <button type="button" 
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 text-sm bg-white px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                                Kirim kode
-                            </button>
+                    @if(session('success'))
+                        <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">
+                            {{ session('success') }}
                         </div>
-                    </div>
+                    @endif
 
-                    <div>
-                        <label for="otp" class="block text-white mb-2 text-sm">Kode OTP</label>
-                        <input type="text" id="otp" 
-                               class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                               placeholder="Masukkan kode OTP">
-                    </div>
+                    @if($errors->any())
+                        <div class="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
+                            @foreach($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                    @endif
 
-                    <button type="submit" 
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors duration-300">
-                        Masuk
-                    </button>
+                    <!-- Form Kirim OTP -->
+                    <form method="POST" action="/send-otp" class="space-y-5">
+                        @csrf
+                        <div>
+                            <label for="phone" class="block text-white mb-2 text-sm">Alamat Email</label>
+                            <div class="relative">
+                                <input type="email" id="email" name="email" 
+                                    class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 pr-28"
+                                    placeholder="Masukkan akun email">
+                                <button type="submit" 
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 text-sm bg-white px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                                    Kirim kode
+                                </button>
+                            </div>
+                        </div>
+                    </form>
 
-                    <div class="border-t border-white/20 pt-4 mt-6">
-                        <p class="text-center text-white text-sm"> 
-                            <a href="{{ route('login') }}" class="text-blue-200 hover:underline">Kembali login!</a>
-                        </p>
-                    </div>
-                </form>
+                    <!-- Form Verifikasi OTP -->
+                    <form method="POST" action="{{ route('verify.otp') }}" class="space-y-5 mb-6">
+                        @csrf
+                        <div>
+                            <label for="otp" class="block text-white mb-2 text-sm">Kode OTP</label>
+                            <input type="text" id="otp" name="otp"
+                                class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                placeholder="Masukkan kode OTP">
+                        </div>
+
+                        <button type="submit" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors duration-300">
+                            Masuk
+                        </button>
+
+                        <div class="border-t border-white/20 pt-4 mt-6">
+                            <p class="text-center text-white text-sm"> 
+                                <a href="{{ route('login') }}" class="text-blue-200 hover:underline">Kembali login!</a>
+                            </p>
+                        </div>
+                    </form>
             </div>
         </div>
     </div>

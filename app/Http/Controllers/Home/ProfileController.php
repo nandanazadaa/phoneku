@@ -32,12 +32,27 @@ class ProfileController extends Controller
         return view('profile.tentang_saya', compact('user'));
     }
 
-    public function riwayat()
-    {
-        $user = Auth::user();
-        $orders = Order::where('user_id', $user->id)->with('orderItems.product')->get();
-        return view('profile.riwayat_pembelian', compact('orders', 'user'));
-    }
+public function riwayat()
+{
+    $user = Auth::user();
+
+    $orders = Order::where('user_id', $user->id)
+        ->with('orderItems.product')
+        ->get();
+
+    // Kumpulkan semua produk dari order items
+   $products = $orders
+    ->flatMap(function ($order) {
+        return $order->orderItems->map(function ($item) {
+            return $item->product;
+        });
+    })
+    ->unique('id')
+    ->values();
+
+    return view('profile.riwayat_pembelian', compact('orders', 'user', 'products'));
+}
+
 
     public function privasiKeamanan()
     {
