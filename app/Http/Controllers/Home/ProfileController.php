@@ -38,7 +38,8 @@ public function riwayat()
 
     $orders = Order::where('user_id', $user->id)
         ->with('orderItems.product')
-        ->get();
+        ->orderBy('created_at', 'desc')
+        ->paginate(5);
 
     // Kumpulkan semua produk dari order items
    $products = $orders

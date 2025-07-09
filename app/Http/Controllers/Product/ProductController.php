@@ -18,23 +18,23 @@ class ProductController extends Controller
     {
         $tab = $request->query('tab', 'list');
         $search = $request->query('search');
-        
+
         // Get products for the list tab
         $query = Product::query();
-        
+
         if ($search) {
             $query->where('name', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
         }
-        
+
         $products = $query->latest()->paginate(10);
-        
+
         // Handle edit tab
         $editProduct = null;
         if ($tab === 'edit' && $request->has('id')) {
             $editProduct = Product::findOrFail($request->id);
         }
-        
+
         return view('admin.product_card', compact('products', 'tab', 'editProduct'));
     }
 
@@ -56,44 +56,44 @@ class ProductController extends Controller
             'image2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
-    
+
         $data = $request->except(['image', 'image2', 'image3']);
-        
+
         // Set is_featured to false if not provided
         if (!isset($data['is_featured'])) {
             $data['is_featured'] = false;
         }
-        
+
         // Handle image uploads
         $imageFields = ['image', 'image2', 'image3'];
-        
+
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
                 try {
                     $image = $request->file($field);
-                    
+
                     // Check if the file is valid
                     if (!$image->isValid()) {
                         return redirect()->back()
                             ->with('error', "File {$field} tidak valid.")
                             ->withInput();
                     }
-                    
+
                     $imageName = Str::slug($request->name) . '-' . $field . '-' . time() . '.' . $image->getClientOriginalExtension();
-                    
+
                     // Store with explicit public disk
                     $path = $image->storeAs('products', $imageName, 'public');
-                    
+
                     // For debugging
                     if (!$path) {
                         return redirect()->back()
                             ->with('error', "Gagal menyimpan {$field} ke storage.")
                             ->withInput();
                     }
-                    
+
                     // Set the image path correctly
                     $data[$field] = $path;
-                    
+
                 } catch (\Exception $e) {
                     return redirect()->back()
                         ->with('error', "Error upload {$field}: " . $e->getMessage())
@@ -101,9 +101,9 @@ class ProductController extends Controller
                 }
             }
         }
-    
+
         Product::create($data);
-    
+
         return redirect()->route('admin.products', ['tab' => 'list'])
             ->with('success', 'Produk berhasil dibuat.');
     }
@@ -114,7 +114,7 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -130,22 +130,22 @@ class ProductController extends Controller
         ]);
 
         $data = $request->except(['image', 'image2', 'image3']);
-        
+
         // Set is_featured to false if not provided
         if (!isset($data['is_featured'])) {
             $data['is_featured'] = false;
         }
-        
+
         // Handle image uploads
         $imageFields = ['image', 'image2', 'image3'];
-        
+
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
                 // Delete old image if exists
                 if ($product->$field) {
                     Storage::disk('public')->delete($product->$field);
                 }
-                
+
                 $image = $request->file($field);
                 $imageName = Str::slug($request->name) . '-' . $field . '-' . time() . '.' . $image->getClientOriginalExtension();
                 $path = $image->storeAs('products', $imageName, 'public');
@@ -165,7 +165,7 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
-        
+
         // Delete product images if exist
         $imageFields = ['image', 'image2', 'image3'];
         foreach ($imageFields as $field) {
@@ -173,7 +173,7 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($product->$field);
             }
         }
-        
+
         $product->delete();
 
         return redirect()->route('admin.products', ['tab' => 'list'])
@@ -196,7 +196,7 @@ class ProductController extends Controller
 
         // For proper display in the template
         $product->formatted_price = 'Rp ' . number_format($product->price, 0, ',', '.');
-        
+
         if ($product->original_price) {
             $product->formatted_original_price = 'Rp ' . number_format($product->original_price, 0, ',', '.');
             $product->has_discount = true;
@@ -210,13 +210,13 @@ class ProductController extends Controller
 
         return view('admin.products.preview', compact('product', 'imagePreview'));
     }
-    
+
     public function show($id) {
         $product = Product::findOrFail($id);
 
         $testimonials = Testimonial::where('product_id', $product->id)
                     ->with('user')
-                    ->get();
+                    ->paginate(6);
 
         $averageRating = $testimonials->avg('rating') ?? 0; // hitung rata-rata
 

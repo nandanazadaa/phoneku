@@ -174,10 +174,45 @@
                 @empty
                     <div class="col-span-3 text-center text-gray-500">Belum ada testimoni.</div>
                 @endforelse
+                </div> {{-- Ini penutup div grid --}}
+                @if ($testimonials->hasPages())
+                    <div class="flex justify-center mt-10">
+                        <nav role="navigation" aria-label="Pagination Navigation"
+                            class="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
+
+                            {{-- Previous Page Link --}}
+                            @if ($testimonials->onFirstPage())
+                                <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">←</span>
+                            @else
+                                <a href="{{ $testimonials->previousPageUrl() }}"
+                                    class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">←</a>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($testimonials->links()->elements[0] as $page => $url)
+                                @if ($page == $testimonials->currentPage())
+                                    <span class="px-4 py-2 text-sm bg-blue-500 text-white">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}"
+                                        class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($testimonials->hasMorePages())
+                                <a href="{{ $testimonials->nextPageUrl() }}"
+                                    class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">→</a>
+                            @else
+                                <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">→</span>
+                            @endif
+                        </nav>
+                    </div>
+                @endif
+
             </div>
-            <div class="flex justify-center mt-8">
+            <!-- <div class="flex justify-center mt-8">
                 <a href="#" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Lihat lebih banyak</a>
-            </div>
+            </div> -->
             <!-- Form Kirim Testimoni User -->
             @auth('web')
                 @php
@@ -235,24 +270,24 @@
                 opacity: 0.5;
                 cursor: not-allowed;
             }
-            
+
             .color-option:hover .color-option-check {
                 opacity: 1;
             }
-            
+
             .btn-icon {
                 transition: transform 0.2s ease;
             }
-            
+
             .btn-icon:hover {
                 transform: scale(1.1);
             }
-            
+
             /* Star rating styles */
             .star-rating .star {
                 color: #fbbf24;
             }
-            
+
             .star-rating .star.empty {
                 color: #d1d5db;
             }
@@ -268,7 +303,7 @@
         const maxStock = @json($product->stock);
         const quantityInput = document.getElementById('quantity-input');
         const totalPrice = document.getElementById('total-price');
-        const minusBtn = document.getElementById('qty-minus');  
+        const minusBtn = document.getElementById('qty-minus');
         const plusBtn = document.getElementById('qty-plus');
         function updateTotalPrice() {
             let qty = parseInt(quantityInput.value) || 1;
@@ -343,7 +378,7 @@
         document.querySelectorAll('.add-to-cart-btn').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 const form = this.closest('form');
                 if (!form) {
                     console.error('Form not found for add to cart button');
@@ -400,7 +435,7 @@
                         } else {
                             alert(data.message || 'Produk berhasil ditambahkan ke keranjang.');
                         }
-                        
+
                         // Update cart count
                         const cartCountElement = document.getElementById('cart-count');
                         if (cartCountElement && data.cartCount !== undefined) {
