@@ -216,6 +216,7 @@ class ProductController extends Controller
 
         $testimonials = Testimonial::where('product_id', $product->id)
                     ->with('user')
+                    ->orderBy('created_at', 'desc')
                     ->paginate(6);
 
         $averageRating = $testimonials->avg('rating') ?? 0; // hitung rata-rata
