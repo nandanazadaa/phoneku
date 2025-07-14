@@ -107,10 +107,16 @@ class CheckoutController extends Controller
                     'quantity' => $quantity,
                     'name' => $product->name,
                 ];
+                // Ambil warna dari cart
+                $cartItem = Cart::where('user_id', $user->id)
+                    ->where('product_id', $product->id)
+                    ->first();
+                $color = $cartItem ? $cartItem->color : null;
                 $orderItems[] = [
                     'product_id' => $product->id,
                     'quantity' => $quantity,
                     'price' => $product->price,
+                    'color' => $color, // <-- tambahkan ini
                 ];
             }
 
@@ -196,6 +202,7 @@ class CheckoutController extends Controller
         $request->validate(['quantity' => 'required|integer|min:1']);
         $product = Product::findOrFail($productId);
         $quantity = $request->quantity;
+        $color = $request->input('color'); // Ambil warna dari request
 
         $currentCartQuantity = Cart::where('user_id', $user->id)->where('product_id', $productId)->sum('quantity');
         $availableStock = $product->stock - $currentCartQuantity;
@@ -205,7 +212,12 @@ class CheckoutController extends Controller
         }
 
         Cart::where('user_id', $user->id)->delete();
-        Cart::create(['user_id' => $user->id, 'product_id' => $productId, 'quantity' => $quantity]);
+        Cart::create([
+            'user_id' => $user->id,
+            'product_id' => $productId,
+            'quantity' => $quantity,
+            'color' => $color, // Simpan warna ke cart
+        ]);
 
         return redirect()->route('checkout');
     }

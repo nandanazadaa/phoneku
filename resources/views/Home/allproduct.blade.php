@@ -163,7 +163,8 @@
                                     <div class="flex mt-4 space-x-2">
                                         @if ($product->stock > 0)
                                             @auth('web')
-                                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form">
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form"
+                                                      data-has-color="{{ $product->color ? '1' : '0' }}">
                                                     @csrf
                                                     <input type="hidden" name="quantity" value="1">
                                                     <button type="submit"
@@ -274,6 +275,27 @@
             // AJAX Add to Cart
             document.querySelectorAll('.add-to-cart-form').forEach(form => {
                 form.addEventListener('submit', function(e) {
+                    // Cek apakah produk punya pilihan warna
+                    if (this.dataset.hasColor === '1') {
+                        e.preventDefault();
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Pilih Warna',
+                                text: 'Tolong isi warna produk terlebih dahulu.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                        } else {
+                            alert('Tolong isi warna produk terlebih dahulu.');
+                        }
+                        // Redirect ke halaman detail produk agar user bisa pilih warna
+                        const detailUrl = this.closest('.w-72').querySelector('a.product-image-container').href;
+                        setTimeout(() => { window.location.href = detailUrl; }, 1500);
+                        return;
+                    }
                     e.preventDefault(); // Mencegah form redirect
                     
                     const button = this.querySelector('.add-to-cart-btn');

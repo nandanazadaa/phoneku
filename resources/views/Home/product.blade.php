@@ -34,7 +34,7 @@
                 </div>
                 <!-- Right: Product Info -->
                 <div class="w-full max-w-lg mx-auto lg:mx-0">
-                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">Handphone</p>
+                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">{{ $product->category }}</p>
                     <h1 class="text-2xl md:text-3xl font-bold mb-2 text-gray-800">{{ $product->name }}</h1>
                     <div class="flex items-center mb-4">
                         <div class="star-rating flex text-lg">
@@ -67,9 +67,7 @@
                                 <label class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer relative" style="border-color: {{ $selectedColor == $color ? '#3b82f6' : '#d1d5db' }};">
                                     <input type="radio" name="color" value="{{ $color }}" class="sr-only color-radio" {{ $selectedColor == $color ? 'checked' : '' }}>
                                     <span class="block w-4 h-4 rounded-full" style="background: {{ $color }};"></span>
-                                    @if($selectedColor == $color)
-                                        <span class="absolute inset-0 border-2 border-blue-500 rounded-full pointer-events-none"></span>
-                                    @endif
+                                    <span class="absolute inset-0 border-2 border-blue-500 rounded-full pointer-events-none" style="display: {{ $selectedColor == $color ? 'block' : 'none' }};"></span>
                                 </label>
                             @endforeach
                         </div>
@@ -174,10 +172,45 @@
                 @empty
                     <div class="col-span-3 text-center text-gray-500">Belum ada testimoni.</div>
                 @endforelse
+                </div> {{-- Ini penutup div grid --}}
+                @if ($testimonials->hasPages())
+                    <div class="flex justify-center mt-10">
+                        <nav role="navigation" aria-label="Pagination Navigation"
+                            class="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
+
+                            {{-- Previous Page Link --}}
+                            @if ($testimonials->onFirstPage())
+                                <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">←</span>
+                            @else
+                                <a href="{{ $testimonials->previousPageUrl() }}"
+                                    class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">←</a>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($testimonials->links()->elements[0] as $page => $url)
+                                @if ($page == $testimonials->currentPage())
+                                    <span class="px-4 py-2 text-sm bg-blue-500 text-white">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}"
+                                        class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($testimonials->hasMorePages())
+                                <a href="{{ $testimonials->nextPageUrl() }}"
+                                    class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">→</a>
+                            @else
+                                <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">→</span>
+                            @endif
+                        </nav>
+                    </div>
+                @endif
+
             </div>
-            <div class="flex justify-center mt-8">
+            <!-- <div class="flex justify-center mt-8">
                 <a href="#" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Lihat lebih banyak</a>
-            </div>
+            </div> -->
             <!-- Form Kirim Testimoni User -->
             @auth('web')
                 @php
@@ -235,24 +268,24 @@
                 opacity: 0.5;
                 cursor: not-allowed;
             }
-            
+
             .color-option:hover .color-option-check {
                 opacity: 1;
             }
-            
+
             .btn-icon {
                 transition: transform 0.2s ease;
             }
-            
+
             .btn-icon:hover {
                 transform: scale(1.1);
             }
-            
+
             /* Star rating styles */
             .star-rating .star {
                 color: #fbbf24;
             }
-            
+
             .star-rating .star.empty {
                 color: #d1d5db;
             }
@@ -268,7 +301,7 @@
         const maxStock = @json($product->stock);
         const quantityInput = document.getElementById('quantity-input');
         const totalPrice = document.getElementById('total-price');
-        const minusBtn = document.getElementById('qty-minus');  
+        const minusBtn = document.getElementById('qty-minus');
         const plusBtn = document.getElementById('qty-plus');
         function updateTotalPrice() {
             let qty = parseInt(quantityInput.value) || 1;
@@ -336,6 +369,16 @@
             radio.addEventListener('change', function() {
                 document.getElementById('cart-color').value = this.value;
                 document.getElementById('buy-color').value = this.value;
+                // Update border highlight
+                document.querySelectorAll('#color-options label').forEach(function(label) {
+                    label.style.borderColor = '#d1d5db';
+                });
+                this.closest('label').style.borderColor = '#3b82f6';
+                // Show blue border ring
+                document.querySelectorAll('#color-options .absolute').forEach(function(span) {
+                    span.style.display = 'none';
+                });
+                this.closest('label').querySelector('.absolute').style.display = 'block';
             });
         });
 
@@ -343,7 +386,7 @@
         document.querySelectorAll('.add-to-cart-btn').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 const form = this.closest('form');
                 if (!form) {
                     console.error('Form not found for add to cart button');
@@ -400,7 +443,7 @@
                         } else {
                             alert(data.message || 'Produk berhasil ditambahkan ke keranjang.');
                         }
-                        
+
                         // Update cart count
                         const cartCountElement = document.getElementById('cart-count');
                         if (cartCountElement && data.cartCount !== undefined) {
@@ -429,15 +472,15 @@
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Oops...',
-                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                title: 'Pilih Warna',
+                                text: 'Silakan pilih warna terlebih dahulu sebelum membeli.',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
                         } else {
-                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                            alert('Silakan pilih warna terlebih dahulu sebelum membeli.');
                         }
                     }
                 })
@@ -461,6 +504,35 @@
                     showConfirmButton: false,
                     timer: 3000
                 });
+            });
+        });
+
+        document.querySelectorAll('form[action*="buy"]').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                // Cek apakah ada input radio warna
+                var colorRadios = document.querySelectorAll('.color-radio');
+                if (colorRadios.length > 0) {
+                    var checked = false;
+                    colorRadios.forEach(function(radio) {
+                        if (radio.checked) checked = true;
+                    });
+                    if (!checked) {
+                        e.preventDefault();
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Pilih Warna',
+                                text: 'Silakan pilih warna terlebih dahulu sebelum membeli.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                        } else {
+                            alert('Silakan pilih warna terlebih dahulu sebelum membeli.');
+                        }
+                    }
+                }
             });
         });
     });

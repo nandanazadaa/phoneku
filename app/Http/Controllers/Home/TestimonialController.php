@@ -31,16 +31,26 @@ class TestimonialController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // Cek apakah user sudah memberikan ulasan untuk order_item_id ini
+        $alreadyReviewed = Testimonial::where('user_id', auth()->id())
+            ->where('order_item_id', $orderItem->id) // Ganti product_id dengan order_item_id
+            ->exists();
+
+        if ($alreadyReviewed) {
+            return redirect()->route('riwayatbeli')->with('error', 'Anda sudah memberikan ulasan untuk pembelian ini.');
+        }
+
+        // Simpan testimonial
         $testimonial = new Testimonial();
         $testimonial->user_id = auth()->id();
         $testimonial->product_id = $orderItem->product_id;
+        $testimonial->order_item_id = $orderItem->id; // Simpan order_item_id
         $testimonial->name = auth()->user()->name;
         $testimonial->city = auth()->user()->profile->city ?? null;
         $testimonial->rating = $request->rating;
         $testimonial->message = $request->message;
-        $testimonial->is_approved = true; // ubah ke true jika ingin langsung disetujui
+        $testimonial->is_approved = true;
 
-        // Simpan foto jika ada
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('testimonials', 'public');
             $testimonial->photo = $path;
@@ -50,7 +60,6 @@ class TestimonialController extends Controller
 
         return redirect()->route('riwayatbeli')->with('success', 'Ulasan berhasil dikirim.');
     }
-
     /**
      * Simpan ulasan umum (bukan dari order item, jika ada route ini).
      */
