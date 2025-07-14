@@ -846,9 +846,6 @@
                         </table>
                     </div>
 
-                    <div class="mt-3">
-                        {{ $products->appends(['tab' => 'list', 'search' => request('search')])->links() ?? '' }} {{-- Added search param to pagination --}}
-                    </div>
                 </div>
             </div>
         </div>
@@ -2067,4 +2064,28 @@ $(document).ready(function() {
 
 });
 </script>
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#basic-datatables').DataTable({
+                pageLength: 10, // Match Laravel pagination
+                searching: false, // Disable client-side search to rely on server-side search
+                ordering: true,
+                serverSide: false, // Set to true if using server-side processing
+                paging: true,
+                lengthChange: false, // Hide "Show X entries" dropdown
+                info: true,
+                language: {
+                    paginate: {
+                        previous: '<i class="fa fa-angle-left"></i>',
+                        next: '<i class="fa fa-angle-right"></i>'
+                    }
+                }
+            });
+        });
+    </script>
 @endpush

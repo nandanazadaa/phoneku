@@ -15,28 +15,25 @@ class ProductController extends Controller
      * Display a listing of the products.
      */
     public function index(Request $request)
-    {
-        $tab = $request->query('tab', 'list');
-        $search = $request->query('search');
-        
-        // Get products for the list tab
-        $query = Product::query();
-        
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-        }
-        
-        $products = $query->latest()->paginate(10);
-        
-        // Handle edit tab
-        $editProduct = null;
-        if ($tab === 'edit' && $request->has('id')) {
-            $editProduct = Product::findOrFail($request->id);
-        }
-        
-        return view('admin.product_card', compact('products', 'tab', 'editProduct'));
+{
+    $tab = $request->query('tab', 'list');
+    $search = $request->query('search');
+    $query = Product::query();
+
+    if ($search) {
+        $query->where('name', 'like', "%{$search}%");
     }
+
+    $products = $query->paginate(10); // Ensure 10 items per page
+    $products->appends(['tab' => 'list', 'search' => $search]);
+
+    if ($tab === 'edit' && $request->has('id')) {
+        $editProduct = Product::findOrFail($request->query('id'));
+        return view('admin.products.index', compact('products', 'editProduct'));
+    }
+
+    return view('admin.product_card', compact('products'));
+}
 
     /**
      * Store a newly created product in storage.
