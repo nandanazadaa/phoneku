@@ -89,7 +89,16 @@
                                         <a href="{{ route('product.show', $item->product) }}">
                                             <h3 class="font-bold text-lg text-gray-800 hover:text-blue-600 line-clamp-2">{{ $item->product->name }}</h3>
                                         </a>
-                                        <p class="text-sm text-gray-600">{{ $item->product->color ?? 'Red' }}</p>
+                                        <p class="text-sm text-gray-600 flex items-center gap-2">
+                                            @if($item->color)
+                                                @if(preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $item->color))
+                                                    <span class="inline-block w-4 h-4 rounded-full border border-gray-300 align-middle mr-1" style="background: {{ $item->color }};"></span>
+                                                @endif
+                                                {{ $item->color }}
+                                            @else
+                                                -
+                                            @endif
+                                        </p>
                                         <p class="text-sm text-gray-500">SKU: {{ $item->product->sku ?? 'N/A' }}</p>
                                         <p class="text-sm font-medium {{ $item->product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
                                             {{ $item->product->stock > 0 ? 'Tersedia (' . $item->product->stock . ' unit)' : 'Stok habis!' }}

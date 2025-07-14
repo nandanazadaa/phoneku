@@ -111,7 +111,16 @@
 
                                 <div class="flex flex-col justify-between w-full text-base text-gray-700 space-y-1">
                                     <h4 class="text-lg font-semibold text-gray-800">{{ $item->product->name }}</h4>
-                                    <p>Warna: {{ $item->product->color ?? 'N/A' }}</p>
+                                    <p>Warna: 
+                                        @if($item->color)
+                                            @if(preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $item->color))
+                                                <span class="inline-block w-4 h-4 rounded-full border border-gray-300 align-middle mr-1" style="background: {{ $item->color }};"></span>
+                                            @endif
+                                            {{ $item->color }}
+                                        @else
+                                            -
+                                        @endif
+                                    </p>
                                     <p>SKU: {{ $item->product->sku ?? 'N/A' }}</p>
                                     <p>Jumlah: {{ $item->quantity }}</p>
                                     <p>Harga Per Unit: Rp{{ number_format($item->price, 0, ',', '.') }}</p>

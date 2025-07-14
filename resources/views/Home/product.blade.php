@@ -34,7 +34,7 @@
                 </div>
                 <!-- Right: Product Info -->
                 <div class="w-full max-w-lg mx-auto lg:mx-0">
-                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">Handphone</p>
+                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">{{ $product->category }}</p>
                     <h1 class="text-2xl md:text-3xl font-bold mb-2 text-gray-800">{{ $product->name }}</h1>
                     <div class="flex items-center mb-4">
                         <div class="star-rating flex text-lg">
@@ -67,9 +67,7 @@
                                 <label class="w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer relative" style="border-color: {{ $selectedColor == $color ? '#3b82f6' : '#d1d5db' }};">
                                     <input type="radio" name="color" value="{{ $color }}" class="sr-only color-radio" {{ $selectedColor == $color ? 'checked' : '' }}>
                                     <span class="block w-4 h-4 rounded-full" style="background: {{ $color }};"></span>
-                                    @if($selectedColor == $color)
-                                        <span class="absolute inset-0 border-2 border-blue-500 rounded-full pointer-events-none"></span>
-                                    @endif
+                                    <span class="absolute inset-0 border-2 border-blue-500 rounded-full pointer-events-none" style="display: {{ $selectedColor == $color ? 'block' : 'none' }};"></span>
                                 </label>
                             @endforeach
                         </div>
@@ -371,6 +369,16 @@
             radio.addEventListener('change', function() {
                 document.getElementById('cart-color').value = this.value;
                 document.getElementById('buy-color').value = this.value;
+                // Update border highlight
+                document.querySelectorAll('#color-options label').forEach(function(label) {
+                    label.style.borderColor = '#d1d5db';
+                });
+                this.closest('label').style.borderColor = '#3b82f6';
+                // Show blue border ring
+                document.querySelectorAll('#color-options .absolute').forEach(function(span) {
+                    span.style.display = 'none';
+                });
+                this.closest('label').querySelector('.absolute').style.display = 'block';
             });
         });
 
@@ -464,15 +472,15 @@
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Oops...',
-                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                title: 'Pilih Warna',
+                                text: 'Silakan pilih warna terlebih dahulu sebelum membeli.',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
                                 timer: 3000
                             });
                         } else {
-                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                            alert('Silakan pilih warna terlebih dahulu sebelum membeli.');
                         }
                     }
                 })
@@ -496,6 +504,35 @@
                     showConfirmButton: false,
                     timer: 3000
                 });
+            });
+        });
+
+        document.querySelectorAll('form[action*="buy"]').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                // Cek apakah ada input radio warna
+                var colorRadios = document.querySelectorAll('.color-radio');
+                if (colorRadios.length > 0) {
+                    var checked = false;
+                    colorRadios.forEach(function(radio) {
+                        if (radio.checked) checked = true;
+                    });
+                    if (!checked) {
+                        e.preventDefault();
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Pilih Warna',
+                                text: 'Silakan pilih warna terlebih dahulu sebelum membeli.',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                        } else {
+                            alert('Silakan pilih warna terlebih dahulu sebelum membeli.');
+                        }
+                    }
+                }
             });
         });
     });
