@@ -15,22 +15,20 @@ class ProductController extends Controller
      * Display a listing of the products.
      */
     public function index(Request $request)
-
     {
         $tab = $request->query('tab', 'list');
         $search = $request->query('search');
 
-        // Get products for the list tab
         $query = Product::query();
 
         if ($search) {
             $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('brand', 'like', "%{$search}%");
         }
 
         $products = $query->latest()->paginate(10);
 
-        // Handle edit tab
         $editProduct = null;
         if ($tab === 'edit' && $request->has('id')) {
             $editProduct = Product::findOrFail($request->id);
@@ -39,17 +37,6 @@ class ProductController extends Controller
         return view('admin.product_card', compact('products', 'tab', 'editProduct'));
     }
 
-    $products = $query->paginate(10); // Ensure 10 items per page
-    $products->appends(['tab' => 'list', 'search' => $search]);
-
-    if ($tab === 'edit' && $request->has('id')) {
-        $editProduct = Product::findOrFail($request->query('id'));
-        return view('admin.products.index', compact('products', 'editProduct'));
-    }
-
-    return view('admin.product_card', compact('products'));
-}
-
     /**
      * Store a newly created product in storage.
      */
@@ -57,13 +44,15 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'brand' => 'required|string|in:samsung,apple,xiaomi,oppo,vivo,realme,other',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'category' => 'required|in:handphone,accessory',
             'is_featured' => 'boolean',
             'stock' => 'required|integer|min:0',
-            'color' => 'nullable|string',
+            'colors' => 'required|array|min:1|max:5', // Updated to handle array of colors
+            'colors.*' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/', // Validate each color as hex
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -71,12 +60,13 @@ class ProductController extends Controller
 
         $data = $request->except(['image', 'image2', 'image3']);
 
-        // Set is_featured to false if not provided
         if (!isset($data['is_featured'])) {
             $data['is_featured'] = false;
         }
 
-        // Handle image uploads
+        // Store colors as JSON array
+        $data['colors'] = json_encode($data['colors']);
+
         $imageFields = ['image', 'image2', 'image3'];
 
         foreach ($imageFields as $field) {
@@ -84,7 +74,6 @@ class ProductController extends Controller
                 try {
                     $image = $request->file($field);
 
-                    // Check if the file is valid
                     if (!$image->isValid()) {
                         return redirect()->back()
                             ->with('error', "File {$field} tidak valid.")
@@ -92,18 +81,14 @@ class ProductController extends Controller
                     }
 
                     $imageName = Str::slug($request->name) . '-' . $field . '-' . time() . '.' . $image->getClientOriginalExtension();
-
-                    // Store with explicit public disk
                     $path = $image->storeAs('products', $imageName, 'public');
 
-                    // For debugging
                     if (!$path) {
                         return redirect()->back()
                             ->with('error', "Gagal menyimpan {$field} ke storage.")
                             ->withInput();
                     }
 
-                    // Set the image path correctly
                     $data[$field] = $path;
 
                 } catch (\Exception $e) {
@@ -129,13 +114,15 @@ class ProductController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'brand' => 'required|string|in:samsung,apple,xiaomi,oppo,vivo,realme,other',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'category' => 'required|in:handphone,accessory',
             'is_featured' => 'boolean',
             'stock' => 'required|integer|min:0',
-            'color' => 'nullable|string',
+            'colors' => 'required|array|min:1|max:5', // Updated to handle array of colors
+            'colors.*' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/', // Validate each color as hex
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -143,17 +130,17 @@ class ProductController extends Controller
 
         $data = $request->except(['image', 'image2', 'image3']);
 
-        // Set is_featured to false if not provided
         if (!isset($data['is_featured'])) {
             $data['is_featured'] = false;
         }
 
-        // Handle image uploads
+        // Store colors as JSON array
+        $data['colors'] = json_encode($data['colors']);
+
         $imageFields = ['image', 'image2', 'image3'];
 
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
-                // Delete old image if exists
                 if ($product->$field) {
                     Storage::disk('public')->delete($product->$field);
                 }
@@ -178,7 +165,6 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        // Delete product images if exist
         $imageFields = ['image', 'image2', 'image3'];
         foreach ($imageFields as $field) {
             if ($product->$field) {
@@ -197,16 +183,15 @@ class ProductController extends Controller
      */
     public function preview(Request $request)
     {
-        // Create a temporary product object with the provided data
         $product = new Product([
             'name' => $request->name ?? 'Product Name',
+            'brand' => $request->brand ?? 'Unknown',
             'price' => $request->price ?? 0,
             'original_price' => $request->original_price ?? null,
             'category' => $request->category ?? 'handphone',
-            'color' => $request->color ?? '',
+            'colors' => $request->colors ? json_encode($request->colors) : json_encode(['#000000']), // Handle colors array
         ]);
 
-        // For proper display in the template
         $product->formatted_price = 'Rp ' . number_format($product->price, 0, ',', '.');
 
         if ($product->original_price) {
@@ -214,7 +199,6 @@ class ProductController extends Controller
             $product->has_discount = true;
         }
 
-        // Handle temporary image preview
         $imagePreview = null;
         if ($request->has('image_preview')) {
             $imagePreview = $request->image_preview;
@@ -223,20 +207,28 @@ class ProductController extends Controller
         return view('admin.products.preview', compact('product', 'imagePreview'));
     }
 
-    public function show($id) {
-        $product = Product::findOrFail($id);
+    public function show($id)
+    {
+        try {
+            $product = Product::findOrFail($id);
 
-        $testimonials = Testimonial::where('product_id', $product->id)
-                    ->with('user')
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(6);
+            $testimonials = Testimonial::where('product_id', $product->id)
+                        ->with('user')
+                        ->orderBy('created_at', 'desc')
+                        ->paginate(6);
 
-        $averageRating = $testimonials->avg('rating') ?? 0; // hitung rata-rata
+            $averageRating = $testimonials->isNotEmpty() ? $testimonials->avg('rating') : 0;
 
-        return view('Home.product', [
-            'product' => $product,
-            'testimonials' => $testimonials,
-            'averageRating' => $averageRating,
-        ]);
+            $selectedColor = old('color', $product->colors[0] ?? '#000000'); // Default to first color
+
+            return view('Home.product', [
+                'product' => $product,
+                'testimonials' => $testimonials,
+                'averageRating' => (float) $averageRating,
+                'selectedColor' => $selectedColor,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return abort(404);
+        }
     }
 }

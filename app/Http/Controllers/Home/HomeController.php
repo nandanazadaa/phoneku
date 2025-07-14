@@ -13,7 +13,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-
         $featuredPhones = Product::phones()->featured()->take(12)->get();
         $featuredAccessories = Product::accessories()->featured()->take(12)->get();
 
@@ -28,6 +27,9 @@ class HomeController extends Controller
      */
     public function allProducts(Request $request)
     {
+        $phones = Product::phones()->latest()->take(12)->get();
+        $accessories = Product::accessories()->latest()->take(12)->get();
+
         $category = $request->input('category');
         $search = $request->input('search');
         $brand = $request->input('brand');
@@ -42,7 +44,7 @@ class HomeController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -67,7 +69,7 @@ class HomeController extends Controller
 
         $products = $query->latest()->paginate(12);
 
-        return view('home.allproduct', compact('products'));
+        return view('home.allproduct', compact('products', 'phones', 'category', 'search', 'brand', 'priceRange', 'accessories'));
     }
 
     /**
@@ -93,10 +95,10 @@ class HomeController extends Controller
             ->take(6)
             ->get();
 
-        // Pass selectedColor for color options (if applicable)
-        $colors = $product->color_options ? (is_array($product->color_options) ? $product->color_options : explode(',', $product->color_options)) : [$product->color];
+        $colors = $product->colors ?? [];
+
         $selectedColor = old('color', $product->color ?? (isset($colors[0]) ? trim($colors[0]) : ''));
 
-        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials', 'selectedColor'));
+        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials', 'colors', 'selectedColor'));
     }
 }

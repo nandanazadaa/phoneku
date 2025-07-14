@@ -123,11 +123,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AuthController::class, 'showAdminLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'adminLogin'])->name('login.post');
 
-    // Admin registration (guest-only)
-    Route::middleware(['guest:admin'])->group(function () {
         Route::get('/register', [AuthController::class, 'showAdminRegistrationForm'])->name('register');
         Route::post('/register', [AuthController::class, 'adminRegister'])->name('register.post');
-    });
 
     // Admin protected routes
     Route::middleware(['auth:admin'])->group(function () {
@@ -163,13 +160,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Admin order management
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
-        
+
         // Manual payment status update
         Route::post('/orders/{order}/update-payment-status', [\App\Http\Controllers\Admin\OrderController::class, 'updatePaymentStatus'])->name('orders.update-payment-status');
-        
+
         // Check Midtrans status for pending orders
         Route::post('/orders/check-midtrans-status', [\App\Http\Controllers\Admin\OrderController::class, 'checkMidtransStatus'])->name('orders.check-midtrans-status');
-        
+
         // Search order by code
         Route::get('/orders/search-by-code', [\App\Http\Controllers\Admin\OrderController::class, 'searchByCode'])->name('orders.search-by-code');
 
