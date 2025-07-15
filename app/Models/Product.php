@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 
 class Product extends Model
 {
@@ -21,7 +22,7 @@ class Product extends Model
         'image',
         'image2',
         'image3',
-        'colors',
+        'color',
     ];
 
     protected $casts = [
@@ -29,30 +30,30 @@ class Product extends Model
         'original_price' => 'float',
         'is_featured' => 'boolean',
         'stock' => 'integer',
-        'colors' => 'array',
+        'color' => 'array', // This is correct and crucial
     ];
 
     /**
-     * Get formatted price with Rp prefix
+     * Get formatted price with Rp prefix.
      */
     public function getFormattedPriceAttribute()
     {
-        return 'Rp ' . number_format($this->price, 0, ',', '.');
+        return 'Rp ' . Number::format($this->price, locale: 'id');
     }
 
     /**
-     * Get formatted original price with Rp prefix
+     * Get formatted original price with Rp prefix.
      */
     public function getFormattedOriginalPriceAttribute()
     {
         if (!$this->original_price) {
             return null;
         }
-        return 'Rp ' . number_format($this->original_price, 0, ',', '.');
+        return 'Rp ' . Number::format($this->original_price, locale: 'id');
     }
 
     /**
-     * Check if product has a discount
+     * Check if product has a discount.
      */
     public function getHasDiscountAttribute()
     {
@@ -60,12 +61,29 @@ class Product extends Model
     }
 
     /**
-     * Get valid hex colors only
+     * Get valid hex colors only from the 'color' attribute.
+     * This accessor is derived from the 'color' attribute after it's cast to an array.
      */
     public function getValidColorsAttribute()
     {
-        return array_filter($this->colors ?? [], function($color) {
-            return preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $color);
+        // FIX: Ensure $this->color is an array before using array_filter
+        // If $this->color is unexpectedly null or a string, this ensures it's an array.
+        $colors = $this->color ?? []; // If $this->color is null, default to an empty array
+
+        // If for some reason $this->color is still a string (e.g., direct database read before casting happens fully)
+        // you might need to manually explode it, though casting should prevent this.
+        // As a fallback for problematic legacy data or unusual access patterns:
+        if (!is_array($colors) && is_string($colors)) {
+            $colors = explode(',', $colors);
+        } elseif (!is_array($colors)) {
+            // If it's neither an array nor a string, make it an empty array to prevent further errors
+            $colors = [];
+        }
+
+
+        return array_filter($colors, function($color) {
+            // Basic hex validation for both 3-digit and 6-digit hex codes
+            return preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', trim($color));
         });
     }
 
@@ -74,42 +92,18 @@ class Product extends Model
      * @param string $hex The hex color code.
      * @return string The color name or the hex code if not found.
      */
-    public function getFriendlyColorName(string $hex): string
+    public function getFriendlyColorName($hexColor)
     {
+        $hexColor = strtoupper(trim($hexColor));
         $colorNames = [
-            '#FFFFFF' => 'Putih',
-            '#000000' => 'Hitam',
-            '#FF0000' => 'Merah',
-            '#00FF00' => 'Hijau',
-            '#0000FF' => 'Biru',
-            '#FFFF00' => 'Kuning',
-            '#FF00FF' => 'Magenta',
-            '#00FFFF' => 'Cyan',
-            '#FFA500' => 'Orange',
-            '#800080' => 'Ungu',
-            '#FFC0CB' => 'Pink',
-            '#A52A2A' => 'Coklat',
-            '#808080' => 'Abu-abu',
-            '#C0C0C0' => 'Silver',
-            '#FFD700' => 'Emas',
-            '#800000' => 'Maroon',
-            '#008000' => 'Hijau Tua',
-            '#000080' => 'Navy',
-            '#008080' => 'Teal',
-            '#808000' => 'Olive',
-            // Add more common colors as needed
+            '#F44336' => 'Red', '#E91E63' => 'Pink', '#9C27B0' => 'Purple', '#673AB7' => 'Deep Purple',
+            '#3F51B5' => 'Indigo', '#2196F3' => 'Blue', '#03A9F4' => 'Light Blue', '#00BCD4' => 'Cyan',
+            '#009688' => 'Teal', '#4CAF50' => 'Green', '#8BC34A' => 'Light Green', '#CDDC39' => 'Lime',
+            '#FFEB3B' => 'Yellow', '#FFC107' => 'Amber', '#FF9800' => 'Orange', '#FF5722' => 'Deep Orange',
+            '#795548' => 'Brown', '#9E9E9E' => 'Gray', '#607D8B' => 'Blue Grey', '#000000' => 'Black', '#FFFFFF' => 'White'
         ];
-
-        $hex = strtoupper($hex);
-
-        // Normalize 3-digit hex to 6-digit for better matching if needed
-        if (strlen($hex) === 4) { // e.g., #FFF
-            $hex = '#' . $hex[1] . $hex[1] . $hex[2] . $hex[2] . $hex[3] . $hex[3];
-        }
-
-        return $colorNames[$hex] ?? $hex; // Return name if found, otherwise return the hex
+        return $colorNames[$hexColor] ?? $hexColor;
     }
-
 
     /**
      * Scope a query to only include handphones.

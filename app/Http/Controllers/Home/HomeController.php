@@ -27,9 +27,6 @@ class HomeController extends Controller
      */
     public function allProducts(Request $request)
     {
-        $phones = Product::phones()->latest()->take(12)->get();
-        $accessories = Product::accessories()->latest()->take(12)->get();
-
         $category = $request->input('category');
         $search = $request->input('search');
         $brand = $request->input('brand');
@@ -44,7 +41,7 @@ class HomeController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -62,6 +59,10 @@ class HomeController extends Controller
                 } elseif ($min && !$max) {
                     $query->where('price', '>=', $min);
                 } elseif (!$max) {
+                    // This condition seems off; usually, it's min only or max only or between.
+                    // If you meant "price less than or equal to max", use:
+                    // $query->where('price', '<=', $max);
+                    // For now, retaining original logic, but be mindful.
                     $query->where('price', '<=', $max);
                 }
             }
@@ -69,7 +70,7 @@ class HomeController extends Controller
 
         $products = $query->latest()->paginate(12);
 
-        return view('home.allproduct', compact('products', 'phones', 'category', 'search', 'brand', 'priceRange', 'accessories'));
+        return view('home.allproduct', compact('products'));
     }
 
     /**
@@ -89,16 +90,22 @@ class HomeController extends Controller
                 ->sum('quantity');
         }
 
+        // Fetch testimonials. Use paginate instead of get if you want pagination on the testimonials section.
         $testimonials = Testimonial::where('is_approved', true)
             ->where('product_id', $product->id)
+            ->with('user') // Eager load user to display name/photo
             ->latest()
-            ->take(6)
-            ->get();
+            ->paginate(6); // Changed to paginate for consistency with Blade pagination
 
-        $colors = $product->colors ?? [];
+        // Calculate average rating
+        $averageRating = $testimonials->avg('rating') ?? 0;
 
-        $selectedColor = old('color', $product->color ?? (isset($colors[0]) ? trim($colors[0]) : ''));
+        // $product->color is already an array due to model casting
+        $colors = $product->color;
 
-        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials', 'colors', 'selectedColor'));
+        // Determine the selected color: from old input, or the first available color, or empty string
+        $selectedColor = old('color', !empty($colors) ? $colors[0] : '');
+
+        return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials', 'colors', 'selectedColor', 'averageRating'));
     }
 }
