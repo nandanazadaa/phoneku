@@ -4,15 +4,16 @@ namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Product;
+use App\Models\Product; // Make sure you import your Product model
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
-use App\Models\Testimonial;
+use App\Models\Testimonial; // Assuming you might use this elsewhere in the HomeController
 
 class HomeController extends Controller
 {
     public function index()
     {
+        // ... (your existing index method code) ...
         $featuredPhones = Product::phones()->featured()->take(12)->get();
         $featuredAccessories = Product::accessories()->featured()->take(12)->get();
 
@@ -46,6 +47,9 @@ class HomeController extends Controller
         }
 
         if ($brand) {
+            // Note: Your existing filtering logic for 'brand' is quite specific.
+            // It slugifies the DB 'brand' column and compares it to the incoming slugged brand from request.
+            // This is compatible with the changes below as long as brands are stored as human-readable strings.
             $query->whereRaw('LOWER(REPLACE(REPLACE(brand, " ", "-"), ".", "")) = ?', [strtolower($brand)]);
         }
 
@@ -58,11 +62,7 @@ class HomeController extends Controller
                     $query->whereBetween('price', [$min, $max]);
                 } elseif ($min && !$max) {
                     $query->where('price', '>=', $min);
-                } elseif (!$max) {
-                    // This condition seems off; usually, it's min only or max only or between.
-                    // If you meant "price less than or equal to max", use:
-                    // $query->where('price', '<=', $max);
-                    // For now, retaining original logic, but be mindful.
+                } elseif (!$min && $max) { // Added this condition for price range like "-5000000" (up to 5jt)
                     $query->where('price', '<=', $max);
                 }
             }
@@ -70,14 +70,26 @@ class HomeController extends Controller
 
         $products = $query->latest()->paginate(12);
 
-        return view('home.allproduct', compact('products'));
+        // --- NEW: Fetch unique brands from the database ---
+        $uniqueBrands = Product::select('brand')
+                            ->whereNotNull('brand') // Only get products that actually have a brand set
+                            ->distinct() // Get only unique brand names
+                            ->orderBy('brand') // Order alphabetically for readability
+                            ->pluck('brand'); // Get as a simple array (e.g., ['Samsung', 'Apple', 'Xiaomi'])
+
+        return view('home.allproduct', compact('products', 'uniqueBrands')); // Pass uniqueBrands to the view
     }
 
     /**
      * Display a specific product.
+     * (This method is from ProductController, not HomeController.
+     * I'm including it here only for context of your previous snippet.
+     * Ensure this is in app/Http/Controllers/Product/ProductController.php if it's not already.)
      */
     public function showProduct(Product $product)
     {
+        // This method should ideally be in ProductController, not HomeController.
+        // Assuming it's here for now based on your previous provided code.
         $relatedProducts = Product::where('category', $product->category)
             ->where('id', '!=', $product->id)
             ->limit(4)
@@ -90,20 +102,17 @@ class HomeController extends Controller
                 ->sum('quantity');
         }
 
-        // Fetch testimonials. Use paginate instead of get if you want pagination on the testimonials section.
         $testimonials = Testimonial::where('is_approved', true)
             ->where('product_id', $product->id)
-            ->with('user') // Eager load user to display name/photo
+            ->with('user')
             ->latest()
-            ->paginate(6); // Changed to paginate for consistency with Blade pagination
+            ->paginate(6);
 
-        // Calculate average rating
         $averageRating = $testimonials->avg('rating') ?? 0;
 
-        // $product->color is already an array due to model casting
-        $colors = $product->color;
+        // $product->color is cast to array by Product model
+        $colors = $product->valid_colors; // Use the accessor for valid hex colors
 
-        // Determine the selected color: from old input, or the first available color, or empty string
         $selectedColor = old('color', !empty($colors) ? $colors[0] : '');
 
         return view('Home.product', compact('product', 'relatedProducts', 'cartQuantity', 'testimonials', 'colors', 'selectedColor', 'averageRating'));

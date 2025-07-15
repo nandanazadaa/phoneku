@@ -28,7 +28,7 @@
             </form>
         </div>
 
-        {{-- Filters (Contoh) --}}
+        {{-- Filters --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <form id="filter-form" action="{{ route('allproduct') }}" method="GET" class="contents">
                 <input type="hidden" name="search" value="{{ request('search') }}"> {{-- Pertahankan search query --}}
@@ -46,18 +46,15 @@
                         class="fas fa-chevron-down text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
 
+                {{-- NEW: Dynamic Brand Filter --}}
                 <div class="relative w-full">
-                    @php
-                        $brands = [
-                            'Samsung', 'Xiaomi', 'Oppo', 'Apple', 'Realme', 'Vivo', 'Asus', 'Infinix', 'Nokia', 'Huawei',
-                            'Sony', 'Lenovo', 'Advan', 'Evercoss', 'OnePlus', 'Google', 'Motorola', 'Meizu', 'Honor', 'Sharp', 'Polytron'
-                        ];
-                    @endphp
                     <select name="brand" onchange="document.getElementById('filter-form').submit()"
                         class="appearance-none bg-white border border-gray-300 text-gray-700 p-2 pl-4 pr-10 rounded-full w-full text-center cursor-pointer focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200">
                         <option value="">Semua Brand</option>
-                        @foreach ($brands as $brand)
-                            <option value="{{ Str::slug($brand) }}" {{ request('brand') == Str::slug($brand) ? 'selected' : '' }}>{{ $brand }}</option>
+                        @foreach ($uniqueBrands as $brandName) {{-- Iterate over uniqueBrands fetched from DB --}}
+                            <option value="{{ Str::slug($brandName) }}" {{ request('brand') == Str::slug($brandName) ? 'selected' : '' }}>
+                                {{ $brandName }}
+                            </option>
                         @endforeach
                     </select>
                     <i
@@ -100,7 +97,6 @@
         </div>
 
         <div class="relative">
-            <!-- Tombol Navigasi -->
             <button
                 class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border rounded-full shadow p-2 z-10 hover:bg-gray-100"
                 onclick="scrollSlider('product-slider', -1)">
@@ -112,11 +108,9 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
 
-            <!-- Produk Slider -->
             <div id="product-slider" class="overflow-x-auto scroll-smooth py-4 px-8">
                 <div class="flex space-x-4 min-w-max">
                     @forelse($products as $product)
-                        <!-- Product Card -->
                         <div
                             class="w-72 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
                             <div class="bg-gray-100 w-full h-56 flex items-center justify-center p-4 relative group">
@@ -158,24 +152,44 @@
                                 <div class="flex mt-4 space-x-2">
                                     @if ($product->stock > 0)
                                         @auth('web')
-                                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                            <form action="{{ route('cart.add', $product->id) }}" method="POST"
+                                                class="add-to-cart-form"
+                                                @if (!empty($product->valid_colors) && count($product->valid_colors) > 0) data-has-color="1" @else data-has-color="0" @endif>
                                                 @csrf
                                                 <input type="hidden" name="quantity" value="1">
+                                                {{-- Add a hidden color input for products with colors, will be validated if needed --}}
+                                                @if (!empty($product->valid_colors) && count($product->valid_colors) > 0)
+                                                    <input type="hidden" name="color" value=""> {{-- This needs to be empty here, user selects on product detail page --}}
+                                                @endif
                                                 <button type="submit"
                                                     class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
                                                     <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                                 </button>
                                             </form>
-                                            <a href="{{ route('product.show', $product) }}"
-                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                <i class="fas fa-shopping-bag"></i> Beli
-                                            </a>
+                                            {{-- For 'Beli' button, direct link to product show page if colors exist --}}
+                                            @if (!empty($product->valid_colors) && count($product->valid_colors) > 0)
+                                                <a href="{{ route('product.show', $product) }}"
+                                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                    <i class="fas fa-shopping-bag"></i> Beli
+                                                </a>
+                                            @else
+                                                {{-- If no colors, allow direct buy (assuming color isn't strictly required for all products)--}}
+                                                <form action="{{ route('buy.now', $product->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="quantity" value="1">
+                                                    <button type="submit"
+                                                        class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                        <i class="fas fa-shopping-bag"></i> Beli
+                                                    </button>
+                                                </form>
+                                            @endif
+
                                         @else
                                             <a href="{{ route('login', ['redirect' => route('allproduct', request()->query())]) }}"
                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-200 transition duration-200">
                                                 <i class="fas fa-cart-plus mr-1"></i> Keranjang
                                             </a>
-                                            <a href="{{ route('product.show', $product) }}"
+                                            <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
                                                 <i class="fas fa-shopping-bag mr-1"></i> Beli
                                             </a>
@@ -196,6 +210,10 @@
                     @endforelse
                 </div>
             </div>
+        </div>
+        {{-- Pagination --}}
+        <div class="mt-8">
+            {{ $products->appends(request()->query())->links() }}
         </div>
     </div>
 @endsection
@@ -225,43 +243,38 @@
     <script>
         function scrollSlider(id, direction) {
             const slider = document.getElementById(id);
-            const totalScroll = 300;
-            const step = 10;
-            const intervalTime = 5;
-            let scrolled = 0;
+            const scrollAmount = 300; // Adjust scroll distance as needed
 
-            const scrollInterval = setInterval(() => {
-                slider.scrollLeft += direction * step;
-                scrolled += step;
-
-                if (scrolled >= totalScroll) {
-                    clearInterval(scrollInterval);
-                }
-            }, intervalTime);
+            slider.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.add-to-cart-form').forEach(form => {
                 form.addEventListener('submit', function(e) {
-                    if (this.dataset.hasColor === '1') {
+                    const hasColorAttribute = this.dataset.hasColor;
+
+                    if (hasColorAttribute === '1') {
+                        // If the product has color options, redirect to detail page
                         e.preventDefault();
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Pilih Warna',
-                                text: 'Tolong isi warna produk terlebih dahulu.',
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 2500
-                            });
-                        } else {
-                            alert('Tolong isi warna produk terlebih dahulu.');
-                        }
-                        const detailUrl = this.closest('.w-72').querySelector('a[href]').href;
-                        setTimeout(() => { window.location.href = detailUrl; }, 1500);
-                        return;
+                        const detailUrl = this.closest('.w-72').querySelector('a[href*="/products/"]').href;
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Pilih Warna',
+                            text: 'Produk ini memiliki pilihan warna. Silakan pilih warna di halaman detail produk.',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3500
+                        });
+                        setTimeout(() => { window.location.href = detailUrl; }, 1500); // Redirect after a short delay
+                        return; // Stop further execution
                     }
+
+                    // If no color options or already handled, proceed with AJAX add to cart
                     e.preventDefault();
 
                     const button = this.querySelector('.add-to-cart-btn');
@@ -275,6 +288,7 @@
                         console.error('CSRF token not found!');
                         button.disabled = false;
                         button.innerHTML = originalButtonText;
+                        alert('CSRF token tidak ditemukan. Silakan refresh halaman.');
                         return;
                     }
 
@@ -292,9 +306,12 @@
                             window.location.href = "{{ route('login', ['redirect' => url()->full()]) }}";
                             throw new Error('Unauthorized');
                         }
-                        return response.json().catch(() => {
-                            throw new Error('Invalid JSON response from server.');
-                        });
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; }).catch(() => {
+                                throw new Error('Invalid JSON response from server or network error.');
+                            });
+                        }
+                        return response.json();
                     })
                     .then(data => {
                         if (data.success) {
@@ -327,10 +344,19 @@
                     .catch(error => {
                         if (error.message !== 'Unauthorized') {
                             console.error('Add to Cart Error:', error);
+                            let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+                            if (error.message && error.errors) { // Check for Laravel validation errors
+                                for (const key in error.errors) {
+                                    if (error.errors.hasOwnProperty(key)) {
+                                        errorMessage = error.errors[key][0]; // Take the first error message
+                                        break;
+                                    }
+                                }
+                            }
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                text: 'Terjadi kesalahan. Silakan coba lagi.',
+                                text: errorMessage,
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
