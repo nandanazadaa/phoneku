@@ -618,6 +618,7 @@
                                     <th>No</th>
                                     <th>Foto Produk</th>
                                     <th>Nama Produk</th>
+                                    <th>Nama Brand</th>
                                     <th>Kategori</th>
                                     <th>Harga</th>
                                     <th>Harga Asli</th>
@@ -885,6 +886,14 @@
                                  </div>
 
                                  <div class="form-group">
+                                    <label for="brand">Nama Brand</label>
+                                    <input type="text" class="form-control" id="brand" name="brand" value="{{ old('brand', $editProduct->brand ?? '') }}" placeholder="Enter product brand">
+                                    @error('brand')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                 <div class="form-group">
                                      <label for="create_description">Deskripsi</label>
                                      <textarea class="form-control @error('description') is-invalid @enderror" id="create_description" name="description" rows="4">{{ old('description') }}</textarea>
                                      @error('description')
@@ -1055,6 +1064,16 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+                                <div class="form-group mb-3"> {{-- Added mb-3 for spacing --}}
+    <label for="brand">Nama Brand</label>
+    <input type="text" class="form-control" id="brand" name="brand"
+           value="{{ old('brand', $editProduct->brand ?? '') }}" {{-- Crucial for pre-filling --}}
+           placeholder="Enter product brand">
+    @error('brand')
+        <div class="text-danger mt-1">{{ $message }}</div>
+    @enderror
+</div>
 
                                 <div class="form-group">
                                     <label for="edit_description">Deskripsi</label>
@@ -1240,6 +1259,14 @@
                         <label for="modal_create_name">Nama Produk <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="modal_create_name" name="name" required>
                          {{-- No @error here, validation handling via JS/redirect --}}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_brand">Nama Brand</label>
+                        <input type="text" class="form-control" id="edit_brand" name="brand">
+                        @error('brand')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="form-group">

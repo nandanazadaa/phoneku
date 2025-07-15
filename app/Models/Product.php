@@ -16,7 +16,7 @@ class Product extends Model
         'price',
         'original_price',
         'category',
-        'brand',
+        'brand', // <-- Add 'brand' here
         'is_featured',
         'stock',
         'image',
@@ -30,20 +30,16 @@ class Product extends Model
         'original_price' => 'float',
         'is_featured' => 'boolean',
         'stock' => 'integer',
-        'color' => 'array', // This is correct and crucial
+        'color' => 'array',
     ];
 
-    /**
-     * Get formatted price with Rp prefix.
-     */
+    // ... (rest of your model code remains the same)
+
     public function getFormattedPriceAttribute()
     {
         return 'Rp ' . Number::format($this->price, locale: 'id');
     }
 
-    /**
-     * Get formatted original price with Rp prefix.
-     */
     public function getFormattedOriginalPriceAttribute()
     {
         if (!$this->original_price) {
@@ -52,46 +48,24 @@ class Product extends Model
         return 'Rp ' . Number::format($this->original_price, locale: 'id');
     }
 
-    /**
-     * Check if product has a discount.
-     */
     public function getHasDiscountAttribute()
     {
         return $this->original_price && $this->original_price > $this->price;
     }
 
-    /**
-     * Get valid hex colors only from the 'color' attribute.
-     * This accessor is derived from the 'color' attribute after it's cast to an array.
-     */
     public function getValidColorsAttribute()
     {
-        // FIX: Ensure $this->color is an array before using array_filter
-        // If $this->color is unexpectedly null or a string, this ensures it's an array.
-        $colors = $this->color ?? []; // If $this->color is null, default to an empty array
-
-        // If for some reason $this->color is still a string (e.g., direct database read before casting happens fully)
-        // you might need to manually explode it, though casting should prevent this.
-        // As a fallback for problematic legacy data or unusual access patterns:
+        $colors = $this->color ?? [];
         if (!is_array($colors) && is_string($colors)) {
             $colors = explode(',', $colors);
         } elseif (!is_array($colors)) {
-            // If it's neither an array nor a string, make it an empty array to prevent further errors
             $colors = [];
         }
-
-
         return array_filter($colors, function($color) {
-            // Basic hex validation for both 3-digit and 6-digit hex codes
             return preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', trim($color));
         });
     }
 
-    /**
-     * Convert hex color to a user-friendly color name.
-     * @param string $hex The hex color code.
-     * @return string The color name or the hex code if not found.
-     */
     public function getFriendlyColorName($hexColor)
     {
         $hexColor = strtoupper(trim($hexColor));
@@ -105,25 +79,16 @@ class Product extends Model
         return $colorNames[$hexColor] ?? $hexColor;
     }
 
-    /**
-     * Scope a query to only include handphones.
-     */
     public function scopePhones($query)
     {
         return $query->where('category', 'handphone');
     }
 
-    /**
-     * Scope a query to only include accessories.
-     */
     public function scopeAccessories($query)
     {
         return $query->where('category', 'accessory');
     }
 
-    /**
-     * Scope a query to only include featured products.
-     */
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);

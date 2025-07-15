@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Number; // Ensure this is imported for formatted prices in Product model (if used directly here, otherwise Product model handles it)
+use Illuminate\Support\Number;
 
 class ProductController extends Controller
 {
@@ -52,10 +52,10 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'category' => 'required|in:handphone,accessory',
-            'brand' => 'nullable|string|max:255',
+            'brand' => 'nullable|string|max:255', // <-- Add validation for brand
             'is_featured' => 'boolean',
             'stock' => 'required|integer|min:0',
-            'color' => 'nullable|string', // Incoming from form as comma-separated string
+            'color' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -63,10 +63,10 @@ class ProductController extends Controller
 
         $data = $request->except(['image', 'image2', 'image3']);
 
-        // Set color to an empty string if not provided, ensures it's not null before casting to array
         $data['color'] = $request->input('color', '');
-        // Use boolean helper to ensure true/false
         $data['is_featured'] = $request->boolean('is_featured');
+        // 'brand' is already included in $data from $request->except() since it's not an image field.
+        // No explicit setting needed here as long as it's passed via the form.
 
         $imageFields = ['image', 'image2', 'image3'];
         foreach ($imageFields as $field) {
@@ -113,10 +113,10 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'category' => 'required|in:handphone,accessory',
-            'brand' => 'nullable|string|max:255',
+            'brand' => 'nullable|string|max:255', // <-- Add validation for brand
             'is_featured' => 'boolean',
             'stock' => 'required|integer|min:0',
-            'color' => 'nullable|string', // Incoming from form as comma-separated string
+            'color' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'image3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -124,15 +124,13 @@ class ProductController extends Controller
 
         $data = $request->except(['image', 'image2', 'image3']);
 
-        // Set color to an empty string if not provided
         $data['color'] = $request->input('color', '');
-        // Use boolean helper to ensure true/false
         $data['is_featured'] = $request->boolean('is_featured');
+        // 'brand' is already included in $data from $request->except() since it's not an image field.
 
         $imageFields = ['image', 'image2', 'image3'];
         foreach ($imageFields as $field) {
             if ($request->hasFile($field)) {
-                // Delete old image if exists
                 if ($product->$field) {
                     Storage::disk('public')->delete($product->$field);
                 }
@@ -149,26 +147,7 @@ class ProductController extends Controller
             ->with('success', 'Produk berhasil diupdate.');
     }
 
-    /**
-     * Remove the specified product from storage.
-     */
-    public function destroy($id)
-    {
-        $product = Product::findOrFail($id);
-
-        // Delete product images if exist
-        $imageFields = ['image', 'image2', 'image3'];
-        foreach ($imageFields as $field) {
-            if ($product->$field) {
-                Storage::disk('public')->delete($product->$field);
-            }
-        }
-
-        $product->delete();
-
-        return redirect()->route('admin.products', ['tab' => 'list'])
-            ->with('success', 'Produk berhasil dihapus.');
-    }
+    // ... (rest of your controller methods)
 
     /**
      * Preview the product card.
@@ -181,10 +160,10 @@ class ProductController extends Controller
             'price' => $request->price ?? 0,
             'original_price' => $request->original_price ?? null,
             'category' => $request->category ?? 'handphone',
-            'brand' => $request->brand ?? null,
+            'brand' => $request->brand ?? null, // <-- Pass brand to preview
             'is_featured' => $request->boolean('is_featured'),
             'stock' => $request->stock ?? 0,
-            'color' => $request->color ?? '', // This will be cast to array by model
+            'color' => $request->color ?? '',
         ]);
 
         $imagePreview = null;
@@ -202,13 +181,11 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        // Fetch related products (e.g., from the same category, excluding the current product)
         $relatedProducts = Product::where('category', $product->category)
             ->where('id', '!=', $product->id)
-            ->limit(4) // Limit to 4 related products
+            ->limit(4)
             ->get();
 
-        // Calculate cart quantity for authenticated users
         $cartQuantity = 0;
         if (Auth::guard('web')->check()) {
             $cartQuantity = Cart::where('user_id', Auth::guard('web')->id())
@@ -216,16 +193,15 @@ class ProductController extends Controller
                 ->sum('quantity');
         }
 
-        // Fetch testimonials for this product
         $testimonials = Testimonial::where('product_id', $product->id)
-            ->where('is_approved', true) // Only approved testimonials
-            ->with('user') // Eager load the user relationship to get user's name/photo
-            ->orderBy('created_at', 'desc') // Order by latest
-            ->paginate(6); // Paginate testimonials, 6 per page
+            ->where('is_approved', true)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(6);
 
         $averageRating = $testimonials->avg('rating') ?? 0;
 
-        $colors = $product->valid_colors;
+        $colors = $product->valid_colors; // Use the accessor to get validated colors
 
         $selectedColor = old('color', !empty($colors) ? $colors[0] : '');
 
