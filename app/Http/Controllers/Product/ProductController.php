@@ -147,6 +147,18 @@ class ProductController extends Controller
             ->with('success', 'Produk berhasil diupdate.');
     }
 
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+        // Jika ada file gambar, hapus dari storage (opsional)
+        if ($product->image) {
+            \Storage::delete($product->image);
+        }
+        $product->delete();
+
+        return redirect()->route('admin.products')->with('success', 'Produk berhasil dihapus.');
+    }
+
     // ... (rest of your controller methods)
 
     /**

@@ -89,26 +89,34 @@
                                         <a href="{{ route('product.show', $item->product) }}">
                                             <h3 class="font-bold text-lg text-gray-800 hover:text-blue-600 line-clamp-2">{{ $item->product->name }}</h3>
                                         </a>
+                                        @if($item->product->brand)
+                                            <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">Brand: {{ ucfirst($item->product->brand) }}</p>
+                                        @endif
+                                        <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">{{ $item->product->category }}</p>
                                         <p class="text-sm text-gray-600 flex items-center gap-2">
                                             @if($item->color)
                                                 @if(preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $item->color))
                                                     <span class="inline-block w-4 h-4 rounded-full border border-gray-300 align-middle mr-1" style="background: {{ $item->color }};"></span>
                                                 @endif
-                                                {{ $item->color }}
+                                                {{-- Hilangkan kode warna, hanya tampilkan swatch --}}
                                             @else
                                                 -
                                             @endif
                                         </p>
-                                        <p class="text-sm text-gray-500">SKU: {{ $item->product->sku ?? 'N/A' }}</p>
-                                        <p class="text-sm font-medium {{ $item->product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
+                                        {{-- Hapus SKU, stok, dan 'yes' --}}
+                                        {{-- <p class="text-sm text-gray-500">SKU: {{ $item->product->sku ?? 'N/A' }}</p> --}}
+                                        {{-- <p class="text-sm font-medium {{ $item->product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
                                             {{ $item->product->stock > 0 ? 'Tersedia (' . $item->product->stock . ' unit)' : 'Stok habis!' }}
-                                        </p>
-                                        @if ($item->quantity > $item->product->stock)
+                                        </p> --}}
+                                        {{-- @if ($item->quantity > $item->product->stock)
                                             <p class="text-xs text-red-500 mt-1">
                                                 Anda memesan {{ $item->quantity }} unit, tetapi stok hanya
                                                 {{ $item->product->stock }} unit
                                             </p>
-                                        @endif
+                                        @endif --}}
+                                        {{-- @if($item->product->description)
+                                            <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ Str::limit($item->product->description, 80) }}</p>
+                                        @endif --}}
                                     </div>
                                 </div>
                                 <div class="flex flex-col sm:items-end w-full sm:w-auto mt-4 sm:mt-0 gap-3">
@@ -117,6 +125,11 @@
                                         <div class="text-sm font-normal text-gray-500">
                                             @if ($item->quantity > 1)
                                                 (Rp{{ number_format($item->product->price, 0, ',', '.') }} per unit)
+                                            @endif
+                                            @if ($item->product->original_price && $item->product->original_price > $item->product->price)
+                                                <span class="line-through ml-2">Rp{{ number_format($item->product->original_price, 0, ',', '.') }}</span>
+                                                @php $discountPercentage = round((($item->product->original_price - $item->product->price) / $item->product->original_price) * 100); @endphp
+                                                <span class="ml-2 text-xs bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded">{{ $discountPercentage }}% OFF</span>
                                             @endif
                                         </div>
                                     </div>

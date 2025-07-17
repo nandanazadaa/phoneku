@@ -639,6 +639,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $product->name }}</td>
+                                        <td>{{ $product->brand ?? '-' }}</td>
                                         <td>
                                             <span class="badge badge-{{ $product->category == 'handphone' ? 'primary' : ($product->category == 'accessory' ? 'info' : 'secondary') }}">
                                                 {{ ucfirst($product->category) }}
@@ -660,17 +661,10 @@
                                                     // Split colors by comma, trim whitespace, filter out empty strings
                                                     $colors = array_filter(array_map('trim', explode(',', $product->color)));
                                                 @endphp
-                                                @forelse($colors as $color)
-                                                    @php $hexColor = strtoupper($color); @endphp {{-- Convert to uppercase --}}
-                                                    @if(!empty($hexColor) && (preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $hexColor)))
-                                                        <span style="display: inline-block; width: 15px; height: 15px; background-color: {{ $hexColor }}; border: 1px solid #ccc; vertical-align: middle; margin-right: 3px; border-radius: 50%;"></span>
-                                                        {{ $hexColor }}@if(!$loop->last),@endif
-                                                    @else
-                                                         {{ $color }}@if(!$loop->last),@endif {{-- Display non-hex text if any --}}
-                                                    @endif
-                                                @empty
-                                                     - {{-- Display '-' if colors string was not empty but contained only empty/whitespace items --}}
-                                                @endforelse
+                                                @foreach($colors as $color)
+                                                    <span style="display: inline-block; width: 15px; height: 15px; background-color: {{ $color }}; border: 1px solid #ccc; vertical-align: middle; margin-right: 3px; border-radius: 50%;"></span>
+                                                    {{ $color }}@if(!$loop->last),@endif
+                                                @endforeach
                                             @else
                                                 -
                                             @endif
@@ -768,17 +762,10 @@
                                                                                         // Split colors by comma, trim whitespace, filter out empty strings
                                                                                         $colors = array_filter(array_map('trim', explode(',', $product->color)));
                                                                                     @endphp
-                                                                                    @forelse($colors as $color)
-                                                                                         @php $hexColor = strtoupper($color); @endphp {{-- Convert to uppercase --}}
-                                                                                         @if(!empty($hexColor) && (preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $hexColor)))
-                                                                                            <span style="display: inline-block; width: 15px; height: 15px; background-color: {{ $hexColor }}; border: 1px solid #ccc; vertical-align: middle; margin-right: 3px; border-radius: 50%;"></span>
-                                                                                            {{ $hexColor }}@if(!$loop->last),@endif
-                                                                                        @else
-                                                                                             {{ $color }}@if(!$loop->last),@endif {{-- Display non-hex text --}}
-                                                                                        @endif
-                                                                                    @empty
-                                                                                         N/A
-                                                                                    @endforelse
+                                                                                    @foreach($colors as $color)
+                                                                                         <span style="display: inline-block; width: 15px; height: 15px; background-color: {{ $color }}; border: 1px solid #ccc; vertical-align: middle; margin-right: 3px; border-radius: 50%;"></span>
+                                                                                         {{ $color }}@if(!$loop->last),@endif
+                                                                                    @endforeach
                                                                                 @else
                                                                                     N/A
                                                                                 @endif

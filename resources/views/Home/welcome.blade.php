@@ -142,26 +142,26 @@
                                 <div class="flex mt-4 space-x-2">
                                     @if ($product->stock > 0)
                                         @auth('web')
-                                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                                                @csrf
-                                                <input type="hidden" name="quantity" value="1">
-                                                <button type="submit"
-                                                    class="add-to-cart-btn bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm w-full text-center hover:bg-blue-200 transition duration-200">
-                                                    <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                                </button>
-                                            </form>
-                                            <a href="{{ route('product.show', $product) }}"
-                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                <i class="fas fa-shopping-bag"></i> Beli
-                                            </a>
+                                            {{-- Hanya tampilkan tombol Beli --}}
+                                            @if (!empty($product->valid_colors) && count($product->valid_colors) > 0)
+                                                <a href="{{ route('product.show', $product) }}"
+                                                    class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                    <i class="fas fa-shopping-bag"></i> Beli
+                                                </a>
+                                            @else
+                                                <form action="{{ route('buy.now', $product->id) }}" method="POST" class="w-full">
+                                                    @csrf
+                                                    <input type="hidden" name="quantity" value="1">
+                                                    <button type="submit"
+                                                        class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                        <i class="fas fa-shopping-bag"></i> Beli
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @else
                                             <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
-                                                class="bg-blue-100 text-blue-600 border border-blue-300 rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-200 transition duration-200">
-                                                <i class="fas fa-cart-plus mr-1"></i> Keranjang
-                                            </a>
-                                            <a href="{{ route('product.show', $product) }}"
-                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm flex-1 text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                <i class="fas fa-shopping-bag"></i> Beli
+                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                <i class="fas fa-shopping-bag mr-1"></i> Beli
                                             </a>
                                         @endauth
                                     @else
