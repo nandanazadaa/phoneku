@@ -30,7 +30,7 @@ class ProductController extends Controller
                   ->orWhere('description', 'like', "%{$search}%");
         }
 
-        $products = $query->latest()->paginate(10);
+        $products = $query->latest()->get();
 
         // Handle edit tab
         $editProduct = null;

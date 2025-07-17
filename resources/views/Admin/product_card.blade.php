@@ -404,7 +404,7 @@
          margin: -7px !important; /* Saturation adjustment */
          margin-top: -7px !important; /* Hue vertical center */
          margin-left: var(--colorpicker-position-x, 0) !important; /* Hue horizontal */
-         position: absolute !important;
+         position: absolute !important; /* Needed for internal pointers */
          pointer-events: none !important; /* Don't block clicks */
      }
       /* Specific positioning for Saturation pointer */
@@ -530,6 +530,21 @@
         padding: 3px;
      }
 
+    ul.pagination svg,
+    .page-link svg,
+    .page-item svg,
+    .pagination svg,
+    nav[role="navigation"] svg {
+        width: 1em !important;
+        height: 1em !important;
+        min-width: 1em !important;
+        min-height: 1em !important;
+        max-width: 1em !important;
+        max-height: 1em !important;
+        display: inline-block !important;
+        vertical-align: middle !important;
+    }
+
 </style>
 @endpush
 
@@ -612,7 +627,7 @@
                     @endif
 
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table id="productTable" class="table table-hover table-striped">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -623,14 +638,14 @@
                                     <th>Harga</th>
                                     <th>Harga Asli</th>
                                     <th>Stok</th>
-                                    <th>Warna</th> {{-- Added Color Header --}}
+                                    <th>Warna</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($products ?? [] as $index => $product)
                                     <tr>
-                                        <td>{{ $products->firstItem() + $index }}</td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>
                                             @if($product->image)
                                                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-table-image" width="100">
@@ -654,11 +669,9 @@
                                              @endif
                                         </td>
                                         <td>{{ $product->stock }}</td>
-                                        {{-- Display Colors (split by comma if multiple) --}}
                                         <td>
                                             @if($product->color)
                                                 @php
-                                                    // Split colors by comma, trim whitespace, filter out empty strings
                                                     $colors = array_filter(array_map('trim', explode(',', $product->color)));
                                                 @endphp
                                                 @foreach($colors as $color)
@@ -671,7 +684,6 @@
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                {{-- Link to edit tab --}}
                                                 <a href="{{ route('admin.products') }}?tab=edit&id={{ $product->id }}" class="btn btn-sm btn-warning mx-1">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
@@ -682,7 +694,6 @@
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </div>
-
                                             <!-- View Product Modal -->
                                             <div class="modal fade" id="viewProductModal{{ $product->id }}" tabindex="-1" role="dialog" aria-labelledby="viewProductModalLabel{{ $product->id }}" aria-hidden="true">
                                                 <div class="modal-dialog modal-lg" role="document">
@@ -759,7 +770,6 @@
                                                                             <td>
                                                                                  @if($product->color)
                                                                                     @php
-                                                                                        // Split colors by comma, trim whitespace, filter out empty strings
                                                                                         $colors = array_filter(array_map('trim', explode(',', $product->color)));
                                                                                     @endphp
                                                                                     @foreach($colors as $color)
@@ -825,7 +835,6 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    {{-- Updated colspan from 9 to 10 --}}
                                     <tr>
                                         <td colspan="10" class="text-center">No products found.</td>
                                     </tr>
@@ -834,6 +843,10 @@
                         </table>
                     </div>
 
+                    {{-- Komentari/Remove pagination Laravel bawaan --}}
+                    {{-- <div class="mt-3">
+                        {{ $products->onEachSide(2)->links('pagination::simple-default') }}
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -1507,7 +1520,7 @@ function updateHiddenColorInput($hiddenInput, colorsArray) {
          if ($element.data('colorpicker')) {
              // console.log('Destroying existing colorpicker instance for', $input.attr('id')); // Debugging
              $element.colorpicker('destroy');
-         }
+        }
 
         // console.log('Initializing colorpicker for', $input.attr('id'), 'with initial value:', $input.val()); // Debugging
 
@@ -2116,24 +2129,24 @@ $('form[id^="create-product-form"], form[id^="edit-product-form"]').on('submit',
 @endpush
 
 @push('scripts')
-    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#basic-datatables').DataTable({
-                pageLength: 10, // Match Laravel pagination
-                searching: false, // Disable client-side search to rely on server-side search
-                ordering: true,
-                serverSide: false, // Set to true if using server-side processing
-                paging: true,
-                lengthChange: false, // Hide "Show X entries" dropdown
-                info: true,
+            $('#productTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                order: [[0, 'asc']],
                 language: {
-                    paginate: {
-                        previous: '<i class="fa fa-angle-left"></i>',
-                        next: '<i class="fa fa-angle-right"></i>'
-                    }
-                }
+                    search: "Cari produk:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ produk",
+                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 produk",
+                    infoFiltered: "(disaring dari _MAX_ total produk)"
+                },
+                columnDefs: [
+                    { orderable: false, targets: 9 } // Kolom aksi tidak bisa diurutkan
+                ]
             });
         });
     </script>
