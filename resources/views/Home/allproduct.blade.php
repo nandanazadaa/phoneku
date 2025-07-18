@@ -96,141 +96,136 @@
             @endif
         </div>
 
-        <div class="relative">
-            <button
-                class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border rounded-full shadow p-2 z-10 hover:bg-gray-100"
-                onclick="scrollSlider('product-slider', -1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button
-                class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white border rounded-full shadow p-2 z-10 hover:bg-gray-100"
-                onclick="scrollSlider('product-slider', 1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-
-            <div id="product-slider" class="overflow-x-auto scroll-smooth py-4 px-8">
-                <div class="flex space-x-4 min-w-max">
-                    @forelse($products as $product)
-                        <div
-                            class="w-72 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
-                            <div class="bg-gray-100 w-full h-56 flex items-center justify-center p-4 relative group">
-                                @if ($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                        class="max-h-full object-contain transition transform group-hover:scale-105">
-                                @else
-                                    <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
-                                        <i class="fa fa-image text-5xl"></i>
-                                    </div>
-                                @endif
-                                @if ($product->original_price && $product->original_price > $product->price)
-                                    @php
-                                        $discountPercentage = round(
-                                            (($product->original_price - $product->price) / $product->original_price) *
-                                                100,
-                                        );
-                                    @endphp
-                                    <span
-                                        class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                                        {{ $discountPercentage }}% OFF
-                                    </span>
-                                @endif
-                            </div>
-                            <div class="p-4 flex flex-col flex-grow">
-                                <h3 class="font-semibold text-base flex-grow mb-2">
-                                    <a href="{{ route('product.show', $product) }}"
-                                        class="hover:text-blue-600 line-clamp-2"
-                                        title="{{ $product->name }}">{{ $product->name }}</a>
-                                </h3>
-                                <p class="text-blue-600 font-bold text-lg">
-                                    {{ $product->formatted_price ?? 'Rp ' . number_format($product->price, 0, ',', '.') }}
+        {{-- Hapus tombol panah kiri/kanan dan slider --}}
+        {{-- Produk Grid --}}
+        <div class="py-4 px-0">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @forelse($products as $product)
+                    <div
+                        class="w-full bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col shadow-sm transition duration-300 ease-in-out hover:shadow-lg">
+                        <div class="bg-gray-100 w-full h-56 flex items-center justify-center p-4 relative group">
+                            @if ($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                    class="max-h-full object-contain transition transform group-hover:scale-105">
+                            @else
+                                <div class="flex items-center justify-center h-full w-full bg-gray-200 text-gray-400">
+                                    <i class="fa fa-image text-5xl"></i>
+                                </div>
+                            @endif
+                            @if ($product->original_price && $product->original_price > $product->price)
+                                @php
+                                    $discountPercentage = round(
+                                        (($product->original_price - $product->price) / $product->original_price) *
+                                            100,
+                                    );
+                                @endphp
+                                <span
+                                    class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                    {{ $discountPercentage }}% OFF
+                                </span>
+                            @endif
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h3 class="font-semibold text-base flex-grow mb-2">
+                                <a href="{{ route('product.show', $product) }}"
+                                    class="hover:text-blue-600 line-clamp-2"
+                                    title="{{ $product->name }}">{{ $product->name }}</a>
+                            </h3>
+                            <p class="text-blue-600 font-bold text-lg">
+                                {{ $product->formatted_price ?? 'Rp ' . number_format($product->price, 0, ',', '.') }}
+                            </p>
+                            @if ($product->original_price && $product->original_price > $product->price)
+                                <p class="text-gray-500 line-through text-sm">
+                                    {{ $product->formatted_original_price ?? 'Rp ' . number_format($product->original_price, 0, ',', '.') }}
                                 </p>
-                                @if ($product->original_price && $product->original_price > $product->price)
-                                    <p class="text-gray-500 line-through text-sm">
-                                        {{ $product->formatted_original_price ?? 'Rp ' . number_format($product->original_price, 0, ',', '.') }}
-                                    </p>
-                                @endif
-                                <div class="flex mt-4 space-x-2">
-                                    @if ($product->stock > 0)
-                                        @auth('web')
-                                            {{-- Hanya tampilkan tombol Beli --}}
-                                            @if (!empty($product->valid_colors) && count($product->valid_colors) > 0)
-                                                <a href="{{ route('product.show', $product) }}"
+                            @endif
+                            <div class="flex mt-4 space-x-2">
+                                @if ($product->stock > 0)
+                                    @auth('web')
+                                        {{-- Hanya tampilkan tombol Beli --}}
+                                        @if (!empty($product->valid_colors) && count($product->valid_colors) > 0)
+                                            <a href="{{ route('product.show', $product) }}"
+                                                class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
+                                                <i class="fas fa-shopping-bag"></i> Beli
+                                            </a>
+                                        @else
+                                            <form action="{{ route('buy.now', $product->id) }}" method="POST" class="w-full">
+                                                @csrf
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit"
                                                     class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
                                                     <i class="fas fa-shopping-bag"></i> Beli
-                                                </a>
-                                            @else
-                                                <form action="{{ route('buy.now', $product->id) }}" method="POST" class="w-full">
-                                                    @csrf
-                                                    <input type="hidden" name="quantity" value="1">
-                                                    <button type="submit"
-                                                        class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                        <i class="fas fa-shopping-bag"></i> Beli
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        @else
-                                            <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
-                                               class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
-                                                <i class="fas fa-shopping-bag mr-1"></i> Beli
-                                            </a>
-                                        @endauth
+                                                </button>
+                                            </form>
+                                        @endif
                                     @else
-                                        <button type="button"
-                                                class="out-of-stock-btn text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full hover:bg-red-200 transition duration-200">
-                                            <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
-                                        </button>
-                                    @endif
-                                </div>
+                                        <a href="{{ route('login', ['redirect' => route('product.show', $product)]) }}"
+                                           class="bg-blue-500 text-white rounded-lg py-2 px-3 text-sm w-full text-center no-underline hover:bg-blue-600 transition duration-200">
+                                            <i class="fas fa-shopping-bag mr-1"></i> Beli
+                                        </a>
+                                    @endauth
+                                @else
+                                    <button type="button"
+                                            class="out-of-stock-btn text-center text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg py-2 px-4 w-full hover:bg-red-200 transition duration-200">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i> Stok Habis
+                                    </button>
+                                @endif
                             </div>
                         </div>
-                    @empty
-                        <div class="text-center w-full py-8">
-                            <p class="text-gray-500">Tidak ada produk yang tersedia saat ini.</p>
-                        </div>
-                    @endforelse
-                </div>
+                    </div>
+                @empty
+                    <div class="text-center w-full py-8 col-span-full">
+                        <p class="text-gray-500">Tidak ada produk yang tersedia saat ini.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
         {{-- Pagination --}}
-        <div class="mt-8">
-            {{ $products->appends(request()->query())->links() }}
-        </div>
+        @if ($products->hasPages())
+            <div class="flex justify-center mt-10">
+                <nav role="navigation" aria-label="Pagination Navigation"
+                    class="inline-flex rounded-md shadow-sm overflow-hidden border border-gray-200">
+
+                    {{-- Previous Page Link --}}
+                    @if ($products->onFirstPage())
+                        <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">←</span>
+                    @else
+                        <a href="{{ $products->previousPageUrl() }}"
+                            class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">←</a>
+                    @endif
+
+                    {{-- Pagination Elements --}}
+                    @foreach ($products->links()->elements[0] as $page => $url)
+                        @if ($page == $products->currentPage())
+                            <span class="px-4 py-2 text-sm bg-blue-500 text-white">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}"
+                                class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($products->hasMorePages())
+                        <a href="{{ $products->nextPageUrl() }}"
+                            class="px-4 py-2 text-sm bg-white text-blue-600 hover:bg-blue-100 transition">→</a>
+                    @else
+                        <span class="px-4 py-2 text-sm bg-gray-100 text-gray-400 cursor-not-allowed">→</span>
+                    @endif
+                </nav>
+            </div>
+        @endif
     </div>
 @endsection
 
 @section('styles')
     <style>
-        #product-slider::-webkit-scrollbar {
-            height: 8px;
-        }
-        #product-slider::-webkit-scrollbar-track {
-            background: #f0f0f0;
-            border-radius: 10px;
-        }
-        #product-slider::-webkit-scrollbar-thumb {
-            background-color: #3b82f6;
-            border-radius: 10px;
-            border: 2px solid #f0f0f0;
-        }
-        #product-slider::-webkit-scrollbar-thumb:hover {
-            background-color: #2563eb;
-        }
+        /* Hapus custom scrollbar karena tidak diperlukan lagi */
     </style>
 @endsection
 
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function scrollSlider(id, direction) {
-            const slider = document.getElementById(id);
-            const scrollAmount = 300; // Adjust scroll distance as needed
-
-            slider.scrollBy({
-                left: direction * scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.add-to-cart-form').forEach(form => {
                 form.addEventListener('submit', function(e) {
