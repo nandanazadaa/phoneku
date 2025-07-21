@@ -27,7 +27,7 @@ class ProductController extends Controller
 
         if ($search) {
             $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('description', 'like', "%{$search}%");
         }
 
         $products = $query->latest()->get();
@@ -211,7 +211,10 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(6);
 
-        $averageRating = $testimonials->avg('rating') ?? 0;
+        // Calculate average rating from all approved testimonials for this product
+        $averageRating = Testimonial::where('product_id', $product->id)
+            ->where('is_approved', true)
+            ->avg('rating') ?? 0;
 
         $colors = $product->valid_colors; // Use the accessor to get validated colors
 

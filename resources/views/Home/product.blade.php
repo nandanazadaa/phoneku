@@ -148,11 +148,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
             @forelse($testimonials as $testi)
                 <div class="bg-white border border-gray-200 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-                    <div class="flex items-center justify-center mb-2 overflow-hidden">
+                    <div class="flex items-center justify-center mb-2 overflow-hidden h-32">
                         @if($testi->photo)
-                            <img src="{{ asset('storage/' . $testi->photo) }}" alt="{{ $testi->user->name ?? 'User' }}" class="object-cover w-30 h-28 rounded-full">
+                            <img src="{{ asset('storage/' . $testi->photo) }}" alt="{{ $testi->user->name ?? 'User' }}" class="object-cover w-full h-32">
                         @else
-                            <i class="fas fa-user-circle text-5xl text-gray-400"></i>
+                            <i class="fas fa-image text-5xl text-gray-400"></i>
                         @endif
                     </div>
                     <h4 class="font-semibold text-gray-800 mb-1">
@@ -286,6 +286,55 @@
 {{-- Include SweetAlert2 from CDN as it's used in the script --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Cegah duplikasi
+    if (!window.__hamburgerMenuFixed) {
+        window.__hamburgerMenuFixed = true;
+        const hamburgerButton = document.getElementById('hamburger-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (hamburgerButton && mobileMenu) {
+            hamburgerButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('active');
+                // Toggle icon
+                const isOpen = !mobileMenu.classList.contains('hidden');
+                const svg = hamburgerButton.querySelector('svg');
+                if (svg) {
+                    if (isOpen) {
+                        svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>`;
+                    } else {
+                        svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>`;
+                    }
+                }
+            });
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!hamburgerButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenu.classList.remove('active');
+                        const svg = hamburgerButton.querySelector('svg');
+                        if (svg) {
+                            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>`;
+                        }
+                    }
+                }
+            });
+            // Close menu when clicking a link
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.remove('active');
+                    const svg = hamburgerButton.querySelector('svg');
+                    if (svg) {
+                        svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>`;
+                    }
+                });
+            });
+        }
+    }
+});
 document.addEventListener('DOMContentLoaded', function () {
     // Harga dinamis
     const unitPrice = @json($product->price);
