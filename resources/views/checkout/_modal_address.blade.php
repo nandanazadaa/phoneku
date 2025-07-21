@@ -78,20 +78,26 @@
         }
     });
 
-    function initializeMap() {
+ function initializeMap() {
+        // Only create the map if it doesn't exist
         if (!leafletMap) {
             leafletMap = L.map('map').setView([-7.797068, 110.370529], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
             marker = L.marker([-7.797068, 110.370529], { draggable: true }).addTo(leafletMap);
+
             leafletMap.on('click', function(e) {
                 marker.setLatLng(e.latlng);
                 updateAddress(e.latlng);
             });
+
             marker.on('dragend', function(e) {
                 updateAddress(e.target.getLatLng());
             });
         }
+        // Always invalidate size when the modal opens to ensure the map displays correctly
         leafletMap.invalidateSize();
+
+        // Get current location
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(pos) {
                 const latlng = [pos.coords.latitude, pos.coords.longitude];
@@ -104,7 +110,7 @@
         }
     }
 
-    function closeModal() {
+function closeModal() {
         const modal = document.getElementById('modalAddress');
         if (modal) {
             modal.classList.add('hidden');
@@ -129,7 +135,7 @@
             });
     }
 
-    function searchLocationOnMap() {
+     function searchLocationOnMap() {
         const query = document.getElementById('searchLocation').value.trim();
         if (!query) return;
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1`, {
