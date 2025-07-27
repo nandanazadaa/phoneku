@@ -35,6 +35,46 @@
             float: left;
             margin-bottom: 15px;
         }
+        /* Custom styling for length menu */
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 12px;
+            background-color: white;
+            font-size: 14px;
+            min-width: 60px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+            padding-right: 30px;
+        }
+        .dataTables_wrapper .dataTables_length select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .dataTables_wrapper .dataTables_length label {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Ensure proper spacing and alignment */
+        .dataTables_wrapper .dataTables_length {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Custom dropdown arrow styling */
+        .dataTables_wrapper .dataTables_length select::-ms-expand {
+            display: none;
+        }
         .table-responsive {
             overflow-x: auto;
         }
@@ -162,7 +202,7 @@
                         </div>
                         <div class="col-md-4 text-right">
                             <div class="mb-2">
-                                <span class="text-muted">Total Orders: {{ $orders->total() }}</span>
+                                <span class="text-muted">Total Orders: {{ $orders->count() }}</span>
                             </div>
                             <div>
                                 <form method="POST" action="{{ route('admin.orders.check-midtrans-status') }}" class="d-inline">
@@ -224,7 +264,7 @@
                             <tbody>
                                 @forelse($orders as $index => $order)
                                     <tr>
-                                        <td>{{ $orders->firstItem() + $index }}</td>
+                                        <td>{{ $index + 1 }}</td>
                                         <td>{{ $order->order_code }}</td>
                                         <td>{{ $order->user ? $order->user->name : 'N/A' }}</td>
                                         <td>{{ $order->created_at->format('d M Y H:i') }}</td>
@@ -359,9 +399,7 @@
                         </table>
                     </div>
 
-                    <div class="mt-3">
-                        {{ $orders->appends(['q' => request('q'), 'status' => request('status')])->links() }}
-                    </div>
+                    {{-- Pagination handled by DataTables --}}
                 </div>
             </div>
         </div>
@@ -432,19 +470,35 @@
         $(document).ready(function() {
             // Initialize DataTable
             $('#orderTable').DataTable({
-                "pageLength": 10,
-                "lengthMenu": [5, 10, 25, 50],
-                "order": [[3, "desc"]], // Sort by Order Date descending by default
-                "language": {
-                    "search": "Search orders:",
-                    "lengthMenu": "Show _MENU_ entries",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ orders",
-                    "infoEmpty": "Showing 0 to 0 of 0 orders",
-                    "infoFiltered": "(filtered from _MAX_ total orders)"
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100, -1], // -1 means "Show all"
+                order: [[3, 'desc']], // Sort by Order Date descending by default
+                language: {
+                    search: "Cari orders:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ orders",
+                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 orders",
+                    infoFiltered: "(disaring dari _MAX_ total orders)"
                 },
-                "columnDefs": [
-                    { "orderable": false, "targets": 8 } // Disable sorting on Actions column (now column 8)
-                ]
+                columnDefs: [
+                    { orderable: false, targets: 8 } // Kolom aksi tidak bisa diurutkan
+                ],
+                // Enable processing indicator
+                processing: true,
+                // Allow showing all records
+                lengthChange: true,
+                // Enable pagination
+                paging: true,
+                // Enable searching
+                searching: true,
+                // Enable sorting
+                ordering: true,
+                // Enable info display
+                info: true,
+                // Optimize for large datasets
+                deferRender: true,
+                // Enable state saving
+                stateSave: true
             });
 
             // Handle modal close
