@@ -14,28 +14,41 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query = Order::with(['user', 'orderItems.product']);
-        if ($request->has('status') && $request->status !== '') {
+
+        // Filter by status (only if status is not empty)
+        if ($request->filled('status')) {
             $query->where('order_status', $request->status);
         }
-        if ($request->has('q')) {
+
+        // Filter by search query
+        if ($request->filled('q')) {
             $q = $request->q;
-            $query->where(function($sub) use ($q) {
+            $query->where(function ($sub) use ($q) {
                 $sub->where('order_code', 'like', "%$q%")
-                    ->orWhereHas('user', function($u) use ($q) {
+                    ->orWhereHas('user', function ($u) use ($q) {
                         $u->where('name', 'like', "%$q%")
-                          ->orWhere('email', 'like', "%$q%");
+                            ->orWhere('email', 'like', "%$q%");
                     });
             });
         }
+
         $orders = $query->latest()->get();
-        return view('admin.orders.index', compact('orders'));
+
+        // Debug logging
+        Log::info('Order search/filter', [
+            'status' => $request->status,
+            'search_query' => $request->q,
+            'total_orders' => $orders->count()
+        ]);
+
+        return view('Admin.orders.index', compact('orders'));
     }
 
     // Show detail order
     public function show(Order $order)
     {
         $order->load(['user', 'orderItems.product']);
-        return view('admin.orders.show', compact('order'));
+        return view('Admin.orders.show', compact('order'));
     }
 
     // Update order status
@@ -48,17 +61,17 @@ class OrderController extends Controller
         ]);
 
         $oldStatus = $order->order_status;
-        
+
         $order->order_status = $request->order_status;
-        
+
         if ($request->has('payment_status')) {
             $order->payment_status = $request->payment_status;
         }
-        
+
         if ($request->has('notes')) {
             $order->notes = $request->notes;
         }
-        
+
         $order->save();
 
         // Reduce stock when order status is changed to "diproses"
@@ -82,7 +95,7 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         $order->delete();
-        return redirect()->route('admin.orders.index')->with('success', 'Order berhasil dihapus.');
+        return redirect()->route('Admin.orders.index')->with('success', 'Order berhasil dihapus.');
     }
 
     // Manual update payment status
@@ -99,11 +112,11 @@ class OrderController extends Controller
 
             // Update payment status
             $order->payment_status = $request->payment_status;
-            
+
             // Update order status based on payment status
             if ($request->payment_status === 'completed') {
                 $order->order_status = Order::ORDER_STATUS_DIPROSES;
-                
+
                 // Reduce stock when payment is completed
                 $this->reduceProductStock($order);
             } elseif ($request->payment_status === 'failed' || $request->payment_status === 'refunded') {
@@ -129,7 +142,6 @@ class OrderController extends Controller
             ]);
 
             return redirect()->back()->with('success', 'Status pembayaran berhasil diupdate.');
-
         } catch (\Exception $e) {
             Log::error('Manual payment status update error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal mengupdate status pembayaran: ' . $e->getMessage());
@@ -150,32 +162,30 @@ class OrderController extends Controller
                 try {
                     // Use Midtrans API to check status
                     $status = \Midtrans\Transaction::status($order->order_code);
-                    
+
                     if ($status->transaction_status === 'settlement') {
                         $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
                         $order->order_status = Order::ORDER_STATUS_DIPROSES;
                         $order->midtrans_transaction_id = $status->transaction_id;
                         $order->save();
-                        
+
                         // Reduce stock when payment is completed
                         $this->reduceProductStock($order);
-                        
+
                         $updatedCount++;
-                        
+
                         Log::info("Order status updated via Midtrans API check", [
                             'order_code' => $order->order_code,
                             'payment_status' => $order->payment_status,
                             'order_status' => $order->order_status
                         ]);
                     }
-                    
                 } catch (\Exception $e) {
                     Log::error("Error checking Midtrans status for order {$order->order_code}: " . $e->getMessage());
                 }
             }
 
             return redirect()->back()->with('success', "Berhasil mengupdate {$updatedCount} order dari {$pendingOrders->count()} pending orders.");
-
         } catch (\Exception $e) {
             Log::error('Check Midtrans status error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal mengecek status Midtrans: ' . $e->getMessage());
@@ -209,7 +219,6 @@ class OrderController extends Controller
                     'message' => 'Order tidak ditemukan'
                 ]);
             }
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -225,16 +234,16 @@ class OrderController extends Controller
     {
         try {
             $order->load('orderItems.product');
-            
+
             foreach ($order->orderItems as $item) {
                 $product = $item->product;
                 if ($product) {
                     $oldStock = $product->stock;
                     $newStock = max(0, $oldStock - $item->quantity);
-                    
+
                     $product->stock = $newStock;
                     $product->save();
-                    
+
                     Log::info('Product stock reduced by admin', [
                         'product_id' => $product->id,
                         'product_name' => $product->name,

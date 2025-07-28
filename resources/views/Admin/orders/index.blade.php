@@ -172,7 +172,7 @@
             <div class="card full-height">
                 <div class="card-body">
                     <div class="card-title">All Orders</div>
-                    
+
                     <!-- Filter Section -->
                     <div class="row mb-4">
                         <div class="col-md-8">
@@ -217,7 +217,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
@@ -334,7 +334,7 @@
                                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                                     @enderror
                                                                 </div>
-                                                                
+
                                                                 <div class="form-group">
                                                                     <label for="payment_status_{{ $order->id }}">Status Pembayaran</label>
                                                                     <select class="form-control" id="payment_status_{{ $order->id }}" name="payment_status">
@@ -423,7 +423,7 @@
                         <label for="order_code">Order Code</label>
                         <input type="text" class="form-control" id="order_code" name="order_code" placeholder="Masukkan Order Code (contoh: ORD-1234567890)" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="payment_status">Payment Status</label>
                         <select class="form-control" id="payment_status" name="payment_status" required>
@@ -434,12 +434,12 @@
                             <option value="refunded">Refunded</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="transaction_id">Transaction ID (Opsional)</label>
                         <input type="text" class="form-control" id="transaction_id" name="transaction_id" placeholder="Masukkan Transaction ID dari Midtrans">
                     </div>
-                    
+
                     <div class="alert alert-info">
                         <i class="fa fa-info-circle mr-1"></i>
                         <strong>Petunjuk:</strong>
@@ -471,7 +471,7 @@
             // Initialize DataTable
             $('#orderTable').DataTable({
                 pageLength: 25,
-                lengthMenu: [10, 25, 50, 100, -1], // -1 means "Show all"
+                lengthMenu: [5, 10, 25, 50], // -1 means "Show all"
                 order: [[3, 'desc']], // Sort by Order Date descending by default
                 language: {
                     search: "Cari orders:",
@@ -514,16 +514,16 @@
             // Handle manual update form submission
             $('#manualUpdateForm').on('submit', function(e) {
                 e.preventDefault();
-                
+
                 const orderCode = $('#order_code').val();
                 const paymentStatus = $('#payment_status').val();
                 const transactionId = $('#transaction_id').val();
-                
+
                 if (!orderCode || !paymentStatus) {
                     alert('Order Code dan Payment Status harus diisi!');
                     return;
                 }
-                
+
                 // Find order by order code
                 $.ajax({
                     url: '/admin/orders/search-by-code',
@@ -533,14 +533,14 @@
                         if (response.order) {
                             // Update form action and submit
                             $('#manualUpdateForm').attr('action', '/admin/orders/' + response.order.id + '/update-payment-status');
-                            
+
                             // Add order_id to form
                             if (!$('#order_id').length) {
                                 $('#manualUpdateForm').append('<input type="hidden" name="order_id" value="' + response.order.id + '">');
                             } else {
                                 $('#order_id').val(response.order.id);
                             }
-                            
+
                             // Submit form
                             $('#manualUpdateForm')[0].submit();
                         } else {
