@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
         <meta name="logged-in" content="true">
         <meta name="user-id" content="{{ Auth::id() }}">
     @endauth
+    <link rel="icon" href="{{ asset('img/LogoIcon.png') }}" type="image/x-icon"/>
     <title>PhoneKu - @yield('title', 'Marketplace Handphone & Aksesoris')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Auth;
             padding: 0;
             overflow-x: hidden;
         }
-        
+
         .slide-container {
             overflow: hidden;
             width: 100%;
@@ -32,38 +33,38 @@ use Illuminate\Support\Facades\Auth;
             align-items: center;
             justify-content: center;
         }
-        
+
         .slides {
             position: relative;
             width: 100%;
         }
-        
+
         .slide {
             display: none;
             width: 100%;
         }
-        
+
         .slide.active {
             display: block;
             animation: slideIn 0.8s ease-in-out;
         }
-        
+
         @keyframes slideIn {
-            from { 
-                opacity: 0.7; 
+            from {
+                opacity: 0.7;
                 transform: translateX(30px);
             }
-            to { 
+            to {
                 opacity: 1;
                 transform: translateX(0);
             }
         }
-        
+
         .slider-dot {
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .slider-dot:hover {
             transform: scale(1.1);
         }
@@ -73,12 +74,12 @@ use Illuminate\Support\Facades\Auth;
 <body class="font-sans">
     <!-- Navbar Include - pastikan path ini benar -->
     @include('partials.navbar')
-    
+
     <!-- Main Content -->
     <main>
         @yield('content')
     </main>
-    
+
     <!-- Footer Include - pastikan path ini benar -->
     @include('partials.footer')
 

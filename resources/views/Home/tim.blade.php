@@ -9,7 +9,7 @@
             <div class="container mx-auto px-4 py-2 flex justify-end"></div>
             <div class="container mx-auto px-4"></div>
 
-            
+
             <section class="py-12">
                 <div class="container mx-auto px-4 ">
                     <div class="mt-8">
@@ -45,7 +45,7 @@
                         <a href="https://www.instagram.com/zada.abiproya/?hl=en"><i class="fab fa-instagram"></i></a>
                         </div>
                       </div>
-              
+
                     <!-- Kartu Profil 2 (Turun) -->
                     <div class="relative bg-white rounded-[212px] w-48 pt-10 text-center py-12 px-3 shadow-lg lg:mt-40 flex flex-col justify-between min-h-[460px]">
                         <h2 class="text-xl font-bold">Muhammad Zayga Ernesto</h2>
@@ -61,9 +61,9 @@
                         <a href="https://www.instagram.com/zaygaernesto/?hl=en"><i class="fab fa-instagram"></i></a>
                         </div>
                       </div>
-              
+
                     <!-- Kartu Profil 3 (Naik) -->
-                    
+
                     <div class="relative bg-white rounded-[212px] w-48 pt-10 text-center py-12 px-3 shadow-lg lg:mt-0 lg:mb-40 flex flex-col justify-between min-h-[460px]">
                     <h2 class="text-xl font-bold">Ikhsanudin</h2>
                         <p class="text-sm text-gray-500 mb-4">Frontend Developer</p>
@@ -78,7 +78,7 @@
                         <a href="https://www.instagram.com/i_can017/?hl=en"><i class="fab fa-instagram"></i></a>
                         </div>
                       </div>
-                      
+
                       <div class="relative bg-white rounded-[212px] w-48 pt-10 text-center py-12 px-3 shadow-lg lg:mt-40 flex flex-col justify-between min-h-[460px]">
                       <h2 class="text-xl font-bold">Akbar Rizqy Effendi</h2>
                         <p class="text-sm text-gray-500 mb-4">Frontend Developer</p>
@@ -103,7 +103,4 @@
       </div>
         </div>
     </div>
-   @endsection 
-   
-</body>
-</html>
+@endsection

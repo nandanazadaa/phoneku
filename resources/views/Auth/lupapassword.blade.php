@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ asset('img/LogoIcon.png') }}" type="image/x-icon"/>
     <title>PhoneKu - Lupa Password</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,9 +14,9 @@
             <div class="mb-4">
                 <img src="img/logo2.png" alt="PhoneKu Logo" class="w-60">
             </div>
-            
+
             <div class="flex-1 flex items-center justify-center">
-                <img src="img/model.png" alt="Person with phone" 
+                <img src="img/model.png" alt="Person with phone"
                      class="w-full h-auto object-contain absolute inset-25 mx-auto my-8"
                      style="max-height: 90vh">
             </div>
@@ -49,10 +50,10 @@
                         <div>
                             <label for="phone" class="block text-white mb-2 text-sm">Alamat Email</label>
                             <div class="relative">
-                                <input type="email" id="email" name="email" 
+                                <input type="email" id="email" name="email"
                                     class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 pr-28"
                                     placeholder="Masukkan akun email">
-                                <button type="submit" 
+                                <button type="submit"
                                         class="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 text-sm bg-white px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                                     Kirim kode
                                 </button>
@@ -70,13 +71,13 @@
                                 placeholder="Masukkan kode OTP">
                         </div>
 
-                        <button type="submit" 
+                        <button type="submit"
                                 class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors duration-300">
                             Masuk
                         </button>
 
                         <div class="border-t border-white/20 pt-4 mt-6">
-                            <p class="text-center text-white text-sm"> 
+                            <p class="text-center text-white text-sm">
                                 <a href="{{ route('login') }}" class="text-blue-200 hover:underline">Kembali login!</a>
                             </p>
                         </div>
