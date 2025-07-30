@@ -48,7 +48,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load(['user', 'orderItems.product']);
-        return view('Admin.orders.show', compact('order'));
+        return view('admin.orders.show', compact('order'));
     }
 
     // Update order status
@@ -95,7 +95,7 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         $order->delete();
-        return redirect()->route('Admin.orders.index')->with('success', 'Order berhasil dihapus.');
+        return redirect()->route('admin.orders.index')->with('success', 'Order berhasil dihapus.');
     }
 
     // Manual update payment status
