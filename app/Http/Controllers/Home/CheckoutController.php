@@ -44,17 +44,22 @@ class CheckoutController extends Controller
 
         $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
         if ($cartItems->isEmpty()) {
-            return view('home.checkout', ['cartItems' => collect(), 'subtotal' => 0, 'couriers' => collect(), 'shippingCost' => 0, 'serviceFee' => 0, 'total' => 0, 'user' => $user]);
+            // Pastikan 'uniqueCouriers' juga dikirim sebagai koleksi kosong
+            return view('home.checkout', ['cartItems' => collect(), 'subtotal' => 0, 'couriers' => collect(), 'uniqueCouriers' => collect(), 'shippingCost' => 0, 'serviceFee' => 0, 'total' => 0, 'user' => $user]);
         }
 
         $couriers = Courier::all();
+        // Buat koleksi baru yang hanya berisi nama kurir unik
+        $uniqueCouriers = $couriers->unique('courier');
+
         $subtotal = $cartItems->sum(fn($item) => $item->product ? $item->product->price * $item->quantity : 0);
         $serviceFee = 5000;
         $defaultCourier = $couriers->first();
         $shippingCost = $defaultCourier ? $defaultCourier->shipping_cost : 20000;
         $total = $subtotal + $shippingCost + $serviceFee;
 
-        return view('home.checkout', compact('cartItems', 'subtotal', 'couriers', 'shippingCost', 'serviceFee', 'total', 'user'));
+        // Kirim 'uniqueCouriers' ke view
+        return view('home.checkout', compact('cartItems', 'subtotal', 'couriers', 'uniqueCouriers', 'shippingCost', 'serviceFee', 'total', 'user'));
     }
 
     public function store(Request $request)
@@ -227,11 +232,11 @@ class CheckoutController extends Controller
         try {
             Log::info('Midtrans callback received:', $request->all());
             Log::info('Request headers:', $request->headers->all());
-            
+
             // Tambahkan debugging untuk melihat raw input
             $rawInput = file_get_contents('php://input');
             Log::info('Raw input:', ['raw' => $rawInput]);
-            
+
             $notif = new \Midtrans\Notification();
             Log::info('Notification object created:', [
                 'order_id' => $notif->order_id ?? 'null',
@@ -239,9 +244,9 @@ class CheckoutController extends Controller
                 'transaction_id' => $notif->transaction_id ?? 'null',
                 'fraud_status' => $notif->fraud_status ?? 'null'
             ]);
-            
+
             $order = Order::where('order_code', $notif->order_id)->first();
-            
+
             if (!$order) {
                 Log::error('Order not found for callback: ' . $notif->order_id);
                 Log::info('Available orders:', Order::pluck('order_code')->toArray());
@@ -257,28 +262,28 @@ class CheckoutController extends Controller
                 case 'settlement':
                     $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
                     $order->order_status = Order::ORDER_STATUS_DIPROSES;
-                    
+
                     // Reduce stock when payment is successful
                     $this->reduceProductStock($order);
                     break;
-                    
+
                 case 'pending':
                     $order->payment_status = Order::PAYMENT_STATUS_PENDING;
                     $order->order_status = Order::ORDER_STATUS_DIBUAT;
                     break;
-                    
+
                 case 'expire':
                 case 'cancel':
                 case 'deny':
                     $order->payment_status = Order::PAYMENT_STATUS_FAILED;
                     $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
                     break;
-                    
+
                 case 'refund':
                     $order->payment_status = Order::PAYMENT_STATUS_REFUNDED;
                     $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
                     break;
-                    
+
                 default:
                     Log::warning('Unknown transaction status: ' . $notif->transaction_status);
                     break;
@@ -305,7 +310,7 @@ class CheckoutController extends Controller
             ]);
 
             return response()->json(['status' => 'ok']);
-            
+
         } catch (\Exception $e) {
             Log::error('Midtrans callback error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -319,7 +324,7 @@ class CheckoutController extends Controller
     {
         try {
             Log::info('Test callback endpoint called');
-            
+
             // Simulate Midtrans callback data
             $testData = [
                 'order_id' => 'ORD-' . time(),
@@ -327,9 +332,9 @@ class CheckoutController extends Controller
                 'transaction_id' => 'TEST-' . time(),
                 'fraud_status' => 'accept'
             ];
-            
+
             Log::info('Test data:', $testData);
-            
+
             // Create a test order if needed
             $order = Order::where('order_code', $testData['order_id'])->first();
             if (!$order) {
@@ -349,26 +354,26 @@ class CheckoutController extends Controller
                     'payment_status' => Order::PAYMENT_STATUS_PENDING
                 ]);
             }
-            
+
             // Process the test callback
             $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
             $order->order_status = Order::ORDER_STATUS_DIPROSES;
             $order->midtrans_transaction_id = $testData['transaction_id'];
             $order->save();
-            
+
             Log::info('Test callback processed successfully', [
                 'order_id' => $order->id,
                 'order_code' => $order->order_code,
                 'payment_status' => $order->payment_status,
                 'order_status' => $order->order_status
             ]);
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Test callback processed successfully',
                 'order' => $order
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Test callback error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
@@ -379,7 +384,7 @@ class CheckoutController extends Controller
     {
         try {
             $results = [];
-            
+
             // Define expected status values using constants
             $expectedPaymentStatuses = [
                 Order::PAYMENT_STATUS_PENDING,
@@ -396,29 +401,29 @@ class CheckoutController extends Controller
                 Order::ORDER_STATUS_SELESAI,
                 Order::ORDER_STATUS_DIBATALKAN
             ];
-            
+
             // Check database values
             $dbPaymentStatuses = Order::distinct()->pluck('payment_status')->toArray();
             $dbOrderStatuses = Order::distinct()->pluck('order_status')->toArray();
-            
+
             // Check for inconsistencies
             $invalidPaymentStatuses = array_diff($dbPaymentStatuses, $expectedPaymentStatuses);
             $invalidOrderStatuses = array_diff($dbOrderStatuses, $expectedOrderStatuses);
-            
+
             $results['payment_status'] = [
                 'expected' => $expectedPaymentStatuses,
                 'found_in_db' => $dbPaymentStatuses,
                 'invalid' => $invalidPaymentStatuses,
                 'is_consistent' => empty($invalidPaymentStatuses)
             ];
-            
+
             $results['order_status'] = [
                 'expected' => $expectedOrderStatuses,
                 'found_in_db' => $dbOrderStatuses,
                 'invalid' => $invalidOrderStatuses,
                 'is_consistent' => empty($invalidOrderStatuses)
             ];
-            
+
             // Check callback mapping
             $callbackMapping = [
                 'capture' => ['payment_status' => Order::PAYMENT_STATUS_COMPLETED, 'order_status' => Order::ORDER_STATUS_DIPROSES],
@@ -429,24 +434,24 @@ class CheckoutController extends Controller
                 'deny' => ['payment_status' => Order::PAYMENT_STATUS_FAILED, 'order_status' => Order::ORDER_STATUS_DIBATALKAN],
                 'refund' => ['payment_status' => Order::PAYMENT_STATUS_REFUNDED, 'order_status' => Order::ORDER_STATUS_DIBATALKAN]
             ];
-            
+
             $results['callback_mapping'] = $callbackMapping;
-            
+
             // Check validation rules
             $validationRules = [
                 'payment_status' => 'in:pending,completed,failed,refunded',
                 'order_status' => 'in:dibuat,diproses,dikirimkan,dalam pengiriman,telah sampai,selesai,dibatalkan'
             ];
-            
+
             $results['validation_rules'] = $validationRules;
-            
+
             // Overall consistency check
             $results['overall_consistent'] = $results['payment_status']['is_consistent'] && $results['order_status']['is_consistent'];
-            
+
             Log::info('Status consistency check completed', $results);
-            
+
             return response()->json($results);
-            
+
         } catch (\Exception $e) {
             Log::error('Status consistency check error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
@@ -463,7 +468,7 @@ class CheckoutController extends Controller
             ]);
 
             $order = Order::where('order_code', $request->order_id)->first();
-            
+
             if (!$order) {
                 Log::error('Order not found for frontend update: ' . $request->order_id);
                 return response()->json(['error' => 'Order not found'], 404);
@@ -478,28 +483,28 @@ class CheckoutController extends Controller
                 case 'settlement':
                     $order->payment_status = Order::PAYMENT_STATUS_COMPLETED;
                     $order->order_status = Order::ORDER_STATUS_DIPROSES;
-                    
+
                     // Reduce stock when payment is successful
                     $this->reduceProductStock($order);
                     break;
-                    
+
                 case 'pending':
                     $order->payment_status = Order::PAYMENT_STATUS_PENDING;
                     $order->order_status = Order::ORDER_STATUS_DIBUAT;
                     break;
-                    
+
                 case 'expire':
                 case 'cancel':
                 case 'deny':
                     $order->payment_status = Order::PAYMENT_STATUS_FAILED;
                     $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
                     break;
-                    
+
                 case 'refund':
                     $order->payment_status = Order::PAYMENT_STATUS_REFUNDED;
                     $order->order_status = Order::ORDER_STATUS_DIBATALKAN;
                     break;
-                    
+
                 default:
                     Log::warning('Unknown transaction status from frontend: ' . $request->transaction_status);
                     break;
@@ -525,7 +530,7 @@ class CheckoutController extends Controller
             ]);
 
             return response()->json(['status' => 'success']);
-            
+
         } catch (\Exception $e) {
             Log::error('Update payment status error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -542,16 +547,16 @@ class CheckoutController extends Controller
     {
         try {
             $order->load('orderItems.product');
-            
+
             foreach ($order->orderItems as $item) {
                 $product = $item->product;
                 if ($product) {
                     $oldStock = $product->stock;
                     $newStock = max(0, $oldStock - $item->quantity);
-                    
+
                     $product->stock = $newStock;
                     $product->save();
-                    
+
                     Log::info('Product stock reduced', [
                         'product_id' => $product->id,
                         'product_name' => $product->name,
@@ -574,7 +579,7 @@ class CheckoutController extends Controller
     public function success(Request $request)
     {
         $orderId = $request->query('order_id');
-        
+
         if (!$orderId) {
             return redirect()->route('cart');
         }

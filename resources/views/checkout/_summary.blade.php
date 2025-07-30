@@ -6,16 +6,22 @@
         <h3 class="text-md font-semibold mb-2">Pilih Kurir</h3>
         <select class="form-control mb-2 w-full border rounded p-2" id="courier" name="courier" required>
             <option value="">Pilih Kurir</option>
-            @foreach($couriers as $courier)
+            @foreach($uniqueCouriers as $courier)
                 <option value="{{ $courier->courier }}">{{ ucfirst($courier->courier) }}</option>
             @endforeach
         </select>
-        <select class="form-control mb-2 w-full border rounded p-2" id="courier-service" name="courier_service" required>
-            <option value="">Pilih Jenis Layanan</option>
-            @foreach($couriers as $courier)
-                <option value="{{ $courier->service_type }}" data-courier="{{ $courier->courier }}" data-cost="{{ $courier->shipping_cost }}">{{ ucfirst($courier->service_type) }} (Rp{{ number_format($courier->shipping_cost, 0, ',', '.') }})</option>
-            @endforeach
-        </select>
+        <div>
+            <!-- Dropdown untuk memilih JENIS LAYANAN -->
+            <select class="form-control w-full border rounded p-2 transition-colors duration-200" id="courier-service" name="courier_service" required>
+                <option value="">Pilih Jenis Layanan</option>
+                {{-- Opsi ini akan diisi secara dinamis oleh JavaScript, tapi tetap ada di sini sebagai sumber data --}}
+                @foreach($couriers as $courier)
+                    <option value="{{ $courier->service_type }}" data-courier="{{ $courier->courier }}" data-cost="{{ $courier->shipping_cost }}" style="display: none;">
+                        {{ ucfirst($courier->service_type) }} (Rp{{ number_format($courier->shipping_cost, 0, ',', '.') }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
     </div>
 
     <!-- Transaction Summary -->
@@ -51,7 +57,7 @@
                 <span id="service-fee-display" class="font-medium">Rp{{ number_format($serviceFee, 0, ',', '.') }}</span>
             </div>
         </div>
-        
+
         <hr class="my-3 border-gray-300">
         <div class="flex justify-between font-bold text-lg text-gray-800">
             <span>Total Pembayaran</span>
@@ -72,6 +78,59 @@
 
 <!-- Tambahkan skrip Midtrans -->
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.clientKey') }}"></script>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const courierSelect = document.getElementById('courier');
+            const serviceSelect = document.getElementById('courier-service');
+            const allServiceOptions = Array.from(serviceSelect.options);
+
+            // Fungsi untuk mengatur status awal atau me-reset dropdown layanan
+            function setInitialServiceState() {
+                // Nonaktifkan dropdown layanan
+                serviceSelect.disabled = true;
+                // Tambahkan style visual untuk menunjukkan elemen tidak aktif
+                serviceSelect.classList.add('bg-gray-200', 'cursor-not-allowed');
+                serviceSelect.classList.remove('bg-white');
+
+                // Kosongkan isinya dan hanya tampilkan opsi placeholder
+                serviceSelect.innerHTML = '';
+                serviceSelect.appendChild(allServiceOptions[0]);
+            }
+
+            // Fungsi yang dijalankan setiap kali kurir diganti
+            function handleCourierChange() {
+                const selectedCourier = courierSelect.value;
+
+                // Reset dropdown layanan terlebih dahulu
+                setInitialServiceState();
+
+                // Jika pengguna memilih kurir yang valid (bukan opsi "Pilih Kurir Anda")
+                if (selectedCourier) {
+                    // Aktifkan kembali dropdown layanan
+                    serviceSelect.disabled = false;
+                    // Hapus style nonaktif dan kembalikan style normal
+                    serviceSelect.classList.remove('bg-gray-200', 'cursor-not-allowed');
+                    serviceSelect.classList.add('bg-white');
+
+                    // Loop dan tampilkan hanya layanan yang relevan
+                    allServiceOptions.forEach(option => {
+                        if (option.dataset.courier === selectedCourier) {
+                            serviceSelect.appendChild(option);
+                            option.style.display = 'block';
+                        }
+                    });
+                }
+            }
+
+            // Jalankan fungsi event listener saat pilihan kurir berubah
+            courierSelect.addEventListener('change', handleCourierChange);
+
+            // Atur kondisi awal saat halaman pertama kali dimuat
+            setInitialServiceState();
+        });
+</script>
+
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
         const payButton = document.getElementById('pay-button');
@@ -187,7 +246,7 @@
                         snap.pay(data.snap_token, {
                             onSuccess: function (result) {
                                 console.log('Payment Success:', result);
-                                
+
                                 // Update payment status via frontend callback
                                 fetch('/update-payment-status', {
                                     method: 'POST',
@@ -211,13 +270,13 @@
                                 .catch(error => {
                                     console.error('Error updating payment status:', error);
                                 });
-                                
+
                                 // Payment success will be handled by Midtrans callback redirect
                                 console.log('Payment completed successfully. Redirecting to success page...');
                             },
                             onPending: function (result) {
                                 console.log('Payment Pending:', result);
-                                
+
                                 // Update payment status via frontend callback
                                 fetch('/update-payment-status', {
                                     method: 'POST',
@@ -241,7 +300,7 @@
                                 .catch(error => {
                                     console.error('Error updating payment status:', error);
                                 });
-                                
+
                                 Swal.fire({
                                     icon: 'info',
                                     title: 'Pembayaran Tertunda',
@@ -269,7 +328,7 @@
                             },
                             onError: function (result) {
                                 console.log('Payment Error:', result);
-                                
+
                                 // Update payment status via frontend callback
                                 fetch('/update-payment-status', {
                                     method: 'POST',
@@ -293,7 +352,7 @@
                                 .catch(error => {
                                     console.error('Error updating payment status:', error);
                                 });
-                                
+
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Pembayaran Gagal',
