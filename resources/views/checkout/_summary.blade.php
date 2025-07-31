@@ -144,6 +144,10 @@
         const subtotal = {{ $subtotal }};
         const serviceFee = {{ $serviceFee }};
 
+        const isProfileComplete = {{ ($user && $user->profile && $user->profile->address && $user->profile->phone) ? 'true' : 'false' }};
+        const profileUrl = '{{ route('profile') }}'; // Ambil URL ke halaman profil
+
+
         // Filter service types based on selected courier
         courierSelect.addEventListener('change', function() {
             const selectedCourier = this.value;
@@ -182,6 +186,19 @@
         // Handle payment button click
         if (payButton) {
             payButton.addEventListener('click', function () {
+
+                if (!isProfileComplete) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Profil Belum Lengkap',
+                        text: 'Silakan lengkapi profil terlebih dahulu.',
+                        confirmButtonColor: '#3B82F6',
+                        // Tambahkan link langsung ke halaman profil untuk memudahkan pengguna
+                        footer: `<a href="${profileUrl}" class="text-blue-600 underline font-semibold">Lengkapi Profil Sekarang</a>`
+                    });
+                    return; // Hentikan eksekusi jika profil tidak lengkap
+                }
+
                 if (!courierSelect.value || !serviceSelect.value) {
                     Swal.fire({
                         icon: 'warning',
